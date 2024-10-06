@@ -1,0 +1,6 @@
+@EtcsServer_HostAddress = http://localhost:5141
+
+GET {{EtcsServer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
