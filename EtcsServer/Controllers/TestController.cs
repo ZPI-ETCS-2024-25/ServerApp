@@ -12,6 +12,16 @@ namespace EtcsServer.Controllers
     {
          private readonly ILogger<TestController> _logger;
 
+        public class JsonResponse
+        {
+            public string message { get; set; }
+        }
+
+        public class PostDATA
+        {
+            public string name { get; set; }
+        }
+
         public TestController(ILogger<TestController> logger)
         {
             _logger = logger;
@@ -21,12 +31,25 @@ namespace EtcsServer.Controllers
         [Route("/")]
         public async Task<ActionResult> PostMessageListener()
         {
-            using (StreamReader stream = new StreamReader(HttpContext.Request.Body))
-            {
-                string message = await stream.ReadToEndAsync();
-                _logger.LogInformation("Received string content: {}", message);
-                return Ok("Server received the message: " + message);
-            }
+            string message = await getPostBodyAsync();
+            _logger.LogInformation("Received string content: {}", message);
+            return Ok("Server received the message: " + message);
+        }
+
+        [HttpPost]
+        [Route("/name")]
+        public async Task<ActionResult> PostNameMessageListener(PostDATA postData)
+        {
+            _logger.LogInformation("Received string content in POST name: {}", postData.name);
+            return Ok(new JsonResponse() { message = "Server received the message: " + postData.name});
+        }
+
+        [HttpGet]
+        [Route("/name")]
+        public async Task<ActionResult> GetName()
+        {
+            _logger.LogInformation("Received GET request for name");
+            return Ok(new JsonResponse() { message = "Server name is ETCS Server" });
         }
 
         [HttpGet]
@@ -62,6 +85,14 @@ namespace EtcsServer.Controllers
             var response = await client.PostAsync("/", new StringContent("Message from the ETCS server"));
             _logger.LogInformation("Response status code from {} is {}", componentUrl, response.StatusCode);
             return await response.Content.ReadAsStringAsync();
+        }
+
+        private async Task<string> getPostBodyAsync()
+        {
+            using (StreamReader stream = new StreamReader(HttpContext.Request.Body))
+            {
+                return await stream.ReadToEndAsync();
+            }
         }
     }
 }
