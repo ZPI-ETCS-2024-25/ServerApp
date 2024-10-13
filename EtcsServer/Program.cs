@@ -1,5 +1,7 @@
 
 using EtcsServer.Configuration;
+using EtcsServer.Database;
+using Microsoft.EntityFrameworkCore;
 
 namespace EtcsServer
 {
@@ -10,8 +12,16 @@ namespace EtcsServer
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            var connectionString = builder.Configuration.GetConnectionString("EtcsDbConnectionString");
+            builder.Services.AddDbContext<EtcsDbContext>(options =>
+            {
+                options.UseSqlServer(connectionString);
+            });
+
+
             builder.Services.Configure<ServerProperties>(builder.Configuration.GetSection("ServerProperties"));
             builder.Services.AddControllers();
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
