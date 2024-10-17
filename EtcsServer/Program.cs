@@ -1,6 +1,7 @@
 
 using EtcsServer.Configuration;
 using EtcsServer.Database;
+using EtcsServer.InMemoryHolders;
 using Microsoft.EntityFrameworkCore;
 
 namespace EtcsServer
@@ -19,6 +20,13 @@ namespace EtcsServer
             });
 
 
+            builder.Services.AddSingleton<CrossingsHolder>();
+            builder.Services.AddSingleton<RailroadSignsHolder>();
+            builder.Services.AddSingleton<RailwaySignalTrackHolder>();
+            builder.Services.AddSingleton<SwitchRoutesHolder>();
+            builder.Services.AddSingleton<TracksHolder>();
+            builder.Services.AddSingleton<TrainsHolder>();
+
             builder.Services.Configure<ServerProperties>(builder.Configuration.GetSection("ServerProperties"));
             builder.Services.AddControllers();
 
@@ -27,6 +35,16 @@ namespace EtcsServer
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                scope.ServiceProvider.GetRequiredService<CrossingsHolder>();
+                scope.ServiceProvider.GetRequiredService<RailroadSignsHolder>();
+                scope.ServiceProvider.GetRequiredService<RailwaySignalTrackHolder>();
+                scope.ServiceProvider.GetRequiredService<SwitchRoutesHolder>();
+                scope.ServiceProvider.GetRequiredService<TracksHolder>();
+                scope.ServiceProvider.GetRequiredService<TrainsHolder>();
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
