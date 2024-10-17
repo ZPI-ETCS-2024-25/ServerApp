@@ -28,7 +28,7 @@ namespace EtcsServer.Controllers
         }
 
         [HttpPost]
-        [Route("/")]
+        [Route("/testPost")]
         public async Task<ActionResult> PostMessageListener()
         {
             string message = await getPostBodyAsync();

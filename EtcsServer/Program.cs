@@ -1,6 +1,7 @@
 
 using EtcsServer.Configuration;
 using EtcsServer.Database;
+using EtcsServer.DriverDataCollectors;
 using EtcsServer.InMemoryHolders;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,6 +28,8 @@ namespace EtcsServer
             builder.Services.AddSingleton<TracksHolder>();
             builder.Services.AddSingleton<TrainsHolder>();
 
+            builder.Services.AddSingleton<LastKnownPositionsTracker>();
+
             builder.Services.Configure<ServerProperties>(builder.Configuration.GetSection("ServerProperties"));
             builder.Services.AddControllers();
 
@@ -44,6 +47,8 @@ namespace EtcsServer
                 scope.ServiceProvider.GetRequiredService<SwitchRoutesHolder>();
                 scope.ServiceProvider.GetRequiredService<TracksHolder>();
                 scope.ServiceProvider.GetRequiredService<TrainsHolder>();
+
+                scope.ServiceProvider.GetRequiredService<LastKnownPositionsTracker>();
             }
 
             // Configure the HTTP request pipeline.
