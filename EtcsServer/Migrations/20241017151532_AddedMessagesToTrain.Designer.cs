@@ -4,6 +4,7 @@ using EtcsServer.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EtcsServer.Migrations
 {
     [DbContext(typeof(EtcsDbContext))]
-    partial class EtcsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241017151532_AddedMessagesToTrain")]
+    partial class AddedMessagesToTrain
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -58,33 +61,6 @@ namespace EtcsServer.Migrations
                     b.HasKey("MessageId");
 
                     b.ToTable("Messages");
-                });
-
-            modelBuilder.Entity("EtcsServer.Database.Entity.RailroadSign", b =>
-                {
-                    b.Property<int>("RailroadSignId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RailroadSignId"));
-
-                    b.Property<int>("DistanceFromTrackStart")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsFacedUp")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("MaxSpeed")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TrackId")
-                        .HasColumnType("int");
-
-                    b.HasKey("RailroadSignId");
-
-                    b.HasIndex("TrackId");
-
-                    b.ToTable("Signs");
                 });
 
             modelBuilder.Entity("EtcsServer.Database.Entity.RailwaySignal", b =>
@@ -249,17 +225,6 @@ namespace EtcsServer.Migrations
                 });
 
             modelBuilder.Entity("EtcsServer.Database.Entity.Crossing", b =>
-                {
-                    b.HasOne("EtcsServer.Database.Entity.Track", "Track")
-                        .WithMany()
-                        .HasForeignKey("TrackId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Track");
-                });
-
-            modelBuilder.Entity("EtcsServer.Database.Entity.RailroadSign", b =>
                 {
                     b.HasOne("EtcsServer.Database.Entity.Track", "Track")
                         .WithMany()

@@ -6,5 +6,6 @@
         public int LengthMeters { get; set; }
         public int MaxSpeedMps { get; set; }
         public int BrakeWeight { get; set; }
+        public List<Message> Messages { get; set; }
     }
 }

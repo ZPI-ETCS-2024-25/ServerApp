@@ -16,6 +16,7 @@ namespace EtcsServer.Database
         public DbSet<SwitchRoute> TrackSwitches { get; set; }
         public DbSet<Track> Tracks { get; set; }
         public DbSet<Train> Trains { get; set; }
+        public DbSet<RailroadSign> Signs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
