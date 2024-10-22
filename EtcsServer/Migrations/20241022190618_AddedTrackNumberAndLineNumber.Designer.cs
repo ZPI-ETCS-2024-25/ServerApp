@@ -4,6 +4,7 @@ using EtcsServer.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EtcsServer.Migrations
 {
     [DbContext(typeof(EtcsDbContext))]
-    partial class EtcsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241022190618_AddedTrackNumberAndLineNumber")]
+    partial class AddedTrackNumberAndLineNumber
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

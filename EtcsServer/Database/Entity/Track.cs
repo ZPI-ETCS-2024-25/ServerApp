@@ -2,6 +2,8 @@
 {
     public class Track : TrackageElement
     {
+        public string TrackNumber { get; set; }
+        public int LineNumber { get; set; }
         public int Kilometer { get; set; }
         public int Length { get; set; }
         public int MaxUpSpeedMps { get; set; }
