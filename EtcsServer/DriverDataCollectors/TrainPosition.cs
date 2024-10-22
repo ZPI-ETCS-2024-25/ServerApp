@@ -6,5 +6,6 @@
         public string Kilometer { get; set; }
         public string Track { get; set; }
         public int LineNumber { get; set; }
+        public string MovementDirection { get; set; }
     }
 }

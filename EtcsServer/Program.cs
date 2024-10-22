@@ -2,6 +2,7 @@
 using EtcsServer.Configuration;
 using EtcsServer.Database;
 using EtcsServer.DriverDataCollectors;
+using EtcsServer.InMemoryData;
 using EtcsServer.InMemoryHolders;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,6 +30,8 @@ namespace EtcsServer
             builder.Services.AddSingleton<TrainsHolder>();
 
             builder.Services.AddSingleton<LastKnownPositionsTracker>();
+            builder.Services.AddSingleton<RailwaySignalStates>();
+            builder.Services.AddSingleton<SwitchStates>();
 
             builder.Services.Configure<ServerProperties>(builder.Configuration.GetSection("ServerProperties"));
             builder.Services.AddControllers();
@@ -49,6 +52,8 @@ namespace EtcsServer
                 scope.ServiceProvider.GetRequiredService<TrainsHolder>();
 
                 scope.ServiceProvider.GetRequiredService<LastKnownPositionsTracker>();
+                scope.ServiceProvider.GetRequiredService<RailwaySignalStates>();
+                scope.ServiceProvider.GetRequiredService<SwitchStates>();
             }
 
             // Configure the HTTP request pipeline.
@@ -58,7 +63,7 @@ namespace EtcsServer
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseAuthorization();
 
