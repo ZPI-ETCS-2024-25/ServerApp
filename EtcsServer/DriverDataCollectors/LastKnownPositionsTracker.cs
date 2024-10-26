@@ -1,4 +1,5 @@
 ﻿using EtcsServer.Controllers;
+using EtcsServer.DriverAppDto;
 
 namespace EtcsServer.DriverDataCollectors
 {
