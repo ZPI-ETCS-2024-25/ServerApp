@@ -22,6 +22,11 @@ namespace EtcsServer.InMemoryData
         {
             states[switchId] = switchFromTo;
         }
+
+        public int GetNextTrackId(int switchId)
+        {
+            return states[switchId].TrackIdTo;
+        }
     }
     public class SwitchFromTo(int trackFromId, int trackToId)
     {

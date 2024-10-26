@@ -1,5 +1,6 @@
 using EtcsServer.Configuration;
 using EtcsServer.Database.Entity;
+using EtcsServer.DecisionMakers;
 using EtcsServer.DriverAppDto;
 using EtcsServer.DriverDataCollectors;
 using EtcsServer.InMemoryData;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Runtime.CompilerServices;
 using static EtcsServer.Controllers.TestController;
+using static EtcsServer.DecisionMakers.MovementAuthorityValidator;
 
 namespace EtcsServer.Controllers
 {
@@ -63,10 +65,15 @@ namespace EtcsServer.Controllers
         }
 
         [HttpPost("marequest")]
-        public async Task<ActionResult> PostMovementAuthorityRequest(MovementAuthorityRequest movementAuthorityRequest)
+        public async Task<ActionResult> PostMovementAuthorityRequest(MovementAuthorityRequest movementAuthorityRequest, [FromServices] MovementAuthorityValidator movementAuthorityValidator)
         {
             _logger.LogInformation("Received movement authority request for train {}", movementAuthorityRequest.TrainId);
-            return Ok(new JsonResponse() { message = "Server received the movement authority request for train " + movementAuthorityRequest.TrainId });
+
+            MovementAuthorityValidationResult validationResult = movementAuthorityValidator.IsTrainValidForMovementAuthority(movementAuthorityRequest.TrainId);
+            if (validationResult == MovementAuthorityValidationResult.OK)
+                return Ok(new JsonResponse() { message = $"Train with id {movementAuthorityRequest.TrainId} is valid to receive a movement authority"});
+            else
+                return BadRequest(new JsonResponse() { message = $"Train with id {movementAuthorityRequest.TrainId} is not valid to receive movement authority: {validationResult}" });            
         }
 
         [HttpPost("speedupdate")]

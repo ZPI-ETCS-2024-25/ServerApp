@@ -13,7 +13,10 @@ namespace EtcsServer.InMemoryHolders
 
         protected override Dictionary<int, Track> LoadValues(EtcsDbContext context)
         {
-            return context.Tracks.ToDictionary(t => t.TrackageElementId, t => t);
+            return context.Tracks
+                .Include(t => t.LeftSideElement)
+                .Include(t => t.RightSideElement)
+                .ToDictionary(t => t.TrackageElementId, t => t);
         }
     }
 }

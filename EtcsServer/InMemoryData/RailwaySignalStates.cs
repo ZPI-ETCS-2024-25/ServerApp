@@ -19,6 +19,11 @@ namespace EtcsServer.InMemoryData
         {
             states[signalId] = message;
         }
+
+        public RailwaySignalMessage GetSignalMessage(int signalId)
+        {
+            return states[signalId];
+        }
     }
     public enum RailwaySignalMessage
     {

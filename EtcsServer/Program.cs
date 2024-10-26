@@ -1,7 +1,9 @@
 
 using EtcsServer.Configuration;
 using EtcsServer.Database;
+using EtcsServer.DecisionMakers;
 using EtcsServer.DriverDataCollectors;
+using EtcsServer.Helpers;
 using EtcsServer.InMemoryData;
 using EtcsServer.InMemoryHolders;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +36,11 @@ namespace EtcsServer
             builder.Services.AddSingleton<SwitchStates>();
             builder.Services.AddSingleton<RegisteredTrainsTracker>();
 
+            builder.Services.AddSingleton<RailwaySignalHelper>();
+            builder.Services.AddSingleton<TrackHelper>();
+
+            builder.Services.AddSingleton<MovementAuthorityValidator>();
+
             builder.Services.Configure<ServerProperties>(builder.Configuration.GetSection("ServerProperties"));
             builder.Services.AddControllers();
 
@@ -56,6 +63,12 @@ namespace EtcsServer
                 scope.ServiceProvider.GetRequiredService<RailwaySignalStates>();
                 scope.ServiceProvider.GetRequiredService<SwitchStates>();
                 scope.ServiceProvider.GetRequiredService<RegisteredTrainsTracker>();
+
+                scope.ServiceProvider.GetRequiredService<RailwaySignalHelper>();
+                scope.ServiceProvider.GetRequiredService<TrackHelper>();
+
+                scope.ServiceProvider.GetRequiredService<MovementAuthorityValidator>();
+
             }
 
             // Configure the HTTP request pipeline.
