@@ -1,6 +1,8 @@
 using EtcsServer.Configuration;
+using EtcsServer.Database.Entity;
 using EtcsServer.DriverAppDto;
 using EtcsServer.DriverDataCollectors;
+using EtcsServer.InMemoryData;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Runtime.CompilerServices;
@@ -20,24 +22,36 @@ namespace EtcsServer.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult> RegisterTrain(Train train)
+        public async Task<ActionResult> RegisterTrain(TrainDto train, [FromServices] RegisteredTrainsTracker registeredTrainsTracker)
         {
             _logger.LogInformation("Received register request for train {}", train.TrainId);
-            return Ok(new JsonResponse() { message = "Server received the register request for train " + train.TrainId });
+            bool result = registeredTrainsTracker.Register(train);
+            if (result)
+                return Ok(new JsonResponse() { message = $"Train with id {train.TrainId} was successfully registered" });
+            else
+                return BadRequest(new JsonResponse() { message = $"Train with id {train.TrainId} is already registered on the server" });
         }
 
         [HttpPost("updatedata")]
-        public async Task<ActionResult> UpdateTrainData(UpdateTrain updateTrain)
+        public async Task<ActionResult> UpdateTrainData(UpdateTrain updateTrain, [FromServices] RegisteredTrainsTracker registeredTrainsTracker)
         {
             _logger.LogInformation("Received train data update request for train {}", updateTrain.TrainId);
-            return Ok(new JsonResponse() { message = "Server received the train data update request for train " + updateTrain.TrainId });
+            bool result = registeredTrainsTracker.Update(updateTrain);
+            if (result)
+                return Ok(new JsonResponse() { message = $"Successfully updated information about the train with id {updateTrain.TrainId}" });
+            else
+                return BadRequest(new JsonResponse() { message = $"Couldn't update information for train with id {updateTrain.TrainNumer}" });
         }
 
         [HttpPost("unregister")]
-        public async Task<ActionResult> UnregisterTrain(UnregisterRequest unregisterRequest)
+        public async Task<ActionResult> UnregisterTrain(UnregisterRequest unregisterRequest, [FromServices] RegisteredTrainsTracker registeredTrainsTracker)
         {
             _logger.LogInformation("Received train unregister request for train {}", unregisterRequest.TrainId);
-            return Ok(new JsonResponse() { message = "Server received the train unregister request for train " + unregisterRequest.TrainId });
+            bool result = registeredTrainsTracker.Unregister(unregisterRequest.TrainId);
+            if (result)
+                return Ok(new JsonResponse() { message = $"Train with id {unregisterRequest.TrainId} was successfully unregistered" });
+            else
+                return BadRequest(new JsonResponse() { message = $"Train with id {unregisterRequest.TrainId} is not registered on the server" }); 
         }
 
         [HttpPost("updateposition")]

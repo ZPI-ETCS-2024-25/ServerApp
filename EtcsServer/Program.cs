@@ -32,6 +32,7 @@ namespace EtcsServer
             builder.Services.AddSingleton<LastKnownPositionsTracker>();
             builder.Services.AddSingleton<RailwaySignalStates>();
             builder.Services.AddSingleton<SwitchStates>();
+            builder.Services.AddSingleton<RegisteredTrainsTracker>();
 
             builder.Services.Configure<ServerProperties>(builder.Configuration.GetSection("ServerProperties"));
             builder.Services.AddControllers();
@@ -54,6 +55,7 @@ namespace EtcsServer
                 scope.ServiceProvider.GetRequiredService<LastKnownPositionsTracker>();
                 scope.ServiceProvider.GetRequiredService<RailwaySignalStates>();
                 scope.ServiceProvider.GetRequiredService<SwitchStates>();
+                scope.ServiceProvider.GetRequiredService<RegisteredTrainsTracker>();
             }
 
             // Configure the HTTP request pipeline.
