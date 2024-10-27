@@ -21,29 +21,43 @@ namespace EtcsServer.DecisionMakers
             this.railwaySignalHelper = railwaySignalHelper;
         }
 
-        public MovementAuthorityValidationResult IsTrainValidForMovementAuthority(string trainId)
+        public MovementAuthorityValidationOutcome IsTrainValidForMovementAuthority(string trainId)
         {
             TrainPosition? trainPosition = lastKnownPositionsTracker.GetLastKnownTrainPosition(trainId);
             if (trainPosition == null)
-                return MovementAuthorityValidationResult.POSITION_NOT_KNOWN;
+                return MovementAuthorityValidationOutcome.GetFailedOutcome(MovementAuthorityValidationResult.POSITION_NOT_KNOWN);
 
             MovementDirection movementDirection = lastKnownPositionsTracker.GetMovementDirection(trainId);
             if (movementDirection == MovementDirection.UNKNOWN)
-                return MovementAuthorityValidationResult.MOVEMENT_DIRECTION_NOT_KNOWN;
+                return MovementAuthorityValidationOutcome.GetFailedOutcome(MovementAuthorityValidationResult.MOVEMENT_DIRECTION_NOT_KNOWN);
 
             Track? nextTrack = trackHelper.GetNextTrack(trainPosition.Track, movementDirection == MovementDirection.UP);
             if (nextTrack == null)
-                return MovementAuthorityValidationResult.END_OF_ROAD;
+                return MovementAuthorityValidationOutcome.GetFailedOutcome(MovementAuthorityValidationResult.END_OF_ROAD);
 
             RailwaySignalTrack? railwaySignalTrack = railwaySignalHelper.GetFirstSignalForTrack(trainPosition, nextTrack.TrackageElementId, movementDirection == MovementDirection.UP);
             if (railwaySignalTrack == null)
-                return MovementAuthorityValidationResult.NO_RAILWAY_SIGNAL_TO_USE;
+                return MovementAuthorityValidationOutcome.GetFailedOutcome(MovementAuthorityValidationResult.NO_RAILWAY_SIGNAL_TO_USE);
 
             RailwaySignalMessage message = railwaySignalHelper.GetMessageForSignal(railwaySignalTrack.RailwaySignalId);
             if (message == RailwaySignalMessage.STOP)
-                return MovementAuthorityValidationResult.NEXT_TRACK_OCCUPIED;
+                return MovementAuthorityValidationOutcome.GetFailedOutcome(MovementAuthorityValidationResult.NEXT_TRACK_OCCUPIED);
 
-            return MovementAuthorityValidationResult.OK;
+            return new MovementAuthorityValidationOutcome()
+            {
+                Result = MovementAuthorityValidationResult.OK,
+                TrainPosition = trainPosition,
+                NextTrack = nextTrack
+            };
+        }
+
+        public class MovementAuthorityValidationOutcome
+        {
+            public MovementAuthorityValidationResult Result { get; set; }
+            public TrainPosition? TrainPosition { get; set; }
+            public Track? NextTrack { get; set; }
+
+            public static MovementAuthorityValidationOutcome GetFailedOutcome(MovementAuthorityValidationResult result) => new MovementAuthorityValidationOutcome() { Result = result };
         }
 
         public enum MovementAuthorityValidationResult

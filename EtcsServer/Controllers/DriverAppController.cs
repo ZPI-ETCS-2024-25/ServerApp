@@ -1,5 +1,6 @@
 using EtcsServer.Configuration;
 using EtcsServer.Database.Entity;
+using EtcsServer.DecisionExecutors;
 using EtcsServer.DecisionMakers;
 using EtcsServer.DriverAppDto;
 using EtcsServer.DriverDataCollectors;
@@ -7,6 +8,7 @@ using EtcsServer.InMemoryData;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using static EtcsServer.Controllers.TestController;
 using static EtcsServer.DecisionMakers.MovementAuthorityValidator;
 
@@ -65,15 +67,20 @@ namespace EtcsServer.Controllers
         }
 
         [HttpPost("marequest")]
-        public async Task<ActionResult> PostMovementAuthorityRequest(MovementAuthorityRequest movementAuthorityRequest, [FromServices] MovementAuthorityValidator movementAuthorityValidator)
+        public async Task<ActionResult> PostMovementAuthorityRequest(
+            MovementAuthorityRequest movementAuthorityRequest,
+            [FromServices] MovementAuthorityValidator movementAuthorityValidator,
+            [FromServices] MovementAuthorityProvider movementAuthorityProvider
+            )
         {
             _logger.LogInformation("Received movement authority request for train {}", movementAuthorityRequest.TrainId);
 
-            MovementAuthorityValidationResult validationResult = movementAuthorityValidator.IsTrainValidForMovementAuthority(movementAuthorityRequest.TrainId);
-            if (validationResult == MovementAuthorityValidationResult.OK)
-                return Ok(new JsonResponse() { message = $"Train with id {movementAuthorityRequest.TrainId} is valid to receive a movement authority"});
-            else
-                return BadRequest(new JsonResponse() { message = $"Train with id {movementAuthorityRequest.TrainId} is not valid to receive movement authority: {validationResult}" });            
+            MovementAuthorityValidationOutcome validationOutcome = movementAuthorityValidator.IsTrainValidForMovementAuthority(movementAuthorityRequest.TrainId);
+            if (validationOutcome.Result != MovementAuthorityValidationResult.OK)
+                return BadRequest(new JsonResponse() { message = $"Train with id {movementAuthorityRequest.TrainId} is not valid to receive movement authority: {validationOutcome.Result}" });
+
+            MovementAuthority movementAuthority = movementAuthorityProvider.ProvideMovementAuthority(movementAuthorityRequest.TrainId, validationOutcome.NextTrack!);
+            return Ok(new JsonResponse() { message = $"Train with id {movementAuthorityRequest.TrainId} was granted a movement authority: " + JsonSerializer.Serialize(movementAuthority)});                
         }
 
         [HttpPost("speedupdate")]

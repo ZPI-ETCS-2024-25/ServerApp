@@ -13,7 +13,9 @@ namespace EtcsServer.InMemoryHolders
 
         protected override Dictionary<int, RailroadSign> LoadValues(EtcsDbContext context)
         {
-            return context.Signs.ToDictionary(s => s.RailroadSignId, s => s);
+            return context.Signs
+                .Include(s => s.Track)
+                .ToDictionary(s => s.RailroadSignId, s => s);
         }
     }
 }

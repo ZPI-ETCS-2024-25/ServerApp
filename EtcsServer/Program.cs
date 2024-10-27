@@ -1,6 +1,7 @@
 
 using EtcsServer.Configuration;
 using EtcsServer.Database;
+using EtcsServer.DecisionExecutors;
 using EtcsServer.DecisionMakers;
 using EtcsServer.DriverDataCollectors;
 using EtcsServer.Helpers;
@@ -40,6 +41,7 @@ namespace EtcsServer
             builder.Services.AddSingleton<TrackHelper>();
 
             builder.Services.AddSingleton<MovementAuthorityValidator>();
+            builder.Services.AddSingleton<MovementAuthorityProvider>();
 
             builder.Services.Configure<ServerProperties>(builder.Configuration.GetSection("ServerProperties"));
             builder.Services.AddControllers();
@@ -68,6 +70,7 @@ namespace EtcsServer
                 scope.ServiceProvider.GetRequiredService<TrackHelper>();
 
                 scope.ServiceProvider.GetRequiredService<MovementAuthorityValidator>();
+                scope.ServiceProvider.GetRequiredService<MovementAuthorityProvider>();
 
             }
 
