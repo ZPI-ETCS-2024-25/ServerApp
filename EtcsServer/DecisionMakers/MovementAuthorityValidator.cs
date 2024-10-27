@@ -31,11 +31,14 @@ namespace EtcsServer.DecisionMakers
             if (movementDirection == MovementDirection.UNKNOWN)
                 return MovementAuthorityValidationResult.MOVEMENT_DIRECTION_NOT_KNOWN;
 
-            Track? nextTrack = trackHelper.GetNextTrack(trainPosition.TrainId, movementDirection == MovementDirection.UP);
+            Track? nextTrack = trackHelper.GetNextTrack(trainPosition.Track, movementDirection == MovementDirection.UP);
             if (nextTrack == null)
                 return MovementAuthorityValidationResult.END_OF_ROAD;
 
-            RailwaySignalTrack railwaySignalTrack = railwaySignalHelper.GetFirstSignalForTrack(nextTrack.TrackageElementId, movementDirection == MovementDirection.UP);
+            RailwaySignalTrack? railwaySignalTrack = railwaySignalHelper.GetFirstSignalForTrack(trainPosition, nextTrack.TrackageElementId, movementDirection == MovementDirection.UP);
+            if (railwaySignalTrack == null)
+                return MovementAuthorityValidationResult.NO_RAILWAY_SIGNAL_TO_USE;
+
             RailwaySignalMessage message = railwaySignalHelper.GetMessageForSignal(railwaySignalTrack.RailwaySignalId);
             if (message == RailwaySignalMessage.STOP)
                 return MovementAuthorityValidationResult.NEXT_TRACK_OCCUPIED;
@@ -49,7 +52,8 @@ namespace EtcsServer.DecisionMakers
             POSITION_NOT_KNOWN,
             MOVEMENT_DIRECTION_NOT_KNOWN,
             END_OF_ROAD,
-            NEXT_TRACK_OCCUPIED
+            NEXT_TRACK_OCCUPIED,
+            NO_RAILWAY_SIGNAL_TO_USE
         }
     }
 }
