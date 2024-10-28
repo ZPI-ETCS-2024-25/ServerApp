@@ -2,12 +2,12 @@
 {
     public class MovementAuthority
     {
-        public int[] Speeds { get; set; }
-        public int[] SpeedDistances { get; set; }
-        public int[] Gradients { get; set; }
-        public int[] GradientDistances { get; set; }
+        public double[] Speeds { get; set; }
+        public double[] SpeedDistances { get; set; }
+        public double[] Gradients { get; set; }
+        public double[] GradientDistances { get; set; }
         public string[] Messages { get; set; }
-        public int[] MessageDistances { get; set; }
-        public int ServerPosition { get; set; }
+        public double[] MessageDistances { get; set; }
+        public double ServerPosition { get; set; }
     }
 }

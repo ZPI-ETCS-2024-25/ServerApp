@@ -22,7 +22,7 @@ namespace EtcsServer.Helpers
             List<RailwaySignalTrack> signalsOnCurrentTrack = railwaySignalTrackHolder.GetValues().Values
                 .Where(s => s.Track.TrackNumber.Equals(trainPosition.Track))
                 .Where(s => s.IsFacedUp == isMovingUp)
-                .Where(s => s.DistanceFromTrackStart > Int32.Parse(trainPosition.Kilometer))
+                .Where(s => s.DistanceFromTrackStart > trainPosition.Kilometer)
                 .OrderBy(s => isMovingUp ? s.DistanceFromTrackStart : -1 * s.DistanceFromTrackStart)
                 .ToList();
 

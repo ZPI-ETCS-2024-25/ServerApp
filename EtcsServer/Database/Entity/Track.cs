@@ -4,11 +4,11 @@
     {
         public string TrackNumber { get; set; }
         public int LineNumber { get; set; }
-        public int Kilometer { get; set; }
-        public int Length { get; set; }
-        public int MaxUpSpeedMps { get; set; }
-        public int MaxDownSpeedMps { get; set; }
-        public int Gradient {  get; set; }
+        public double Kilometer { get; set; }
+        public double Length { get; set; }
+        public double MaxUpSpeedMps { get; set; }
+        public double MaxDownSpeedMps { get; set; }
+        public double Gradient {  get; set; }
 
     }
 }

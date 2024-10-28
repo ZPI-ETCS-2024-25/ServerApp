@@ -7,7 +7,7 @@
         public Track Track { get; set; }
         public int RailwaySignalId { get; set; }
         public RailwaySignal RailwaySignal { get; set; }
-        public int DistanceFromTrackStart { get; set; }
+        public double DistanceFromTrackStart { get; set; }
         public bool IsFacedUp { get; set; }
     }
 }

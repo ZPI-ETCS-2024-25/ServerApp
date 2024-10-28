@@ -10,6 +10,6 @@
         public int TrackToId { get; set; }
         public Track TrackTo { get; set; }
 
-        public int MaxSpeedMps { get; set; }
+        public double MaxSpeedMps { get; set; }
     }
 }

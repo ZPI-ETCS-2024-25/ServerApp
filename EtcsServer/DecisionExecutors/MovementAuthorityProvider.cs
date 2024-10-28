@@ -40,7 +40,7 @@ namespace EtcsServer.DecisionExecutors
                 GradientDistances = [track.Kilometer],
                 Messages = ["You are in the middle of the track"],
                 MessageDistances = [track.Kilometer + track.Length / 2],
-                ServerPosition = Int32.Parse(trainPosition.Kilometer)
+                ServerPosition = trainPosition.Kilometer
             };
         }
     }
