@@ -79,7 +79,10 @@ namespace EtcsServer.Controllers
             if (validationOutcome.Result != MovementAuthorityValidationResult.OK)
                 return BadRequest(new JsonResponse() { message = $"Train with id {movementAuthorityRequest.TrainId} is not valid to receive movement authority: {validationOutcome.Result}" });
 
-            MovementAuthority movementAuthority = movementAuthorityProvider.ProvideMovementAuthority(movementAuthorityRequest.TrainId, validationOutcome.NextTrack!);
+            MovementAuthority movementAuthority = validationOutcome.NextStopSignal == null ?
+                movementAuthorityProvider.ProvideMovementAuthorityToEtcsBorder(movementAuthorityRequest.TrainId) :
+                movementAuthorityProvider.ProvideMovementAuthority(movementAuthorityRequest.TrainId, validationOutcome.NextStopSignal!);
+            
             return Ok(new JsonResponse() { message = $"Train with id {movementAuthorityRequest.TrainId} was granted a movement authority: " + JsonSerializer.Serialize(movementAuthority)});                
         }
 

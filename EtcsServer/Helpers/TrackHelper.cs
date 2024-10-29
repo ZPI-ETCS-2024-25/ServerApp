@@ -34,8 +34,14 @@ namespace EtcsServer.Helpers
             }
         }
 
-        private Track? GetTrackById(int trackId) {
+        public Track? GetTrackById(int trackId) {
             return tracksHolder.GetValues()[trackId];
+        }
+
+        public Track? GetTrackByTrackName(string trackName)
+        {
+            return tracksHolder.GetValues().Values
+                .FirstOrDefault(t => t.TrackNumber.Equals(trackName));
         }
     }
 }

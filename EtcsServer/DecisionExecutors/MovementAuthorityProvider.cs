@@ -1,6 +1,7 @@
 ﻿using EtcsServer.Database.Entity;
 using EtcsServer.DriverAppDto;
 using EtcsServer.DriverDataCollectors;
+using EtcsServer.Helpers;
 using EtcsServer.InMemoryHolders;
 
 namespace EtcsServer.DecisionExecutors
@@ -9,17 +10,93 @@ namespace EtcsServer.DecisionExecutors
     {
         private readonly LastKnownPositionsTracker lastKnownPositionsTracker;
         private readonly RailroadSignsHolder railroadSignsHolder;
-        private readonly TracksHolder tracksHolder;
+        private readonly TrackHelper trackHelper;
 
         public MovementAuthorityProvider(
             LastKnownPositionsTracker lastKnownPositionsTracker,
             RailroadSignsHolder railroadSignsHolder,
-            TracksHolder tracksHolder
+            TrackHelper trackHelper
             )
         {
             this.lastKnownPositionsTracker = lastKnownPositionsTracker;
             this.railroadSignsHolder = railroadSignsHolder;
-            this.tracksHolder = tracksHolder;
+            this.trackHelper = trackHelper;
+        }
+
+        public MovementAuthority ProvideMovementAuthorityToEtcsBorder(string trainId)
+        {
+            TrainPosition trainPosition = lastKnownPositionsTracker.GetLastKnownTrainPosition(trainId)!;
+            bool isMovingUp = trainPosition.Direction.Equals("up");
+
+            List<RailroadSign> _signs = [];
+            List<double> _signsDistances = [];
+            List<double> _gradients = [];
+            List<double> _gradientsDistances = [];
+
+            Track currentTrack = trackHelper.GetTrackByTrackName(trainId)!;
+            while (currentTrack != null && currentTrack.TrackPosition == TrackPosition.INSIDE_ZONE)
+            {
+                List<RailroadSign> currentSigns = railroadSignsHolder.GetValues().Values
+                    .Where(s => s.TrackId == currentTrack.TrackageElementId)
+                    .Where(s => s.IsFacedUp = trainPosition.Direction.Equals("up"))
+                    .ToList();
+                _signs.AddRange(currentSigns);
+                _signsDistances.AddRange(currentSigns.Select(s => s.DistanceFromTrackStart));
+
+                _gradients.Add(currentTrack.Gradient);
+                _gradientsDistances.Add(currentTrack.Kilometer);
+
+                currentTrack = trackHelper.GetNextTrack(currentTrack.TrackNumber, isMovingUp)!;
+            }
+
+            return new MovementAuthority()
+            {
+                Speeds = _signs.Select(s => s.MaxSpeed).ToArray(),
+                SpeedDistances = _signsDistances.ToArray(),
+                Gradients = _gradients.ToArray(),
+                GradientDistances = _gradientsDistances.ToArray(),
+                Messages = ["Travel safe"],
+                MessageDistances = [trainPosition.Kilometer],
+                ServerPosition = trainPosition.Kilometer
+            };
+        }
+
+        public MovementAuthority ProvideMovementAuthority(string trainId, RailwaySignalTrack stopSignal)
+        {
+            TrainPosition trainPosition = lastKnownPositionsTracker.GetLastKnownTrainPosition(trainId)!;
+            bool isMovingUp = trainPosition.Direction.Equals("up");
+
+            List<RailroadSign> _signs = [];
+            List<double> _signsDistances = [];
+            List<double> _gradients = [];
+            List<double> _gradientsDistances = [];
+
+            Track currentTrack = trackHelper.GetTrackByTrackName(trainId)!;
+            while (currentTrack.TrackageElementId != stopSignal.TrackId)
+            {
+                List<RailroadSign> currentSigns = railroadSignsHolder.GetValues().Values
+                    .Where(s => s.TrackId == currentTrack.TrackageElementId)
+                    .Where(s => s.IsFacedUp = trainPosition.Direction.Equals("up"))
+                    .ToList();
+                _signs.AddRange(currentSigns);
+                _signsDistances.AddRange(currentSigns.Select(s => s.DistanceFromTrackStart));
+
+                _gradients.Add(currentTrack.Gradient);
+                _gradientsDistances.Add(currentTrack.Kilometer);
+
+                currentTrack = trackHelper.GetNextTrack(currentTrack.TrackNumber, isMovingUp)!;
+            }
+
+            return new MovementAuthority()
+            {
+                Speeds = _signs.Select(s => s.MaxSpeed).ToArray(),
+                SpeedDistances = _signsDistances.ToArray(),
+                Gradients = _gradients.ToArray(),
+                GradientDistances = _gradientsDistances.ToArray(),
+                Messages = ["Travel safe"],
+                MessageDistances = [trainPosition.Kilometer],
+                ServerPosition = trainPosition.Kilometer
+            };
         }
 
         public MovementAuthority ProvideMovementAuthority(string trainId, Track nextTrack)
@@ -30,7 +107,7 @@ namespace EtcsServer.DecisionExecutors
                     .Where(s => s.Track.TrackNumber.Equals(nextTrack.TrackNumber))
                     .Where(s => s.IsFacedUp = trainPosition.Direction.Equals("up"))
                     .ToList();
-            Track track = tracksHolder.GetValues().Values.First(t => t.TrackNumber.Equals(nextTrack.TrackNumber));
+            Track track = trackHelper.GetTrackByTrackName(nextTrack.TrackNumber)!;
 
             return new MovementAuthority()
             {

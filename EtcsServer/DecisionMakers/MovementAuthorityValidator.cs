@@ -35,19 +35,13 @@ namespace EtcsServer.DecisionMakers
             if (nextTrack == null)
                 return MovementAuthorityValidationOutcome.GetFailedOutcome(MovementAuthorityValidationResult.END_OF_ROAD);
 
-            RailwaySignalTrack? railwaySignalTrack = railwaySignalHelper.GetFirstSignalForTrack(trainPosition, nextTrack.TrackageElementId, movementDirection == MovementDirection.UP);
-            if (railwaySignalTrack == null)
-                return MovementAuthorityValidationOutcome.GetFailedOutcome(MovementAuthorityValidationResult.NO_RAILWAY_SIGNAL_TO_USE);
-
-            RailwaySignalMessage message = railwaySignalHelper.GetMessageForSignal(railwaySignalTrack.RailwaySignalId);
-            if (message == RailwaySignalMessage.STOP)
-                return MovementAuthorityValidationOutcome.GetFailedOutcome(MovementAuthorityValidationResult.NEXT_TRACK_OCCUPIED);
+            RailwaySignalTrack? firstStopSignal = railwaySignalHelper.GetFirstStopSignal(trainPosition, movementDirection == MovementDirection.UP);
 
             return new MovementAuthorityValidationOutcome()
             {
                 Result = MovementAuthorityValidationResult.OK,
                 TrainPosition = trainPosition,
-                NextTrack = nextTrack
+                NextStopSignal = firstStopSignal
             };
         }
 
@@ -55,7 +49,7 @@ namespace EtcsServer.DecisionMakers
         {
             public MovementAuthorityValidationResult Result { get; set; }
             public TrainPosition? TrainPosition { get; set; }
-            public Track? NextTrack { get; set; }
+            public RailwaySignalTrack? NextStopSignal { get; set; }
 
             public static MovementAuthorityValidationOutcome GetFailedOutcome(MovementAuthorityValidationResult result) => new MovementAuthorityValidationOutcome() { Result = result };
         }

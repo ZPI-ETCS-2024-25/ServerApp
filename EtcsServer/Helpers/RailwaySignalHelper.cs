@@ -8,35 +8,70 @@ namespace EtcsServer.Helpers
 {
     public class RailwaySignalHelper
     {
+        private readonly TrackHelper trackHelper;
         private readonly RailwaySignalTrackHolder railwaySignalTrackHolder;
         private readonly RailwaySignalStates railwaySignalStates;
 
-        public RailwaySignalHelper(RailwaySignalTrackHolder railwaySignalTrackHolder, RailwaySignalStates railwaySignalStates)
+        public RailwaySignalHelper(
+            TrackHelper trackHelper,
+            RailwaySignalTrackHolder railwaySignalTrackHolder,
+            RailwaySignalStates railwaySignalStates
+            )
         {
+            this.trackHelper = trackHelper;
             this.railwaySignalTrackHolder = railwaySignalTrackHolder;
             this.railwaySignalStates = railwaySignalStates;
         }
 
-        public RailwaySignalTrack? GetFirstSignalForTrack(TrainPosition trainPosition, int trackIdTo, bool isMovingUp)
+        public RailwaySignalTrack? GetFirstStopSignal(TrainPosition trainPosition, bool isMovingUp)
         {
-            List<RailwaySignalTrack> signalsOnCurrentTrack = railwaySignalTrackHolder.GetValues().Values
-                .Where(s => s.Track.TrackNumber.Equals(trainPosition.Track))
+            int currentTrackId = trackHelper.GetTrackByTrackName(trainPosition.Track)!.TrackageElementId;
+            Track? currentTrack = trackHelper.GetTrackById(currentTrackId);
+            double currentKilometer = trainPosition.Kilometer;
+            while (currentTrack != null)
+            {
+                List<RailwaySignalTrack> signalsOnCurrentTrack = railwaySignalTrackHolder.GetValues().Values
+                .Where(s => s.TrackId == currentTrack.TrackageElementId)
                 .Where(s => s.IsFacedUp == isMovingUp)
-                .Where(s => s.DistanceFromTrackStart > trainPosition.Kilometer)
+                .Where(s => isMovingUp ? currentKilometer < s.DistanceFromTrackStart : currentKilometer > s.DistanceFromTrackStart)
                 .OrderBy(s => isMovingUp ? s.DistanceFromTrackStart : -1 * s.DistanceFromTrackStart)
                 .ToList();
 
-            if (signalsOnCurrentTrack.Count > 0)
-                return signalsOnCurrentTrack.First();
+                RailwaySignalTrack? firstStopSignal = signalsOnCurrentTrack
+                    .FirstOrDefault(s => railwaySignalStates.GetSignalMessage(s.RailwaySignalId) != RailwaySignalMessage.STOP);
+                if (firstStopSignal != null)
+                    return firstStopSignal;
+
+                int? nextTrackId = isMovingUp ? currentTrack.RightSideElementId : currentTrack.LeftSideElementId;
+                if (nextTrackId.HasValue)
+                {
+                    currentTrack = trackHelper.GetTrackById(nextTrackId.Value);
+                    if (currentTrack != null)
+                        currentKilometer = currentTrack.Kilometer;
+                }
+                    
+                else return null;
+            }
+
+            return null;
+        }
+
+        public List<RailwaySignalTrack> GetSignalsAheadOfTrain(TrainPosition trainPosition, int trackIdTo, bool isMovingUp)
+        {
+            List<RailwaySignalTrack> signalsOnCurrentTrack = railwaySignalTrackHolder.GetValues().Values
+                .Where(s => s.Track.TrackNumber.Equals(trainPosition.Track) && s.Track.LineNumber == trainPosition.LineNumber)
+                .Where(s => s.IsFacedUp == isMovingUp)
+                .Where(s => isMovingUp ? trainPosition.Kilometer < s.DistanceFromTrackStart : trainPosition.Kilometer > s.DistanceFromTrackStart)
+                .OrderBy(s => isMovingUp ? s.DistanceFromTrackStart : -1 * s.DistanceFromTrackStart)
+                .ToList();
 
             List<RailwaySignalTrack> signalsOnNextTrack = railwaySignalTrackHolder.GetValues().Values
                 .Where(s => s.TrackId == trackIdTo)
                 .Where(s => s.IsFacedUp == isMovingUp)
-                .OrderBy(s => s.TrackId == trackIdTo ? 1 : 0)
-                .ThenBy(s => isMovingUp ? s.DistanceFromTrackStart : -1 * s.DistanceFromTrackStart)
+                .OrderBy(s => isMovingUp ? s.DistanceFromTrackStart : -1 * s.DistanceFromTrackStart)
                 .ToList();
 
-            return signalsOnNextTrack.FirstOrDefault();
+            return signalsOnCurrentTrack.Concat(signalsOnNextTrack).ToList();
         }
 
         public RailwaySignalMessage GetMessageForSignal(int signalId) {
