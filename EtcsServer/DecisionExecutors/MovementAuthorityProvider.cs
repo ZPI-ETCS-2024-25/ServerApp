@@ -33,7 +33,7 @@ namespace EtcsServer.DecisionExecutors
             List<double> _gradients = [];
             List<double> _gradientsDistances = [];
 
-            Track currentTrack = trackHelper.GetTrackByTrackName(trainId)!;
+            Track currentTrack = trackHelper.GetTrackByTrainPosition(trainPosition)!;
             while (currentTrack != null && currentTrack.TrackPosition == TrackPosition.INSIDE_ZONE)
             {
                 List<RailroadSign> currentSigns = railroadSignsHolder.GetValues().Values
@@ -46,7 +46,7 @@ namespace EtcsServer.DecisionExecutors
                 _gradients.Add(currentTrack.Gradient);
                 _gradientsDistances.Add(currentTrack.Kilometer);
 
-                currentTrack = trackHelper.GetNextTrack(currentTrack.TrackNumber, isMovingUp)!;
+                currentTrack = trackHelper.GetNextTrack(currentTrack.TrackageElementId, isMovingUp)!;
             }
 
             return new MovementAuthority()
@@ -71,7 +71,7 @@ namespace EtcsServer.DecisionExecutors
             List<double> _gradients = [];
             List<double> _gradientsDistances = [];
 
-            Track currentTrack = trackHelper.GetTrackByTrackName(trainId)!;
+            Track currentTrack = trackHelper.GetTrackByTrainPosition(trainPosition)!;
             while (currentTrack.TrackageElementId != stopSignal.TrackId)
             {
                 List<RailroadSign> currentSigns = railroadSignsHolder.GetValues().Values
@@ -84,7 +84,7 @@ namespace EtcsServer.DecisionExecutors
                 _gradients.Add(currentTrack.Gradient);
                 _gradientsDistances.Add(currentTrack.Kilometer);
 
-                currentTrack = trackHelper.GetNextTrack(currentTrack.TrackNumber, isMovingUp)!;
+                currentTrack = trackHelper.GetNextTrack(currentTrack.TrackageElementId, isMovingUp)!;
             }
 
             return new MovementAuthority()
@@ -107,7 +107,7 @@ namespace EtcsServer.DecisionExecutors
                     .Where(s => s.Track.TrackNumber.Equals(nextTrack.TrackNumber))
                     .Where(s => s.IsFacedUp = trainPosition.Direction.Equals("up"))
                     .ToList();
-            Track track = trackHelper.GetTrackByTrackName(nextTrack.TrackNumber)!;
+            Track track = trackHelper.GetTrackByTrainPosition(trainPosition)!;
 
             return new MovementAuthority()
             {

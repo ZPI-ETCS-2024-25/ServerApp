@@ -31,7 +31,7 @@ namespace EtcsServer.DecisionMakers
             if (movementDirection == MovementDirection.UNKNOWN)
                 return MovementAuthorityValidationOutcome.GetFailedOutcome(MovementAuthorityValidationResult.MOVEMENT_DIRECTION_NOT_KNOWN);
 
-            Track? nextTrack = trackHelper.GetNextTrack(trainPosition.Track, movementDirection == MovementDirection.UP);
+            Track? nextTrack = trackHelper.GetNextTrack(trackHelper.GetTrackByTrainPosition(trainPosition)!.TrackageElementId, movementDirection == MovementDirection.UP);
             if (nextTrack == null)
                 return MovementAuthorityValidationOutcome.GetFailedOutcome(MovementAuthorityValidationResult.END_OF_ROAD);
 

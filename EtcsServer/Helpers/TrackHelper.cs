@@ -2,6 +2,7 @@
 using EtcsServer.DriverAppDto;
 using EtcsServer.InMemoryData;
 using EtcsServer.InMemoryHolders;
+using Microsoft.IdentityModel.Protocols.Configuration;
 
 namespace EtcsServer.Helpers
 {
@@ -16,9 +17,9 @@ namespace EtcsServer.Helpers
             this.switchStates = switchStates;
         }
 
-        public Track? GetNextTrack(string trackId, bool isDirectionUp)
+        public Track? GetNextTrack(int trackId, bool isDirectionUp)
         {
-            Track track = tracksHolder.GetValues().Values.First(t => t.TrackNumber.Equals(trackId));
+            Track track = tracksHolder.GetValues()[trackId];
             TrackageElement? nextElement = isDirectionUp ? track.RightSideElement : track.LeftSideElement;
 
             switch (nextElement) {
@@ -38,10 +39,20 @@ namespace EtcsServer.Helpers
             return tracksHolder.GetValues()[trackId];
         }
 
-        public Track? GetTrackByTrackName(string trackName)
+        public Track? GetTrackByTrainPosition(TrainPosition trainPosition)
         {
-            return tracksHolder.GetValues().Values
-                .FirstOrDefault(t => t.TrackNumber.Equals(trackName));
+            Track? track = tracksHolder.GetValues().Values
+                .Where(t => t.TrackNumber.Equals(trainPosition.Track) && t.LineNumber == trainPosition.LineNumber)
+                .Where(t => t.Kilometer <= trainPosition.Kilometer)
+                .OrderBy(t => t.Kilometer)
+                .LastOrDefault();
+            
+            if (track == null) return null;
+            if (track.Kilometer + track.Length < track.Kilometer)
+                return null;
+
+            return track;
+
         }
     }
 }
