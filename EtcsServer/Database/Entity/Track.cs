@@ -9,6 +9,14 @@
         public double MaxUpSpeedMps { get; set; }
         public double MaxDownSpeedMps { get; set; }
         public double Gradient {  get; set; }
+        public TrackPosition TrackPosition { get; set; }
 
+    }
+
+    public enum TrackPosition
+    {
+        INSIDE_ZONE,
+        INCOMING_ZONE,
+        OUTSIDE_ZONE
     }
 }
