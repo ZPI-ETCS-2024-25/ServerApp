@@ -61,7 +61,7 @@ namespace EtcsServer.DecisionExecutors
             };
         }
 
-        public MovementAuthority ProvideMovementAuthority(string trainId, RailwaySignalTrack stopSignal)
+        public MovementAuthority ProvideMovementAuthority(string trainId, RailwaySignal stopSignal)
         {
             TrainPosition trainPosition = lastKnownPositionsTracker.GetLastKnownTrainPosition(trainId)!;
             bool isMovingUp = trainPosition.Direction.Equals("up");

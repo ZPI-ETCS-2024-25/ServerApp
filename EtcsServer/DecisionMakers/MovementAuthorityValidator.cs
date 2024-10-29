@@ -35,7 +35,7 @@ namespace EtcsServer.DecisionMakers
             if (nextTrack == null)
                 return MovementAuthorityValidationOutcome.GetFailedOutcome(MovementAuthorityValidationResult.END_OF_ROAD);
 
-            RailwaySignalTrack? firstStopSignal = railwaySignalHelper.GetFirstStopSignal(trainPosition, movementDirection == MovementDirection.UP);
+            RailwaySignal? firstStopSignal = railwaySignalHelper.GetFirstStopSignal(trainPosition, movementDirection == MovementDirection.UP);
 
             return new MovementAuthorityValidationOutcome()
             {
@@ -49,7 +49,7 @@ namespace EtcsServer.DecisionMakers
         {
             public MovementAuthorityValidationResult Result { get; set; }
             public TrainPosition? TrainPosition { get; set; }
-            public RailwaySignalTrack? NextStopSignal { get; set; }
+            public RailwaySignal? NextStopSignal { get; set; }
 
             public static MovementAuthorityValidationOutcome GetFailedOutcome(MovementAuthorityValidationResult result) => new MovementAuthorityValidationOutcome() { Result = result };
         }

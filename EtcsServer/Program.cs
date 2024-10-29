@@ -27,7 +27,7 @@ namespace EtcsServer
 
             builder.Services.AddSingleton<CrossingsHolder>();
             builder.Services.AddSingleton<RailroadSignsHolder>();
-            builder.Services.AddSingleton<RailwaySignalTrackHolder>();
+            builder.Services.AddSingleton<RailwaySignalsHolder>();
             builder.Services.AddSingleton<SwitchRoutesHolder>();
             builder.Services.AddSingleton<TracksHolder>();
             builder.Services.AddSingleton<TrainsHolder>();
@@ -56,7 +56,7 @@ namespace EtcsServer
             {
                 scope.ServiceProvider.GetRequiredService<CrossingsHolder>();
                 scope.ServiceProvider.GetRequiredService<RailroadSignsHolder>();
-                scope.ServiceProvider.GetRequiredService<RailwaySignalTrackHolder>();
+                scope.ServiceProvider.GetRequiredService<RailwaySignalsHolder>();
                 scope.ServiceProvider.GetRequiredService<SwitchRoutesHolder>();
                 scope.ServiceProvider.GetRequiredService<TracksHolder>();
                 scope.ServiceProvider.GetRequiredService<TrainsHolder>();

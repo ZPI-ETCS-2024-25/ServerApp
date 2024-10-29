@@ -92,34 +92,16 @@ namespace EtcsServer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RailwaySignalId"));
 
-                    b.HasKey("RailwaySignalId");
-
-                    b.ToTable("RailwaySignal");
-                });
-
-            modelBuilder.Entity("EtcsServer.Database.Entity.RailwaySignalTrack", b =>
-                {
-                    b.Property<int>("RailwaySignalTrackId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RailwaySignalTrackId"));
-
                     b.Property<double>("DistanceFromTrackStart")
                         .HasColumnType("float");
 
                     b.Property<bool>("IsFacedUp")
                         .HasColumnType("bit");
 
-                    b.Property<int>("RailwaySignalId")
-                        .HasColumnType("int");
-
                     b.Property<int>("TrackId")
                         .HasColumnType("int");
 
-                    b.HasKey("RailwaySignalTrackId");
-
-                    b.HasIndex("RailwaySignalId");
+                    b.HasKey("RailwaySignalId");
 
                     b.HasIndex("TrackId");
 
@@ -280,21 +262,13 @@ namespace EtcsServer.Migrations
                     b.Navigation("Track");
                 });
 
-            modelBuilder.Entity("EtcsServer.Database.Entity.RailwaySignalTrack", b =>
+            modelBuilder.Entity("EtcsServer.Database.Entity.RailwaySignal", b =>
                 {
-                    b.HasOne("EtcsServer.Database.Entity.RailwaySignal", "RailwaySignal")
-                        .WithMany()
-                        .HasForeignKey("RailwaySignalId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("EtcsServer.Database.Entity.Track", "Track")
                         .WithMany()
                         .HasForeignKey("TrackId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("RailwaySignal");
 
                     b.Navigation("Track");
                 });

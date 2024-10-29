@@ -12,7 +12,7 @@ namespace EtcsServer.Database
 
         public DbSet<Crossing> Crossings { get; set; }
         public DbSet<Message> Messages { get; set; }
-        public DbSet<RailwaySignalTrack> TrackSignals { get; set; }
+        public DbSet<RailwaySignal> TrackSignals { get; set; }
         public DbSet<SwitchRoute> TrackSwitches { get; set; }
         public DbSet<Track> Tracks { get; set; }
         public DbSet<Train> Trains { get; set; }

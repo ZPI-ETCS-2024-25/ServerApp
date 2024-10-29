@@ -24,18 +24,6 @@ namespace EtcsServer.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "RailwaySignal",
-                columns: table => new
-                {
-                    RailwaySignalId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RailwaySignal", x => x.RailwaySignalId);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "TrackageElement",
                 columns: table => new
                 {
@@ -65,20 +53,13 @@ namespace EtcsServer.Migrations
                 {
                     TrainId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    LengthMeters = table.Column<int>(type: "int", nullable: false),
-                    WeightKilos = table.Column<int>(type: "int", nullable: false),
-                    MaxSpeedMps = table.Column<int>(type: "int", nullable: false),
-                    BrakeWeight = table.Column<int>(type: "int", nullable: false),
-                    MessageId = table.Column<int>(type: "int", nullable: true)
+                    LengthMeters = table.Column<double>(type: "float", nullable: false),
+                    MaxSpeedMps = table.Column<double>(type: "float", nullable: false),
+                    BrakeWeight = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Trains", x => x.TrainId);
-                    table.ForeignKey(
-                        name: "FK_Trains_Messages_MessageId",
-                        column: x => x.MessageId,
-                        principalTable: "Messages",
-                        principalColumn: "MessageId");
                 });
 
             migrationBuilder.CreateTable(
@@ -103,10 +84,14 @@ namespace EtcsServer.Migrations
                 columns: table => new
                 {
                     TrackageElementId = table.Column<int>(type: "int", nullable: false),
-                    Length = table.Column<int>(type: "int", nullable: false),
-                    MaxUpSpeedMps = table.Column<int>(type: "int", nullable: false),
-                    MaxDownSpeedMps = table.Column<int>(type: "int", nullable: false),
-                    Gradient = table.Column<int>(type: "int", nullable: false)
+                    TrackNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LineNumber = table.Column<int>(type: "int", nullable: false),
+                    Kilometer = table.Column<double>(type: "float", nullable: false),
+                    Length = table.Column<double>(type: "float", nullable: false),
+                    MaxUpSpeedMps = table.Column<double>(type: "float", nullable: false),
+                    MaxDownSpeedMps = table.Column<double>(type: "float", nullable: false),
+                    Gradient = table.Column<double>(type: "float", nullable: false),
+                    TrackPosition = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -120,12 +105,35 @@ namespace EtcsServer.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "MessageTrain",
+                columns: table => new
+                {
+                    MessagesMessageId = table.Column<int>(type: "int", nullable: false),
+                    ReceiversTrainId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MessageTrain", x => new { x.MessagesMessageId, x.ReceiversTrainId });
+                    table.ForeignKey(
+                        name: "FK_MessageTrain_Messages_MessagesMessageId",
+                        column: x => x.MessagesMessageId,
+                        principalTable: "Messages",
+                        principalColumn: "MessageId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MessageTrain_Trains_ReceiversTrainId",
+                        column: x => x.ReceiversTrainId,
+                        principalTable: "Trains",
+                        principalColumn: "TrainId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Crossings",
                 columns: table => new
                 {
                     CrossingId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    IsDamaged = table.Column<bool>(type: "bit", nullable: false),
                     TrackId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -140,25 +148,40 @@ namespace EtcsServer.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Signs",
+                columns: table => new
+                {
+                    RailroadSignId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TrackId = table.Column<int>(type: "int", nullable: false),
+                    DistanceFromTrackStart = table.Column<double>(type: "float", nullable: false),
+                    IsFacedUp = table.Column<bool>(type: "bit", nullable: false),
+                    MaxSpeed = table.Column<double>(type: "float", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Signs", x => x.RailroadSignId);
+                    table.ForeignKey(
+                        name: "FK_Signs_Track_TrackId",
+                        column: x => x.TrackId,
+                        principalTable: "Track",
+                        principalColumn: "TrackageElementId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TrackSignals",
                 columns: table => new
                 {
-                    RailwaySignalTrackId = table.Column<int>(type: "int", nullable: false)
+                    RailwaySignalId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TrackId = table.Column<int>(type: "int", nullable: false),
-                    RailwaySignalId = table.Column<int>(type: "int", nullable: false),
-                    DistanceFromTrackStart = table.Column<int>(type: "int", nullable: false),
+                    DistanceFromTrackStart = table.Column<double>(type: "float", nullable: false),
                     IsFacedUp = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TrackSignals", x => x.RailwaySignalTrackId);
-                    table.ForeignKey(
-                        name: "FK_TrackSignals_RailwaySignal_RailwaySignalId",
-                        column: x => x.RailwaySignalId,
-                        principalTable: "RailwaySignal",
-                        principalColumn: "RailwaySignalId",
-                        onDelete: ReferentialAction.Cascade);
+                    table.PrimaryKey("PK_TrackSignals", x => x.RailwaySignalId);
                     table.ForeignKey(
                         name: "FK_TrackSignals_Track_TrackId",
                         column: x => x.TrackId,
@@ -176,7 +199,7 @@ namespace EtcsServer.Migrations
                     SwitchId = table.Column<int>(type: "int", nullable: false),
                     TrackFromId = table.Column<int>(type: "int", nullable: false),
                     TrackToId = table.Column<int>(type: "int", nullable: false),
-                    MaxSpeedMps = table.Column<int>(type: "int", nullable: false)
+                    MaxSpeedMps = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -204,6 +227,16 @@ namespace EtcsServer.Migrations
                 column: "TrackId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_MessageTrain_ReceiversTrainId",
+                table: "MessageTrain",
+                column: "ReceiversTrainId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Signs_TrackId",
+                table: "Signs",
+                column: "TrackId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TrackageElement_LeftSideElementId",
                 table: "TrackageElement",
                 column: "LeftSideElementId");
@@ -212,11 +245,6 @@ namespace EtcsServer.Migrations
                 name: "IX_TrackageElement_RightSideElementId",
                 table: "TrackageElement",
                 column: "RightSideElementId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TrackSignals_RailwaySignalId",
-                table: "TrackSignals",
-                column: "RailwaySignalId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TrackSignals_TrackId",
@@ -237,11 +265,6 @@ namespace EtcsServer.Migrations
                 name: "IX_TrackSwitches_TrackToId",
                 table: "TrackSwitches",
                 column: "TrackToId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Trains_MessageId",
-                table: "Trains",
-                column: "MessageId");
         }
 
         /// <inheritdoc />
@@ -251,25 +274,28 @@ namespace EtcsServer.Migrations
                 name: "Crossings");
 
             migrationBuilder.DropTable(
+                name: "MessageTrain");
+
+            migrationBuilder.DropTable(
+                name: "Signs");
+
+            migrationBuilder.DropTable(
                 name: "TrackSignals");
 
             migrationBuilder.DropTable(
                 name: "TrackSwitches");
 
             migrationBuilder.DropTable(
-                name: "Trains");
+                name: "Messages");
 
             migrationBuilder.DropTable(
-                name: "RailwaySignal");
+                name: "Trains");
 
             migrationBuilder.DropTable(
                 name: "Switch");
 
             migrationBuilder.DropTable(
                 name: "Track");
-
-            migrationBuilder.DropTable(
-                name: "Messages");
 
             migrationBuilder.DropTable(
                 name: "TrackageElement");

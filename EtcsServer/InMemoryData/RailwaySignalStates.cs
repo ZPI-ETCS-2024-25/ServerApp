@@ -8,7 +8,7 @@ namespace EtcsServer.InMemoryData
     {
         private readonly Dictionary<int, RailwaySignalMessage> states;
 
-        public RailwaySignalStates([FromServices] RailwaySignalTrackHolder signalTrackHolder)
+        public RailwaySignalStates([FromServices] RailwaySignalsHolder signalTrackHolder)
         {
             states = [];
             signalTrackHolder.GetValues().Values.ToList()

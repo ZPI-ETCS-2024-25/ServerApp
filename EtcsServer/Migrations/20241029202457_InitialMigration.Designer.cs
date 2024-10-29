@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EtcsServer.Migrations
 {
     [DbContext(typeof(EtcsDbContext))]
-    [Migration("20241013095131_InitialMigration")]
+    [Migration("20241029202457_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -32,9 +32,6 @@ namespace EtcsServer.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CrossingId"));
-
-                    b.Property<bool>("IsDamaged")
-                        .HasColumnType("bit");
 
                     b.Property<int>("TrackId")
                         .HasColumnType("int");
@@ -63,6 +60,33 @@ namespace EtcsServer.Migrations
                     b.ToTable("Messages");
                 });
 
+            modelBuilder.Entity("EtcsServer.Database.Entity.RailroadSign", b =>
+                {
+                    b.Property<int>("RailroadSignId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RailroadSignId"));
+
+                    b.Property<double>("DistanceFromTrackStart")
+                        .HasColumnType("float");
+
+                    b.Property<bool>("IsFacedUp")
+                        .HasColumnType("bit");
+
+                    b.Property<double>("MaxSpeed")
+                        .HasColumnType("float");
+
+                    b.Property<int>("TrackId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RailroadSignId");
+
+                    b.HasIndex("TrackId");
+
+                    b.ToTable("Signs");
+                });
+
             modelBuilder.Entity("EtcsServer.Database.Entity.RailwaySignal", b =>
                 {
                     b.Property<int>("RailwaySignalId")
@@ -71,34 +95,16 @@ namespace EtcsServer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RailwaySignalId"));
 
-                    b.HasKey("RailwaySignalId");
-
-                    b.ToTable("RailwaySignal");
-                });
-
-            modelBuilder.Entity("EtcsServer.Database.Entity.RailwaySignalTrack", b =>
-                {
-                    b.Property<int>("RailwaySignalTrackId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RailwaySignalTrackId"));
-
-                    b.Property<int>("DistanceFromTrackStart")
-                        .HasColumnType("int");
+                    b.Property<double>("DistanceFromTrackStart")
+                        .HasColumnType("float");
 
                     b.Property<bool>("IsFacedUp")
                         .HasColumnType("bit");
 
-                    b.Property<int>("RailwaySignalId")
-                        .HasColumnType("int");
-
                     b.Property<int>("TrackId")
                         .HasColumnType("int");
 
-                    b.HasKey("RailwaySignalTrackId");
-
-                    b.HasIndex("RailwaySignalId");
+                    b.HasKey("RailwaySignalId");
 
                     b.HasIndex("TrackId");
 
@@ -113,8 +119,8 @@ namespace EtcsServer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SwitchRouteId"));
 
-                    b.Property<int>("MaxSpeedMps")
-                        .HasColumnType("int");
+                    b.Property<double>("MaxSpeedMps")
+                        .HasColumnType("float");
 
                     b.Property<int>("SwitchId")
                         .HasColumnType("int");
@@ -169,26 +175,33 @@ namespace EtcsServer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TrainId"));
 
-                    b.Property<int>("BrakeWeight")
-                        .HasColumnType("int");
+                    b.Property<double>("BrakeWeight")
+                        .HasColumnType("float");
 
-                    b.Property<int>("LengthMeters")
-                        .HasColumnType("int");
+                    b.Property<double>("LengthMeters")
+                        .HasColumnType("float");
 
-                    b.Property<int>("MaxSpeedMps")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("MessageId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("WeightKilos")
-                        .HasColumnType("int");
+                    b.Property<double>("MaxSpeedMps")
+                        .HasColumnType("float");
 
                     b.HasKey("TrainId");
 
-                    b.HasIndex("MessageId");
-
                     b.ToTable("Trains");
+                });
+
+            modelBuilder.Entity("MessageTrain", b =>
+                {
+                    b.Property<int>("MessagesMessageId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReceiversTrainId")
+                        .HasColumnType("int");
+
+                    b.HasKey("MessagesMessageId", "ReceiversTrainId");
+
+                    b.HasIndex("ReceiversTrainId");
+
+                    b.ToTable("MessageTrain");
                 });
 
             modelBuilder.Entity("EtcsServer.Database.Entity.Switch", b =>
@@ -202,16 +215,29 @@ namespace EtcsServer.Migrations
                 {
                     b.HasBaseType("EtcsServer.Database.Entity.TrackageElement");
 
-                    b.Property<int>("Gradient")
+                    b.Property<double>("Gradient")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Kilometer")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Length")
+                        .HasColumnType("float");
+
+                    b.Property<int>("LineNumber")
                         .HasColumnType("int");
 
-                    b.Property<int>("Length")
-                        .HasColumnType("int");
+                    b.Property<double>("MaxDownSpeedMps")
+                        .HasColumnType("float");
 
-                    b.Property<int>("MaxDownSpeedMps")
-                        .HasColumnType("int");
+                    b.Property<double>("MaxUpSpeedMps")
+                        .HasColumnType("float");
 
-                    b.Property<int>("MaxUpSpeedMps")
+                    b.Property<string>("TrackNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TrackPosition")
                         .HasColumnType("int");
 
                     b.ToTable("Track", (string)null);
@@ -228,21 +254,24 @@ namespace EtcsServer.Migrations
                     b.Navigation("Track");
                 });
 
-            modelBuilder.Entity("EtcsServer.Database.Entity.RailwaySignalTrack", b =>
+            modelBuilder.Entity("EtcsServer.Database.Entity.RailroadSign", b =>
                 {
-                    b.HasOne("EtcsServer.Database.Entity.RailwaySignal", "RailwaySignal")
-                        .WithMany()
-                        .HasForeignKey("RailwaySignalId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("EtcsServer.Database.Entity.Track", "Track")
                         .WithMany()
                         .HasForeignKey("TrackId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("RailwaySignal");
+                    b.Navigation("Track");
+                });
+
+            modelBuilder.Entity("EtcsServer.Database.Entity.RailwaySignal", b =>
+                {
+                    b.HasOne("EtcsServer.Database.Entity.Track", "Track")
+                        .WithMany()
+                        .HasForeignKey("TrackId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Track");
                 });
@@ -291,11 +320,19 @@ namespace EtcsServer.Migrations
                     b.Navigation("RightSideElement");
                 });
 
-            modelBuilder.Entity("EtcsServer.Database.Entity.Train", b =>
+            modelBuilder.Entity("MessageTrain", b =>
                 {
                     b.HasOne("EtcsServer.Database.Entity.Message", null)
-                        .WithMany("Receivers")
-                        .HasForeignKey("MessageId");
+                        .WithMany()
+                        .HasForeignKey("MessagesMessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EtcsServer.Database.Entity.Train", null)
+                        .WithMany()
+                        .HasForeignKey("ReceiversTrainId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("EtcsServer.Database.Entity.Switch", b =>
@@ -314,11 +351,6 @@ namespace EtcsServer.Migrations
                         .HasForeignKey("EtcsServer.Database.Entity.Track", "TrackageElementId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("EtcsServer.Database.Entity.Message", b =>
-                {
-                    b.Navigation("Receivers");
                 });
 #pragma warning restore 612, 618
         }
