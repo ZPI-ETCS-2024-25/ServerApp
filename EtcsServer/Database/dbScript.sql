@@ -26,14 +26,16 @@ INSERT INTO Track(TrackageElementId, [Length], MaxUpSpeedMps, MaxDownSpeedMps, G
 INSERT INTO Switch VALUES(2)
 INSERT INTO TrackSwitches(SwitchId, TrackFromId, TrackToId, MaxSpeedMps) VALUES
 (2, 1, 3, 20),
-(2, 1, 4, 50)
+(2, 1, 4, 50),
+(2, 3, 1, 20),
+(2, 4, 1, 20)
 
 --signs
 INSERT INTO Signs(TrackId, DistanceFromTrackStart, IsFacedUp, MaxSpeed) VALUES
-(4, 0, 1,30),
-(4, 5, 1, 50),
-(4, 15, 1, 15),
-(4, 10, 0, 30)
+(3, 0, 1,30),
+(3, 5, 1, 50),
+(3, 15, 1, 15),
+(3, 10, 0, 30)
 
 --signals
 INSERT INTO TrackSignals(TrackId, DistanceFromTrackStart, IsFacedUp) VALUES

@@ -26,7 +26,7 @@ namespace EtcsServer.Helpers
                 case null:
                     return null;
                 case Switch trainSwitch:
-                    int nextTrackId = switchStates.GetNextTrackId(trainSwitch.TrackageElementId);
+                    int nextTrackId = switchStates.GetNextTrackId(trainSwitch.TrackageElementId, trackId);
                     return GetTrackById(nextTrackId);
                 case Track nextTrack:
                     return nextTrack;
@@ -52,7 +52,6 @@ namespace EtcsServer.Helpers
                 return null;
 
             return track;
-
         }
     }
 }

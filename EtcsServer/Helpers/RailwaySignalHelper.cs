@@ -25,15 +25,14 @@ namespace EtcsServer.Helpers
 
         public RailwaySignal? GetFirstStopSignal(TrainPosition trainPosition, bool isMovingUp)
         {
-            int currentTrackId = trackHelper.GetTrackByTrainPosition(trainPosition)!.TrackageElementId;
-            Track? currentTrack = trackHelper.GetTrackById(currentTrackId);
+            Track? currentTrack = trackHelper.GetTrackByTrainPosition(trainPosition);
             double currentKilometer = trainPosition.Kilometer;
             while (currentTrack != null)
             {
                 List<RailwaySignal> signalsOnCurrentTrack = railwaySignalTrackHolder.GetValues().Values
                 .Where(s => s.TrackId == currentTrack.TrackageElementId)
                 .Where(s => s.IsFacedUp == isMovingUp)
-                .Where(s => isMovingUp ? currentKilometer < s.DistanceFromTrackStart : currentKilometer > s.DistanceFromTrackStart)
+                .Where(s => isMovingUp ? currentKilometer <= s.DistanceFromTrackStart : currentKilometer >= s.DistanceFromTrackStart)
                 .OrderBy(s => isMovingUp ? s.DistanceFromTrackStart : -1 * s.DistanceFromTrackStart)
                 .ToList();
 
@@ -44,7 +43,7 @@ namespace EtcsServer.Helpers
 
                 currentTrack = trackHelper.GetNextTrack(currentTrack.TrackageElementId, isMovingUp);
                 if (currentTrack != null)
-                    currentKilometer = currentTrack.Kilometer;
+                    currentKilometer = isMovingUp ? currentTrack.Kilometer : currentTrack.Length;
                 else return null;
             }
 

@@ -25,39 +25,69 @@ namespace EtcsServer.DecisionExecutors
 
         public MovementAuthority ProvideMovementAuthorityToEtcsBorder(string trainId)
         {
+            //TODO include switches in max speeds
             TrainPosition trainPosition = lastKnownPositionsTracker.GetLastKnownTrainPosition(trainId)!;
             bool isMovingUp = trainPosition.Direction.Equals("up");
 
-            List<RailroadSign> _signs = [];
-            List<double> _signsDistances = [];
+            List<double> _maxSpeeds = [];
+            List<double> _maxSpeedsDistances = [];
             List<double> _gradients = [];
             List<double> _gradientsDistances = [];
 
+            double distanceSoFar = 0;
+
             Track currentTrack = trackHelper.GetTrackByTrainPosition(trainPosition)!;
+            int startingTrackId = currentTrack.TrackageElementId;
             while (currentTrack != null && currentTrack.TrackPosition == TrackPosition.INSIDE_ZONE)
             {
+                double currentTrackMaxSpeed = isMovingUp ? currentTrack.MaxUpSpeedMps : currentTrack.MaxDownSpeedMps;
                 List<RailroadSign> currentSigns = railroadSignsHolder.GetValues().Values
                     .Where(s => s.TrackId == currentTrack.TrackageElementId)
                     .Where(s => s.IsFacedUp = trainPosition.Direction.Equals("up"))
+                    .Where(s => s.MaxSpeed < currentTrackMaxSpeed)
+                    .OrderBy(s => isMovingUp ? s.DistanceFromTrackStart : -1 * s.DistanceFromTrackStart)
                     .ToList();
-                _signs.AddRange(currentSigns);
-                _signsDistances.AddRange(currentSigns.Select(s => s.DistanceFromTrackStart));
 
-                _gradients.Add(currentTrack.Gradient);
-                _gradientsDistances.Add(currentTrack.Kilometer);
+                if (currentSigns.Count > 0)
+                {
+                    if ((isMovingUp && currentSigns.First().DistanceFromTrackStart > 0) || currentSigns.First().DistanceFromTrackStart < currentTrack.Length)
+                    {
+                        if (currentTrackMaxSpeed != _maxSpeeds.LastOrDefault()) {
+                            _maxSpeeds.Add(currentTrackMaxSpeed);
+                            _maxSpeedsDistances.Add(distanceSoFar);
+                        }
+                    }
+                    
+                    _maxSpeeds.AddRange(currentSigns.Select(s => s.MaxSpeed));
+                    _maxSpeedsDistances.AddRange(currentSigns.Select(s => isMovingUp ? distanceSoFar + s.DistanceFromTrackStart : distanceSoFar + (currentTrack.Length - s.DistanceFromTrackStart)));
+                }
+                else if (currentTrackMaxSpeed != _maxSpeeds.LastOrDefault())
+                {
+                    _maxSpeeds.Add(currentTrackMaxSpeed);
+                    _maxSpeedsDistances.Add(distanceSoFar);
+                }
 
+                if (currentTrack.Gradient !=  _gradients.LastOrDefault())
+                {
+                    _gradients.Add(currentTrack.Gradient);
+                    _gradientsDistances.Add(distanceSoFar);
+                }
+
+                if (currentTrack.TrackageElementId == startingTrackId)
+                    distanceSoFar += isMovingUp ? currentTrack.Length - trainPosition.Kilometer : trainPosition.Kilometer;
+                else distanceSoFar += currentTrack.Length;
                 currentTrack = trackHelper.GetNextTrack(currentTrack.TrackageElementId, isMovingUp)!;
             }
 
             return new MovementAuthority()
             {
-                Speeds = _signs.Select(s => s.MaxSpeed).ToArray(),
-                SpeedDistances = _signsDistances.ToArray(),
+                Speeds = _maxSpeeds.Append(0).ToArray(),
+                SpeedDistances = _maxSpeedsDistances.Append(distanceSoFar).ToArray(),
                 Gradients = _gradients.ToArray(),
                 GradientDistances = _gradientsDistances.ToArray(),
                 Messages = ["Travel safe"],
-                MessageDistances = [trainPosition.Kilometer],
-                ServerPosition = trainPosition.Kilometer
+                MessageDistances = [0],
+                ServerPosition = trainPosition.Kilometer //TODO kilometer without track number and line number is ambiguous
             };
         }
 
