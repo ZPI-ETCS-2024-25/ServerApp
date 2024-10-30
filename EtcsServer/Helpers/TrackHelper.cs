@@ -17,10 +17,15 @@ namespace EtcsServer.Helpers
             this.switchStates = switchStates;
         }
 
-        public Track? GetNextTrack(int trackId, bool isDirectionUp)
+        public TrackageElement? GetNextTrackageElement(int trackId, bool isDirectionUp)
         {
             Track track = tracksHolder.GetValues()[trackId];
-            TrackageElement? nextElement = isDirectionUp ? track.RightSideElement : track.LeftSideElement;
+            return isDirectionUp ? track.RightSideElement : track.LeftSideElement;
+        }
+
+        public Track? GetNextTrack(int trackId, bool isDirectionUp)
+        {
+            TrackageElement? nextElement = GetNextTrackageElement(trackId, isDirectionUp);
 
             switch (nextElement) {
                 case null:

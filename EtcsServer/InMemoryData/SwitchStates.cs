@@ -7,6 +7,7 @@ namespace EtcsServer.InMemoryData
     public class SwitchStates
     {
         private readonly Dictionary<(int, int), SwitchFromTo> states;
+        private readonly SwitchRoutesHolder switchRoutesHolder;
 
         public SwitchStates([FromServices] SwitchRoutesHolder switchRoutesHolder)
         {
@@ -16,6 +17,7 @@ namespace EtcsServer.InMemoryData
                 .Select(group => group.First())
                 .ToList()
                 .ForEach(switchRoute => states.Add((switchRoute.SwitchId, switchRoute.TrackFromId), new SwitchFromTo(switchRoute.TrackFromId, switchRoute.TrackToId)));
+            this.switchRoutesHolder = switchRoutesHolder;
         }
 
         public void SetSwitchState(int switchId, SwitchFromTo switchFromTo)
@@ -26,6 +28,14 @@ namespace EtcsServer.InMemoryData
         public int GetNextTrackId(int switchId, int trackIdFrom)
         {
             return states[(switchId, trackIdFrom)].TrackIdTo;
+        }
+
+        public double? GetMaxSpeed(int switchId, int trackIdFrom)
+        {
+            return switchRoutesHolder.GetValues().Values
+                .Where(sr => sr.SwitchId == switchId)
+                .Where(sr => sr.TrackFromId == trackIdFrom)
+                .FirstOrDefault()?.MaxSpeedMps;
         }
     }
     public class SwitchFromTo(int trackFromId, int trackToId)
