@@ -31,9 +31,11 @@ namespace EtcsServer.DecisionMakers
             if (movementDirection == MovementDirection.UNKNOWN)
                 return MovementAuthorityValidationOutcome.GetFailedOutcome(MovementAuthorityValidationResult.MOVEMENT_DIRECTION_NOT_KNOWN);
 
-            Track? nextTrack = trackHelper.GetNextTrack(trackHelper.GetTrackByTrainPosition(trainPosition)!.TrackageElementId, movementDirection == MovementDirection.UP);
-            if (nextTrack == null)
-                return MovementAuthorityValidationOutcome.GetFailedOutcome(MovementAuthorityValidationResult.END_OF_ROAD);
+            Track currentTrack = trackHelper.GetTrackByTrainPosition(trainPosition)!;
+            Track? nextTrack = trackHelper.GetNextTrack(currentTrack.TrackageElementId, movementDirection == MovementDirection.UP);
+            if ((currentTrack.TrackPosition == TrackPosition.INCOMING_ZONE && nextTrack!.TrackPosition == TrackPosition.OUTSIDE_ZONE) ||
+                (currentTrack.TrackPosition == TrackPosition.OUTSIDE_ZONE && nextTrack == null))
+                return MovementAuthorityValidationOutcome.GetFailedOutcome(MovementAuthorityValidationResult.TRAIN_OUTSIDE_OF_ETCS_BORDER);
 
             RailwaySignal? firstStopSignal = railwaySignalHelper.GetFirstStopSignal(trainPosition, movementDirection == MovementDirection.UP);
 
@@ -61,7 +63,8 @@ namespace EtcsServer.DecisionMakers
             MOVEMENT_DIRECTION_NOT_KNOWN,
             END_OF_ROAD,
             NEXT_TRACK_OCCUPIED,
-            NO_RAILWAY_SIGNAL_TO_USE
+            NO_RAILWAY_SIGNAL_TO_USE,
+            TRAIN_OUTSIDE_OF_ETCS_BORDER
         }
     }
 }

@@ -32,6 +32,7 @@ namespace EtcsServer.DecisionExecutors
             TrainPosition trainPosition = lastKnownPositionsTracker.GetLastKnownTrainPosition(trainId)!;
             bool isMovingUp = trainPosition.Direction.Equals("up");
             Track? track = trackHelper.GetTrackByTrainPosition(trainPosition);
+            bool wasInsideEtcsBorder = false;
 
             MovementAuthorityContainer authorityContainer = new()
             {
@@ -40,8 +41,11 @@ namespace EtcsServer.DecisionExecutors
                 CurrentTrack = track
             };
 
-            while (authorityContainer.CurrentTrack != null && authorityContainer.CurrentTrack.TrackPosition == TrackPosition.INSIDE_ZONE)
+            while (!wasInsideEtcsBorder || (authorityContainer.CurrentTrack != null && authorityContainer.CurrentTrack.TrackPosition == TrackPosition.INSIDE_ZONE))
             {
+                if (authorityContainer.CurrentTrack.TrackPosition == TrackPosition.INSIDE_ZONE)
+                    wasInsideEtcsBorder = true;
+
                 RegisterSpeedsForCurrentTrack(authorityContainer, isMovingUp);
 
                 authorityContainer.RegisterGradient(authorityContainer.CurrentTrack.Gradient, authorityContainer.DistanceSoFar);
@@ -112,7 +116,7 @@ namespace EtcsServer.DecisionExecutors
             authorityContainer.RegisterSpeed(startingPointMaxSpeed, distanceSoFar);
             signsAhead.ForEach(s => authorityContainer.RegisterSpeed(
                 s.MaxSpeed,
-                isMovingUp ? distanceSoFar + (s.DistanceFromTrackStart - currentKilometer) : distanceSoFar + (currentKilometer - s.DistanceFromTrackStart)
+                isMovingUp ? distanceSoFar + (s.DistanceFromTrackStart + currentTrack.Kilometer - currentKilometer) : distanceSoFar + (currentKilometer - s.DistanceFromTrackStart - currentTrack.Kilometer)
             ));
         }
 
@@ -120,7 +124,7 @@ namespace EtcsServer.DecisionExecutors
         {
             Track currentTrack = authorityContainer.CurrentTrack!;
             if (currentTrack.TrackageElementId == authorityContainer.StartingTrackId)
-                authorityContainer.DistanceSoFar += isMovingUp ? currentTrack.Length - originalTrainPosition.Kilometer : originalTrainPosition.Kilometer;
+                authorityContainer.DistanceSoFar += isMovingUp ? (currentTrack.Kilometer + currentTrack.Length) - originalTrainPosition.Kilometer : originalTrainPosition.Kilometer - currentTrack.Kilometer;
             else authorityContainer.DistanceSoFar += currentTrack.Length;
         }
 
