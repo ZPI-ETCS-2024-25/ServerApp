@@ -7,5 +7,6 @@ namespace EtcsServer.InMemoryData.Contract
         bool Register(TrainDto train);
         bool Update(UpdateTrain updateTrain);
         bool Unregister(string trainId);
+        List<TrainDto> GetRegisteredTrains();
     }
 }

@@ -8,6 +8,7 @@ using EtcsServer.DecisionMakers;
 using EtcsServer.DecisionMakers.Contract;
 using EtcsServer.DriverDataCollectors;
 using EtcsServer.DriverDataCollectors.Contract;
+using EtcsServer.ExtensionMethods;
 using EtcsServer.Helpers;
 using EtcsServer.Helpers.Contract;
 using EtcsServer.InMemoryData;
@@ -31,23 +32,7 @@ namespace EtcsServer
             });
 
 
-            builder.Services.AddSingleton<IHolder<Crossing>, CrossingsHolder>();
-            builder.Services.AddSingleton<IHolder<RailroadSign>, RailroadSignsHolder>();
-            builder.Services.AddSingleton<IHolder<RailwaySignal>, RailwaySignalsHolder>();
-            builder.Services.AddSingleton<IHolder<SwitchRoute>, SwitchRoutesHolder>();
-            builder.Services.AddSingleton<IHolder<Track>, TracksHolder>();
-            builder.Services.AddSingleton<IHolder<Train>, TrainsHolder>();
-
-            builder.Services.AddSingleton<ITrainPositionTracker, LastKnownPositionsTracker>();
-            builder.Services.AddSingleton<IRailwaySignalStates, RailwaySignalStates>();
-            builder.Services.AddSingleton<ISwitchStates, SwitchStates>();
-            builder.Services.AddSingleton<IRegisteredTrainsTracker, RegisteredTrainsTracker>();
-
-            builder.Services.AddSingleton<IRailwaySignalHelper, RailwaySignalHelper>();
-            builder.Services.AddSingleton<ITrackHelper, TrackHelper>();
-
-            builder.Services.AddSingleton<IMovementAuthorityValidator, MovementAuthorityValidator>();
-            builder.Services.AddSingleton<IMovementAuthorityProvider, MovementAuthorityProvider>();
+            builder.Services.AddProjectServices();
 
             builder.Services.Configure<ServerProperties>(builder.Configuration.GetSection("ServerProperties"));
             builder.Services.AddControllers();

@@ -63,6 +63,11 @@ namespace EtcsServer.InMemoryData
             trains.Remove(trainId);
             return true;
         }
+
+        public List<TrainDto> GetRegisteredTrains()
+        {
+            return trains.Values.ToList();
+        }
     }
 
 }
