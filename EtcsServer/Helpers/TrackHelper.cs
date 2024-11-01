@@ -1,17 +1,18 @@
 ﻿using EtcsServer.Database.Entity;
 using EtcsServer.DriverAppDto;
-using EtcsServer.InMemoryData;
+using EtcsServer.Helpers.Contract;
+using EtcsServer.InMemoryData.Contract;
 using EtcsServer.InMemoryHolders;
 using Microsoft.IdentityModel.Protocols.Configuration;
 
 namespace EtcsServer.Helpers
 {
-    public class TrackHelper
+    public class TrackHelper : ITrackHelper
     {
-        private readonly TracksHolder tracksHolder;
-        private readonly SwitchStates switchStates;
+        private readonly IHolder<Track> tracksHolder;
+        private readonly ISwitchStates switchStates;
 
-        public TrackHelper(TracksHolder tracksHolder, SwitchStates switchStates)
+        public TrackHelper(IHolder<Track> tracksHolder, ISwitchStates switchStates)
         {
             this.tracksHolder = tracksHolder;
             this.switchStates = switchStates;

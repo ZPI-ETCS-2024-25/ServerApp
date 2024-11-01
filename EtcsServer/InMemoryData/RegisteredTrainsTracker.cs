@@ -1,6 +1,7 @@
 ﻿using EtcsServer.Controllers;
 using EtcsServer.Database.Entity;
 using EtcsServer.DriverAppDto;
+using EtcsServer.InMemoryData.Contract;
 using EtcsServer.InMemoryHolders;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -9,7 +10,7 @@ using System.Text.Json;
 
 namespace EtcsServer.InMemoryData
 {
-    public class RegisteredTrainsTracker
+    public class RegisteredTrainsTracker : IRegisteredTrainsTracker
     {
         private readonly Dictionary<string, TrainDto> trains;
         private readonly ILogger<RegisteredTrainsTracker> logger;

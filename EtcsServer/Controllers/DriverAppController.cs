@@ -1,16 +1,12 @@
-using EtcsServer.Configuration;
-using EtcsServer.Database.Entity;
-using EtcsServer.DecisionExecutors;
-using EtcsServer.DecisionMakers;
+using EtcsServer.DecisionExecutors.Contract;
+using EtcsServer.DecisionMakers.Contract;
 using EtcsServer.DriverAppDto;
-using EtcsServer.DriverDataCollectors;
-using EtcsServer.InMemoryData;
+using EtcsServer.DriverDataCollectors.Contract;
+using EtcsServer.InMemoryData.Contract;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using static EtcsServer.Controllers.TestController;
-using static EtcsServer.DecisionMakers.MovementAuthorityValidator;
+using static EtcsServer.DecisionMakers.Contract.MovementAuthorityValidationOutcome;
 
 namespace EtcsServer.Controllers
 {
@@ -26,7 +22,7 @@ namespace EtcsServer.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult> RegisterTrain(TrainDto train, [FromServices] RegisteredTrainsTracker registeredTrainsTracker)
+        public async Task<ActionResult> RegisterTrain(TrainDto train, [FromServices] IRegisteredTrainsTracker registeredTrainsTracker)
         {
             _logger.LogInformation("Received register request for train {}", train.TrainId);
             bool result = registeredTrainsTracker.Register(train);
@@ -37,7 +33,7 @@ namespace EtcsServer.Controllers
         }
 
         [HttpPost("updatedata")]
-        public async Task<ActionResult> UpdateTrainData(UpdateTrain updateTrain, [FromServices] RegisteredTrainsTracker registeredTrainsTracker)
+        public async Task<ActionResult> UpdateTrainData(UpdateTrain updateTrain, [FromServices] IRegisteredTrainsTracker registeredTrainsTracker)
         {
             _logger.LogInformation("Received train data update request for train {}", updateTrain.TrainId);
             bool result = registeredTrainsTracker.Update(updateTrain);
@@ -48,7 +44,7 @@ namespace EtcsServer.Controllers
         }
 
         [HttpPost("unregister")]
-        public async Task<ActionResult> UnregisterTrain(UnregisterRequest unregisterRequest, [FromServices] RegisteredTrainsTracker registeredTrainsTracker)
+        public async Task<ActionResult> UnregisterTrain(UnregisterRequest unregisterRequest, [FromServices] IRegisteredTrainsTracker registeredTrainsTracker)
         {
             _logger.LogInformation("Received train unregister request for train {}", unregisterRequest.TrainId);
             bool result = registeredTrainsTracker.Unregister(unregisterRequest.TrainId);
@@ -59,7 +55,7 @@ namespace EtcsServer.Controllers
         }
 
         [HttpPost("updateposition")]
-        public async Task<ActionResult> UpdateTrainPosition(TrainPosition trainPosition, [FromServices] LastKnownPositionsTracker positionsTracker)
+        public async Task<ActionResult> UpdateTrainPosition(TrainPosition trainPosition, [FromServices] ITrainPositionTracker positionsTracker)
         {
             _logger.LogInformation("Received train position for train {}: {}", trainPosition.TrainId, trainPosition.Kilometer);
             positionsTracker.RegisterTrainPosition(trainPosition);
@@ -69,8 +65,8 @@ namespace EtcsServer.Controllers
         [HttpPost("marequest")]
         public async Task<ActionResult> PostMovementAuthorityRequest(
             MovementAuthorityRequest movementAuthorityRequest,
-            [FromServices] MovementAuthorityValidator movementAuthorityValidator,
-            [FromServices] MovementAuthorityProvider movementAuthorityProvider
+            [FromServices] IMovementAuthorityValidator movementAuthorityValidator,
+            [FromServices] IMovementAuthorityProvider movementAuthorityProvider
             )
         {
             _logger.LogInformation("Received movement authority request for train {}", movementAuthorityRequest.TrainId);

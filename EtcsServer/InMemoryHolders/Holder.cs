@@ -1,8 +1,4 @@
 ﻿using EtcsServer.Database;
-using EtcsServer.Database.Entity;
-using Microsoft.EntityFrameworkCore;
-using System.Net;
-using System.Runtime.CompilerServices;
 
 namespace EtcsServer.InMemoryHolders
 {

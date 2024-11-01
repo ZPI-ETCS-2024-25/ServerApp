@@ -1,14 +1,15 @@
 ﻿using EtcsServer.Database.Entity;
+using EtcsServer.InMemoryData.Contract;
 using EtcsServer.InMemoryHolders;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EtcsServer.InMemoryData
 {
-    public class RailwaySignalStates
+    public class RailwaySignalStates : IRailwaySignalStates
     {
         private readonly Dictionary<int, RailwaySignalMessage> states;
 
-        public RailwaySignalStates([FromServices] RailwaySignalsHolder signalTrackHolder)
+        public RailwaySignalStates([FromServices] IHolder<RailwaySignal> signalTrackHolder)
         {
             states = [];
             signalTrackHolder.GetValues().Values.ToList()
@@ -26,11 +27,6 @@ namespace EtcsServer.InMemoryData
         {
             return states[signalId];
         }
-    }
-    public enum RailwaySignalMessage
-    {
-        STOP,
-        GO
     }
 
 }

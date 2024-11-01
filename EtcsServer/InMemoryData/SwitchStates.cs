@@ -1,15 +1,16 @@
 ﻿using EtcsServer.Database.Entity;
+using EtcsServer.InMemoryData.Contract;
 using EtcsServer.InMemoryHolders;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EtcsServer.InMemoryData
 {
-    public class SwitchStates
+    public class SwitchStates : ISwitchStates
     {
         private readonly Dictionary<(int, int), SwitchFromTo> states;
-        private readonly SwitchRoutesHolder switchRoutesHolder;
+        private readonly IHolder<SwitchRoute> switchRoutesHolder;
 
-        public SwitchStates([FromServices] SwitchRoutesHolder switchRoutesHolder)
+        public SwitchStates([FromServices] IHolder<SwitchRoute> switchRoutesHolder)
         {
             states = [];
             switchRoutesHolder.GetValues().Values.ToList()
@@ -38,10 +39,4 @@ namespace EtcsServer.InMemoryData
                 .FirstOrDefault()?.MaxSpeedMps;
         }
     }
-    public class SwitchFromTo(int trackFromId, int trackToId)
-    {
-        public int TrackIdFrom { get; set; } = trackFromId;
-        public int TrackIdTo { get; set; } = trackToId;
-    }
-
 }

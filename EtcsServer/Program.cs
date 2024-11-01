@@ -1,11 +1,17 @@
 
 using EtcsServer.Configuration;
 using EtcsServer.Database;
+using EtcsServer.Database.Entity;
 using EtcsServer.DecisionExecutors;
+using EtcsServer.DecisionExecutors.Contract;
 using EtcsServer.DecisionMakers;
+using EtcsServer.DecisionMakers.Contract;
 using EtcsServer.DriverDataCollectors;
+using EtcsServer.DriverDataCollectors.Contract;
 using EtcsServer.Helpers;
+using EtcsServer.Helpers.Contract;
 using EtcsServer.InMemoryData;
+using EtcsServer.InMemoryData.Contract;
 using EtcsServer.InMemoryHolders;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,23 +31,23 @@ namespace EtcsServer
             });
 
 
-            builder.Services.AddSingleton<CrossingsHolder>();
-            builder.Services.AddSingleton<RailroadSignsHolder>();
-            builder.Services.AddSingleton<RailwaySignalsHolder>();
-            builder.Services.AddSingleton<SwitchRoutesHolder>();
-            builder.Services.AddSingleton<TracksHolder>();
-            builder.Services.AddSingleton<TrainsHolder>();
+            builder.Services.AddSingleton<IHolder<Crossing>, CrossingsHolder>();
+            builder.Services.AddSingleton<IHolder<RailroadSign>, RailroadSignsHolder>();
+            builder.Services.AddSingleton<IHolder<RailwaySignal>, RailwaySignalsHolder>();
+            builder.Services.AddSingleton<IHolder<SwitchRoute>, SwitchRoutesHolder>();
+            builder.Services.AddSingleton<IHolder<Track>, TracksHolder>();
+            builder.Services.AddSingleton<IHolder<Train>, TrainsHolder>();
 
-            builder.Services.AddSingleton<LastKnownPositionsTracker>();
-            builder.Services.AddSingleton<RailwaySignalStates>();
-            builder.Services.AddSingleton<SwitchStates>();
-            builder.Services.AddSingleton<RegisteredTrainsTracker>();
+            builder.Services.AddSingleton<ITrainPositionTracker, LastKnownPositionsTracker>();
+            builder.Services.AddSingleton<IRailwaySignalStates, RailwaySignalStates>();
+            builder.Services.AddSingleton<ISwitchStates, SwitchStates>();
+            builder.Services.AddSingleton<IRegisteredTrainsTracker, RegisteredTrainsTracker>();
 
-            builder.Services.AddSingleton<RailwaySignalHelper>();
-            builder.Services.AddSingleton<TrackHelper>();
+            builder.Services.AddSingleton<IRailwaySignalHelper, RailwaySignalHelper>();
+            builder.Services.AddSingleton<ITrackHelper, TrackHelper>();
 
-            builder.Services.AddSingleton<MovementAuthorityValidator>();
-            builder.Services.AddSingleton<MovementAuthorityProvider>();
+            builder.Services.AddSingleton<IMovementAuthorityValidator, MovementAuthorityValidator>();
+            builder.Services.AddSingleton<IMovementAuthorityProvider, MovementAuthorityProvider>();
 
             builder.Services.Configure<ServerProperties>(builder.Configuration.GetSection("ServerProperties"));
             builder.Services.AddControllers();
@@ -54,23 +60,23 @@ namespace EtcsServer
 
             using (var scope = app.Services.CreateScope())
             {
-                scope.ServiceProvider.GetRequiredService<CrossingsHolder>();
-                scope.ServiceProvider.GetRequiredService<RailroadSignsHolder>();
-                scope.ServiceProvider.GetRequiredService<RailwaySignalsHolder>();
-                scope.ServiceProvider.GetRequiredService<SwitchRoutesHolder>();
-                scope.ServiceProvider.GetRequiredService<TracksHolder>();
-                scope.ServiceProvider.GetRequiredService<TrainsHolder>();
+                scope.ServiceProvider.GetRequiredService<IHolder<Crossing>>();
+                scope.ServiceProvider.GetRequiredService<IHolder<RailroadSign>>();
+                scope.ServiceProvider.GetRequiredService<IHolder<RailwaySignal>>();
+                scope.ServiceProvider.GetRequiredService<IHolder<SwitchRoute>>();
+                scope.ServiceProvider.GetRequiredService<IHolder<Track>>();
+                scope.ServiceProvider.GetRequiredService<IHolder<Train>>();
 
-                scope.ServiceProvider.GetRequiredService<LastKnownPositionsTracker>();
-                scope.ServiceProvider.GetRequiredService<RailwaySignalStates>();
-                scope.ServiceProvider.GetRequiredService<SwitchStates>();
-                scope.ServiceProvider.GetRequiredService<RegisteredTrainsTracker>();
+                scope.ServiceProvider.GetRequiredService<ITrainPositionTracker>();
+                scope.ServiceProvider.GetRequiredService<IRailwaySignalStates>();
+                scope.ServiceProvider.GetRequiredService<ISwitchStates>();
+                scope.ServiceProvider.GetRequiredService<IRegisteredTrainsTracker>();
 
-                scope.ServiceProvider.GetRequiredService<RailwaySignalHelper>();
-                scope.ServiceProvider.GetRequiredService<TrackHelper>();
+                scope.ServiceProvider.GetRequiredService<IRailwaySignalHelper>();
+                scope.ServiceProvider.GetRequiredService<ITrackHelper>();
 
-                scope.ServiceProvider.GetRequiredService<MovementAuthorityValidator>();
-                scope.ServiceProvider.GetRequiredService<MovementAuthorityProvider>();
+                scope.ServiceProvider.GetRequiredService<IMovementAuthorityValidator>();
+                scope.ServiceProvider.GetRequiredService<IMovementAuthorityProvider>();
 
             }
 

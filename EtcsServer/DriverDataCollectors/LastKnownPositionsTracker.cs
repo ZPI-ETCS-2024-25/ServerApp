@@ -1,9 +1,10 @@
 ﻿using EtcsServer.Controllers;
 using EtcsServer.DriverAppDto;
+using EtcsServer.DriverDataCollectors.Contract;
 
 namespace EtcsServer.DriverDataCollectors
 {
-    public class LastKnownPositionsTracker
+    public partial class LastKnownPositionsTracker : ITrainPositionTracker
     {
         private readonly Dictionary<string, List<TrainPosition>> trainsPositions;
         private readonly ILogger<LastKnownPositionsTracker> logger;
@@ -40,13 +41,6 @@ namespace EtcsServer.DriverDataCollectors
                 "down" => MovementDirection.DOWN,
                 _ => MovementDirection.UNKNOWN
             };
-        }
-
-        public enum MovementDirection
-        {
-            UP,
-            DOWN,
-            UNKNOWN
         }
     }
 }

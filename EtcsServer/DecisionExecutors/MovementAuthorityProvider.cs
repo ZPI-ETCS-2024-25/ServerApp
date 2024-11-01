@@ -1,24 +1,25 @@
 ﻿using EtcsServer.Database.Entity;
+using EtcsServer.DecisionExecutors.Contract;
 using EtcsServer.DriverAppDto;
-using EtcsServer.DriverDataCollectors;
-using EtcsServer.Helpers;
-using EtcsServer.InMemoryData;
+using EtcsServer.DriverDataCollectors.Contract;
+using EtcsServer.Helpers.Contract;
+using EtcsServer.InMemoryData.Contract;
 using EtcsServer.InMemoryHolders;
 
 namespace EtcsServer.DecisionExecutors
 {
-    public class MovementAuthorityProvider
+    public class MovementAuthorityProvider : IMovementAuthorityProvider
     {
-        private readonly LastKnownPositionsTracker lastKnownPositionsTracker;
-        private readonly RailroadSignsHolder railroadSignsHolder;
-        private readonly TrackHelper trackHelper;
-        private readonly SwitchStates switchStates;
+        private readonly ITrainPositionTracker lastKnownPositionsTracker;
+        private readonly IHolder<RailroadSign> railroadSignsHolder;
+        private readonly ITrackHelper trackHelper;
+        private readonly ISwitchStates switchStates;
 
         public MovementAuthorityProvider(
-            LastKnownPositionsTracker lastKnownPositionsTracker,
-            RailroadSignsHolder railroadSignsHolder,
-            TrackHelper trackHelper,
-            SwitchStates switchStates
+            ITrainPositionTracker lastKnownPositionsTracker,
+            IHolder<RailroadSign> railroadSignsHolder,
+            ITrackHelper trackHelper,
+            ISwitchStates switchStates
             )
         {
             this.lastKnownPositionsTracker = lastKnownPositionsTracker;
