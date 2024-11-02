@@ -5,24 +5,28 @@ using EtcsServer.DriverDataCollectors.Contract;
 using EtcsServer.Helpers.Contract;
 using EtcsServer.InMemoryData.Contract;
 using EtcsServer.InMemoryHolders;
+using System.Runtime.ConstrainedExecution;
 
 namespace EtcsServer.DecisionExecutors
 {
     public class MovementAuthorityProvider : IMovementAuthorityProvider
     {
         private readonly ITrainPositionTracker lastKnownPositionsTracker;
+        private readonly IRegisteredTrainsTracker registeredTrainsTracker;
         private readonly IHolder<RailroadSign> railroadSignsHolder;
         private readonly ITrackHelper trackHelper;
         private readonly ISwitchStates switchStates;
 
         public MovementAuthorityProvider(
             ITrainPositionTracker lastKnownPositionsTracker,
+            IRegisteredTrainsTracker registeredTrainsTracker,
             IHolder<RailroadSign> railroadSignsHolder,
             ITrackHelper trackHelper,
             ISwitchStates switchStates
             )
         {
             this.lastKnownPositionsTracker = lastKnownPositionsTracker;
+            this.registeredTrainsTracker = registeredTrainsTracker;
             this.railroadSignsHolder = railroadSignsHolder;
             this.trackHelper = trackHelper;
             this.switchStates = switchStates;
@@ -30,12 +34,13 @@ namespace EtcsServer.DecisionExecutors
 
         public MovementAuthority ProvideMovementAuthorityToEtcsBorder(string trainId)
         {
+            TrainDto train = registeredTrainsTracker.GetRegisteredTrain(trainId)!;
             TrainPosition trainPosition = lastKnownPositionsTracker.GetLastKnownTrainPosition(trainId)!;
             bool isMovingUp = trainPosition.Direction.Equals("up");
             Track? track = trackHelper.GetTrackByTrainPosition(trainPosition);
             bool wasInsideEtcsBorder = false;
 
-            MovementAuthorityContainer authorityContainer = new()
+            MovementAuthorityContainer authorityContainer = new(train)
             {
                 StartingTrackId = track!.TrackageElementId,
                 CurrentKilometer = trainPosition.Kilometer,
@@ -61,11 +66,12 @@ namespace EtcsServer.DecisionExecutors
 
         public MovementAuthority ProvideMovementAuthority(string trainId, RailwaySignal stopSignal)
         {
+            TrainDto train = registeredTrainsTracker.GetRegisteredTrain(trainId)!;
             TrainPosition trainPosition = lastKnownPositionsTracker.GetLastKnownTrainPosition(trainId)!;
             bool isMovingUp = trainPosition.Direction.Equals("up");
             Track? track = trackHelper.GetTrackByTrainPosition(trainPosition);
 
-            MovementAuthorityContainer authorityContainer = new()
+            MovementAuthorityContainer authorityContainer = new(train)
             {
                 StartingTrackId = track!.TrackageElementId,
                 CurrentKilometer = trainPosition.Kilometer,
@@ -177,8 +183,10 @@ namespace EtcsServer.DecisionExecutors
             UpdateTravelledDistance(authorityContainer, isMovingUp, trainPosition, stopSignal);
         }
 
-        class MovementAuthorityContainer
+        class MovementAuthorityContainer(TrainDto train)
         {
+            private readonly TrainDto _train = train;
+
             public List<double> Speeds { get; set; } = [];
             public List<double> SpeedsDistances { get; set; } = [];
             public List<double> Gradients { get; set; } = [];
@@ -191,12 +199,19 @@ namespace EtcsServer.DecisionExecutors
 
             public void RegisterSpeed(double speed, double distance)
             {
+                if (Speeds.Count > 0 && Speeds.Last() < speed)
+                    distance += Int32.Parse(_train.LengthMeters) / 1000;
+
                 if (Speeds.Count == 0 || speed != Speeds.Last())
                 {
-                    if (SpeedsDistances.Count == 0 || distance != SpeedsDistances.Last())
+                    if (SpeedsDistances.Count == 0 || distance > SpeedsDistances.Last())
                     {
                         Speeds.Add(speed);
                         SpeedsDistances.Add(distance);
+                    } else if (distance < SpeedsDistances.Last())
+                    {
+                        Speeds[Speeds.Count - 1] = speed;
+                        SpeedsDistances[SpeedsDistances.Count - 1] = distance;
                     } else
                     {
                         Speeds[Speeds.Count - 1] = Math.Min(Speeds.Last(), speed);

@@ -68,6 +68,12 @@ namespace EtcsServer.InMemoryData
         {
             return trains.Values.ToList();
         }
+
+        public TrainDto? GetRegisteredTrain(string trainId)
+        {
+            _ = trains.TryGetValue(trainId, out TrainDto? result);
+            return result;
+        }
     }
 
 }
