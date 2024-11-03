@@ -14,6 +14,7 @@ namespace EtcsServer.DecisionMakers.Contract
         public enum MovementAuthorityValidationResult
         {
             OK,
+            TRAIN_NOT_REGISTERED,
             POSITION_NOT_KNOWN,
             MOVEMENT_DIRECTION_NOT_KNOWN,
             END_OF_ROAD,

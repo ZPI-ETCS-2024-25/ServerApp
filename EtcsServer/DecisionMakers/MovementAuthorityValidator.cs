@@ -3,18 +3,26 @@ using EtcsServer.DecisionMakers.Contract;
 using EtcsServer.DriverAppDto;
 using EtcsServer.DriverDataCollectors.Contract;
 using EtcsServer.Helpers.Contract;
+using EtcsServer.InMemoryData.Contract;
 using static EtcsServer.DecisionMakers.Contract.MovementAuthorityValidationOutcome;
 
 namespace EtcsServer.DecisionMakers
 {
     public partial class MovementAuthorityValidator : IMovementAuthorityValidator
     {
+        private readonly IRegisteredTrainsTracker registeredTrainsTracker;
         private readonly ITrainPositionTracker lastKnownPositionsTracker;
         private readonly ITrackHelper trackHelper;
         private readonly IRailwaySignalHelper railwaySignalHelper;
 
-        public MovementAuthorityValidator(ITrainPositionTracker lastKnownPositionsTracker, ITrackHelper trackHelper, IRailwaySignalHelper railwaySignalHelper)
+        public MovementAuthorityValidator(
+            IRegisteredTrainsTracker registeredTrainsTracker,
+            ITrainPositionTracker lastKnownPositionsTracker,
+            ITrackHelper trackHelper,
+            IRailwaySignalHelper railwaySignalHelper
+            )
         {
+            this.registeredTrainsTracker = registeredTrainsTracker;
             this.lastKnownPositionsTracker = lastKnownPositionsTracker;
             this.trackHelper = trackHelper;
             this.railwaySignalHelper = railwaySignalHelper;
@@ -22,6 +30,9 @@ namespace EtcsServer.DecisionMakers
 
         public MovementAuthorityValidationOutcome IsTrainValidForMovementAuthority(string trainId)
         {
+            if (registeredTrainsTracker.GetRegisteredTrain(trainId) == null)
+                return MovementAuthorityValidationOutcome.GetFailedOutcome(MovementAuthorityValidationResult.TRAIN_NOT_REGISTERED);
+
             TrainPosition? trainPosition = lastKnownPositionsTracker.GetLastKnownTrainPosition(trainId);
             if (trainPosition == null)
                 return MovementAuthorityValidationOutcome.GetFailedOutcome(MovementAuthorityValidationResult.POSITION_NOT_KNOWN);

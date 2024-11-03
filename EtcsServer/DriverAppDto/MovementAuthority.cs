@@ -8,6 +8,8 @@
         public double[] GradientDistances { get; set; }
         public string[] Messages { get; set; }
         public double[] MessageDistances { get; set; }
+        public int[] Lines { get; set; }
+        public double[] LinesDistances { get; set; }
         public double ServerPosition { get; set; }
     }
 }

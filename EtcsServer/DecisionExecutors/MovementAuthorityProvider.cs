@@ -55,6 +55,7 @@ namespace EtcsServer.DecisionExecutors
                 RegisterSpeedsForCurrentTrack(authorityContainer, isMovingUp);
 
                 authorityContainer.RegisterGradient(authorityContainer.CurrentTrack.Gradient, authorityContainer.DistanceSoFar);
+                authorityContainer.RegisterLine();
 
                 UpdateTravelledDistance(authorityContainer, isMovingUp, trainPosition);
 
@@ -83,6 +84,7 @@ namespace EtcsServer.DecisionExecutors
                 RegisterSpeedsForCurrentTrack(authorityContainer, isMovingUp);
 
                 authorityContainer.RegisterGradient(authorityContainer.CurrentTrack.Gradient, authorityContainer.DistanceSoFar);
+                authorityContainer.RegisterLine();
 
                 UpdateTravelledDistance(authorityContainer, isMovingUp, trainPosition);
 
@@ -182,6 +184,7 @@ namespace EtcsServer.DecisionExecutors
         {
             RegisterSpeedsForCurrentTrack(authorityContainer, isMovingUp, stopSignal);
             authorityContainer.RegisterGradient(authorityContainer.CurrentTrack!.Gradient, authorityContainer.DistanceSoFar);
+            authorityContainer.RegisterLine();
             UpdateTravelledDistance(authorityContainer, isMovingUp, trainPosition, stopSignal);
         }
 
@@ -193,6 +196,8 @@ namespace EtcsServer.DecisionExecutors
             public List<double> SpeedsDistances { get; set; } = [];
             public List<double> Gradients { get; set; } = [];
             public List<double> GradientsDistances { get; set; } = [];
+            public List<int> Lines { get; set; } = [];
+            public List<double> LinesDistances { get; set; } = [];
 
             public int StartingTrackId { get; set; }
             public double CurrentKilometer { get; set; }
@@ -221,15 +226,6 @@ namespace EtcsServer.DecisionExecutors
                 }
             }
 
-            public void RegisterSpeedNoDistanceConstraint(double speed, double distance)
-            {
-                if (Speeds.Count == 0 || speed != Speeds.Last())
-                {
-                    Speeds.Add(speed);
-                    SpeedsDistances.Add(distance);
-                }
-            }
-
             public void RegisterGradient(double gradient, double distance)
             {
                 if (Gradients.Count == 0 || gradient != Gradients.Last())
@@ -239,9 +235,19 @@ namespace EtcsServer.DecisionExecutors
                 }
             }
 
+            public void RegisterLine()
+            {
+                if (CurrentTrack != null && (Lines.Count == 0 || CurrentTrack.LineNumber != Lines.Last()))
+                {
+                    Lines.Add(CurrentTrack.LineNumber);
+                    LinesDistances.Add(DistanceSoFar);
+                }
+            }
+
             public MovementAuthority CreateMovementAuthority(TrainPosition trainPosition)
             {
                 RegisterSpeed(0, DistanceSoFar);
+                LinesDistances.Add(DistanceSoFar);
                 return new MovementAuthority()
                 {
                     Speeds = Speeds.ToArray(),
@@ -250,7 +256,9 @@ namespace EtcsServer.DecisionExecutors
                     GradientDistances = GradientsDistances.ToArray(),
                     Messages = ["Travel safe"],
                     MessageDistances = [0],
-                    ServerPosition = trainPosition.Kilometer //TODO kilometer without track number and line number is ambiguous
+                    Lines = Lines.ToArray(),
+                    LinesDistances = LinesDistances.ToArray(),
+                    ServerPosition = trainPosition.Kilometer
                 };
             }
         }
