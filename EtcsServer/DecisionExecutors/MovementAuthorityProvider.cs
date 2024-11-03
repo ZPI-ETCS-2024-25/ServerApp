@@ -104,7 +104,7 @@ namespace EtcsServer.DecisionExecutors
             Track currentTrack = authorityContainer.CurrentTrack!;
             double currentKilometer = authorityContainer.CurrentKilometer;
             double distanceSoFar = authorityContainer.DistanceSoFar;
-            double currentTrackMaxSpeed = isMovingUp ? currentTrack.MaxUpSpeedMps : currentTrack.MaxDownSpeedMps;
+            double currentTrackMaxSpeed = isMovingUp ? currentTrack.MaxUpSpeed : currentTrack.MaxDownSpeed;
             if (stopKilometerOnTrack == -1)
                 stopKilometerOnTrack = isMovingUp ? currentTrack.Length : 0;
 

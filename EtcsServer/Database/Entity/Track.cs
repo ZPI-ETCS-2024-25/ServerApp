@@ -6,8 +6,8 @@
         public int LineNumber { get; set; }
         public double Kilometer { get; set; }
         public double Length { get; set; }
-        public double MaxUpSpeedMps { get; set; }
-        public double MaxDownSpeedMps { get; set; }
+        public double MaxUpSpeed { get; set; }
+        public double MaxDownSpeed { get; set; }
         public double Gradient {  get; set; }
         public TrackPosition TrackPosition { get; set; }
 
