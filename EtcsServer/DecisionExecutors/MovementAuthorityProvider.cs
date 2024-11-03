@@ -166,13 +166,15 @@ namespace EtcsServer.DecisionExecutors
         {
             double distanceSoFar = authorityContainer.DistanceSoFar;
             double? switchMaxSpeed = switchStates.GetMaxSpeed(trainSwitch.TrackageElementId, authorityContainer.CurrentTrack!.TrackageElementId);
+            double? switchLength = switchStates.GetSwitchLength(trainSwitch.TrackageElementId, authorityContainer.CurrentTrack!.TrackageElementId);
             double? maxSpeedBeforeSwitch = authorityContainer.Speeds.LastOrDefault();
 
-            if (switchMaxSpeed.HasValue)
+            if (switchMaxSpeed.HasValue && switchLength.HasValue)
             {
                 authorityContainer.RegisterSpeed(switchMaxSpeed.Value, distanceSoFar);
+                authorityContainer.DistanceSoFar += switchLength.Value;
                 if (maxSpeedBeforeSwitch.HasValue)
-                    authorityContainer.RegisterSpeedNoDistanceConstraint(maxSpeedBeforeSwitch.Value, distanceSoFar);
+                    authorityContainer.RegisterSpeed(maxSpeedBeforeSwitch.Value, distanceSoFar);
             }
         }
 

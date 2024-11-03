@@ -38,5 +38,13 @@ namespace EtcsServer.InMemoryData
                 .Where(sr => sr.TrackFromId == trackIdFrom)
                 .FirstOrDefault()?.MaxSpeedMps;
         }
+
+        public double? GetSwitchLength(int switchId, int trackIdFrom)
+        {
+            return switchRoutesHolder.GetValues().Values
+                .Where(sr => sr.SwitchId == switchId)
+                .Where(sr => sr.TrackFromId == trackIdFrom)
+                .FirstOrDefault()?.SwitchLength;
+        }
     }
 }
