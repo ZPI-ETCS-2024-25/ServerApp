@@ -2,6 +2,7 @@
 {
     public class MovementAuthority
     {
+        public string MessageType { get; set; } = "MA";
         public double[] Speeds { get; set; }
         public double[] SpeedDistances { get; set; }
         public double[] Gradients { get; set; }

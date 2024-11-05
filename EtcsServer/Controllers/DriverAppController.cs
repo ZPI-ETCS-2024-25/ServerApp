@@ -27,9 +27,9 @@ namespace EtcsServer.Controllers
             _logger.LogInformation("Received register request for train {}", train.TrainId);
             bool result = registeredTrainsTracker.Register(train);
             if (result)
-                return Ok(new JsonResponse() { message = $"Train with id {train.TrainId} was successfully registered" });
+                return Ok(new RegisterTrainResponse());
             else
-                return BadRequest(new JsonResponse() { message = $"Train with id {train.TrainId} is already registered on the server" });
+                return BadRequest(new RegisterTrainResponse() { RegisterSuccess = false });
         }
 
         [HttpPost("updatedata")]
@@ -37,10 +37,7 @@ namespace EtcsServer.Controllers
         {
             _logger.LogInformation("Received train data update request for train {}", updateTrain.TrainId);
             bool result = registeredTrainsTracker.Update(updateTrain);
-            if (result)
-                return Ok(new JsonResponse() { message = $"Successfully updated information about the train with id {updateTrain.TrainId}" });
-            else
-                return BadRequest(new JsonResponse() { message = $"Couldn't update information for train with id {updateTrain.TrainNumer}" });
+            return result ? Ok() : BadRequest();
         }
 
         [HttpPost("unregister")]
@@ -48,10 +45,7 @@ namespace EtcsServer.Controllers
         {
             _logger.LogInformation("Received train unregister request for train {}", unregisterRequest.TrainId);
             bool result = registeredTrainsTracker.Unregister(unregisterRequest.TrainId);
-            if (result)
-                return Ok(new JsonResponse() { message = $"Train with id {unregisterRequest.TrainId} was successfully unregistered" });
-            else
-                return BadRequest(new JsonResponse() { message = $"Train with id {unregisterRequest.TrainId} is not registered on the server" }); 
+            return result ? Ok(new UnregisterTrainResponse()) : BadRequest(new UnregisterTrainResponse());
         }
 
         [HttpPost("updateposition")]
@@ -79,14 +73,14 @@ namespace EtcsServer.Controllers
                 movementAuthorityProvider.ProvideMovementAuthorityToEtcsBorder(movementAuthorityRequest.TrainId) :
                 movementAuthorityProvider.ProvideMovementAuthority(movementAuthorityRequest.TrainId, validationOutcome.NextStopSignal!);
             
-            return Ok(new JsonResponse() { message = $"Train with id {movementAuthorityRequest.TrainId} was granted a movement authority: " + JsonSerializer.Serialize(movementAuthority)});                
+            return Ok(movementAuthority);                
         }
 
         [HttpPost("speedupdate")]
         public async Task<ActionResult> PostTrainSpeed(TrainSpeed trainSpeed)
         {
             _logger.LogInformation("Received train speed ({}) for train {}", trainSpeed.Speed, trainSpeed.TrainId);
-            return Ok(new JsonResponse() { message = "Server received the speed report for train " + trainSpeed.TrainId });
+            return Ok();
         }
     }
 }
