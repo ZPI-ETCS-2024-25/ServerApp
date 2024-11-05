@@ -12,11 +12,4 @@
         public TrackPosition TrackPosition { get; set; }
 
     }
-
-    public enum TrackPosition
-    {
-        INSIDE_ZONE,
-        INCOMING_ZONE,
-        OUTSIDE_ZONE
-    }
 }
