@@ -4,7 +4,5 @@
     {
         void SetSwitchState(int switchId, SwitchFromTo switchFromTo);
         int GetNextTrackId(int switchId, int trackIdFrom);
-        double? GetMaxSpeed(int switchId, int trackIdFrom);
-        double? GetSwitchLength(int switchId, int trackIdFrom);
     }
 }

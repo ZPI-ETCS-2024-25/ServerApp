@@ -30,21 +30,5 @@ namespace EtcsServer.InMemoryData
         {
             return states[(switchId, trackIdFrom)].TrackIdTo;
         }
-
-        public double? GetMaxSpeed(int switchId, int trackIdFrom)
-        {
-            return switchRoutesHolder.GetValues().Values
-                .Where(sr => sr.SwitchId == switchId)
-                .Where(sr => sr.TrackFromId == trackIdFrom)
-                .FirstOrDefault()?.MaxSpeed;
-        }
-
-        public double? GetSwitchLength(int switchId, int trackIdFrom)
-        {
-            return switchRoutesHolder.GetValues().Values
-                .Where(sr => sr.SwitchId == switchId)
-                .Where(sr => sr.TrackFromId == trackIdFrom)
-                .FirstOrDefault()?.SwitchLength;
-        }
     }
 }
