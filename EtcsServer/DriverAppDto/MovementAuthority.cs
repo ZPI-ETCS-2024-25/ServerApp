@@ -1,6 +1,6 @@
 ﻿namespace EtcsServer.DriverAppDto
 {
-    public class MovementAuthority
+    public class MovementAuthority : ServerResponse
     {
         public string MessageType { get; set; } = "MA";
         public double[] Speeds { get; set; }

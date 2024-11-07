@@ -1,6 +1,6 @@
 ﻿namespace EtcsServer.DriverAppDto
 {
-    public class UnregisterTrainResponse
+    public class UnregisterTrainResponse : ServerResponse
     {
         public string MessageType { get; set; } = "LTO";
     }

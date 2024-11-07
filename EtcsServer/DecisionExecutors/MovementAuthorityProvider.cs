@@ -204,8 +204,9 @@ namespace EtcsServer.DecisionExecutors
             public double DistanceSoFar { get; set; }
             public Track? CurrentTrack { get; set; }
 
-            public void RegisterSpeed(double speed, double distance)
+            public void RegisterSpeed(double speed, double kilometer)
             {
+                int distance = (int)(kilometer * 1000);
                 if (Speeds.Count > 0 && Speeds.Last() < speed)
                     distance += Int32.Parse(_train.LengthMeters) / 1000;
 
@@ -226,8 +227,9 @@ namespace EtcsServer.DecisionExecutors
                 }
             }
 
-            public void RegisterGradient(double gradient, double distance)
+            public void RegisterGradient(double gradient, double kilometer)
             {
+                int distance = (int)(kilometer * 1000);
                 if (Gradients.Count == 0 || gradient != Gradients.Last())
                 {
                     Gradients.Add(gradient);
@@ -240,14 +242,15 @@ namespace EtcsServer.DecisionExecutors
                 if (CurrentTrack != null && (Lines.Count == 0 || CurrentTrack.LineNumber != Lines.Last()))
                 {
                     Lines.Add(CurrentTrack.LineNumber);
-                    LinesDistances.Add(DistanceSoFar);
+                    LinesDistances.Add(DistanceSoFar * 1000);
                 }
             }
 
             public MovementAuthority CreateMovementAuthority(TrainPosition trainPosition)
             {
                 RegisterSpeed(0, DistanceSoFar);
-                LinesDistances.Add(DistanceSoFar);
+                LinesDistances.Add(DistanceSoFar * 1000);
+                GradientsDistances.Add(DistanceSoFar * 1000);
                 return new MovementAuthority()
                 {
                     Speeds = Speeds.ToArray(),
