@@ -1,5 +1,6 @@
 ﻿using EtcsServer.Database.Entity;
 using EtcsServer.DriverAppDto;
+using EtcsServer.DriverDataCollectors.Contract;
 using EtcsServer.Helpers.Contract;
 using EtcsServer.InMemoryData.Contract;
 using EtcsServer.InMemoryHolders;
@@ -24,10 +25,12 @@ namespace EtcsServer.Helpers
             this.railwaySignalStates = railwaySignalStates;
         }
 
-        public RailwaySignal? GetFirstStopSignal(TrainPosition trainPosition, bool isMovingUp)
+        public RailwaySignal? GetFirstStopSignal(TrainPosition trainPosition, MovementDirection movementDirection)
         {
             Track? currentTrack = trackHelper.GetTrackByTrainPosition(trainPosition);
             double currentKilometer = trainPosition.Kilometer;
+            bool isMovingUp = movementDirection == MovementDirection.UP;
+
             while (currentTrack != null)
             {
                 List<RailwaySignal> signalsOnCurrentTrack = railwaySignalTrackHolder.GetValues().Values
@@ -42,7 +45,7 @@ namespace EtcsServer.Helpers
                 if (firstStopSignal != null)
                     return firstStopSignal;
 
-                currentTrack = trackHelper.GetNextTrack(currentTrack.TrackageElementId, isMovingUp);
+                currentTrack = trackHelper.GetNextTrack(currentTrack.TrackageElementId, movementDirection);
                 if (currentTrack != null)
                     currentKilometer = isMovingUp ? currentTrack.Kilometer : currentTrack.Length;
                 else return null;

@@ -1,39 +1,56 @@
 ﻿using EtcsServer.Database.Entity;
 using EtcsServer.DriverAppDto;
+using EtcsServer.DriverDataCollectors.Contract;
 using EtcsServer.Helpers.Contract;
+using EtcsServer.InMemoryData;
 using EtcsServer.InMemoryData.Contract;
 using EtcsServer.InMemoryHolders;
 using Microsoft.IdentityModel.Protocols.Configuration;
+using System.Web.Http.Tracing;
 
 namespace EtcsServer.Helpers
 {
     public class TrackHelper : ITrackHelper
     {
+        private readonly IHolder<TrackageElement> trackageElementsHolder;
         private readonly IHolder<Track> tracksHolder;
         private readonly ISwitchStates switchStates;
 
-        public TrackHelper(IHolder<Track> tracksHolder, ISwitchStates switchStates)
+        public TrackHelper(
+            IHolder<TrackageElement> trackageElementsHolder,
+            IHolder<Track> tracksHolder,
+            ISwitchStates switchStates
+            )
         {
+            this.trackageElementsHolder = trackageElementsHolder;
             this.tracksHolder = tracksHolder;
             this.switchStates = switchStates;
         }
 
-        public TrackageElement? GetNextTrackageElement(int trackId, bool isDirectionUp)
+        public TrackageElement GetTrackageElement(int trackageElementId)
         {
-            Track track = tracksHolder.GetValues()[trackId];
-            return isDirectionUp ? track.RightSideElement : track.LeftSideElement;
+            return trackageElementsHolder.GetValues()[trackageElementId];
         }
 
-        public Track? GetNextTrack(int trackId, bool isDirectionUp)
+        public TrackageElement? GetNextTrackageElement(int trackageElementId, TrackEnd trackEnd)
         {
-            TrackageElement? nextElement = GetNextTrackageElement(trackId, isDirectionUp);
+            TrackageElement trackageElement = trackageElementsHolder.GetValues()[trackageElementId];
+            return trackEnd == TrackEnd.RIGHT ? trackageElement.RightSideElement : trackageElement.LeftSideElement;
+        }
+
+        public Track? GetNextTrack(int trackId, MovementDirection movementDirection) => GetNextTrack(trackId, TrackEnd.RIGHT);
+
+        public Track? GetNextTrack(int trackId, TrackEnd currentTrackEnd)
+        {
+            TrackageElement? nextElement = GetNextTrackageElement(trackId, currentTrackEnd);
 
             switch (nextElement) {
                 case null:
                     return null;
                 case Switch trainSwitch:
-                    int nextTrackId = switchStates.GetNextTrackId(trainSwitch.TrackageElementId, trackId);
-                    return GetTrackById(nextTrackId);
+                    return GetNextTrackBySwitch(trainSwitch.TrackageElementId, trackId);
+                case SwitchingTrack switchingTrack:
+                    return GetNextTrackBySwitchingTrack(switchingTrack, currentTrackEnd);
                 case Track nextTrack:
                     return nextTrack;
                 default:
@@ -58,6 +75,20 @@ namespace EtcsServer.Helpers
                 return null;
 
             return track;
+        }
+
+        private Track? GetNextTrackBySwitch(int switchId, int trackFromId)
+        {
+            int nextTrackId = switchStates.GetNextTrackId(switchId, trackFromId);
+            return GetTrackById(nextTrackId);
+        }
+
+        private Track? GetNextTrackBySwitchingTrack(SwitchingTrack switchingTrack, TrackEnd startingTrackEnd)
+        {
+            TrackageElement? nextElement = startingTrackEnd == TrackEnd.LEFT ? switchingTrack.RightSideElement : switchingTrack.LeftSideElement;
+            if (nextElement != null && nextElement is Switch trainSwitch)
+                return GetNextTrackBySwitch(trainSwitch.TrackageElementId, switchingTrack.TrackageElementId);
+            else throw new Exception("Switching track " + switchingTrack.TrackageElementId + " is not connected to a switch from both sides");
         }
     }
 }

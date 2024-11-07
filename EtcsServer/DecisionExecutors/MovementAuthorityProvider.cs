@@ -2,10 +2,13 @@
 using EtcsServer.DecisionExecutors.Contract;
 using EtcsServer.DriverAppDto;
 using EtcsServer.DriverDataCollectors.Contract;
+using EtcsServer.ExtensionMethods;
 using EtcsServer.Helpers.Contract;
+using EtcsServer.InMemoryData;
 using EtcsServer.InMemoryData.Contract;
 using EtcsServer.InMemoryHolders;
 using System.Runtime.ConstrainedExecution;
+using System.Security.AccessControl;
 
 namespace EtcsServer.DecisionExecutors
 {
@@ -36,7 +39,7 @@ namespace EtcsServer.DecisionExecutors
         {
             TrainDto train = registeredTrainsTracker.GetRegisteredTrain(trainId)!;
             TrainPosition trainPosition = lastKnownPositionsTracker.GetLastKnownTrainPosition(trainId)!;
-            bool isMovingUp = trainPosition.Direction.Equals("up");
+            TrackEnd destinationTrackEnd = trainPosition.Direction.Equals("up") ? TrackEnd.RIGHT : TrackEnd.LEFT;
             Track? track = trackHelper.GetTrackByTrainPosition(trainPosition);
             bool wasInsideEtcsBorder = false;
 
@@ -52,14 +55,14 @@ namespace EtcsServer.DecisionExecutors
                 if (authorityContainer.CurrentTrack.TrackPosition == TrackPosition.INSIDE_ZONE)
                     wasInsideEtcsBorder = true;
 
-                RegisterSpeedsForCurrentTrack(authorityContainer, isMovingUp);
+                RegisterSpeedsForCurrentTrack(authorityContainer, destinationTrackEnd);
 
                 authorityContainer.RegisterGradient(authorityContainer.CurrentTrack.Gradient, authorityContainer.DistanceSoFar);
                 authorityContainer.RegisterLine();
 
-                UpdateTravelledDistance(authorityContainer, isMovingUp, trainPosition);
+                UpdateTravelledDistance(authorityContainer, destinationTrackEnd, trainPosition);
 
-                HandleNextTrackageElement(authorityContainer, isMovingUp);
+                HandleNextTrackageElement(authorityContainer, destinationTrackEnd);
             }
 
             return authorityContainer.CreateMovementAuthority(trainPosition);
@@ -69,7 +72,7 @@ namespace EtcsServer.DecisionExecutors
         {
             TrainDto train = registeredTrainsTracker.GetRegisteredTrain(trainId)!;
             TrainPosition trainPosition = lastKnownPositionsTracker.GetLastKnownTrainPosition(trainId)!;
-            bool isMovingUp = trainPosition.Direction.Equals("up");
+            TrackEnd destinationTrackEnd = trainPosition.Direction.Equals("up") ? TrackEnd.RIGHT : TrackEnd.LEFT;
             Track? track = trackHelper.GetTrackByTrainPosition(trainPosition);
 
             MovementAuthorityContainer authorityContainer = new(train)
@@ -81,29 +84,30 @@ namespace EtcsServer.DecisionExecutors
 
             while (authorityContainer.CurrentTrack.TrackageElementId != stopSignal.TrackId)
             {
-                RegisterSpeedsForCurrentTrack(authorityContainer, isMovingUp);
+                RegisterSpeedsForCurrentTrack(authorityContainer, destinationTrackEnd);
 
                 authorityContainer.RegisterGradient(authorityContainer.CurrentTrack.Gradient, authorityContainer.DistanceSoFar);
                 authorityContainer.RegisterLine();
 
-                UpdateTravelledDistance(authorityContainer, isMovingUp, trainPosition);
+                UpdateTravelledDistance(authorityContainer, destinationTrackEnd, trainPosition);
 
-                HandleNextTrackageElement(authorityContainer, isMovingUp);
+                HandleNextTrackageElement(authorityContainer, destinationTrackEnd);
             }
 
-            UpdateMovementAuthorityUntilStopSignalIsReached(authorityContainer, isMovingUp, trainPosition, stopSignal);
+            UpdateMovementAuthorityUntilStopSignalIsReached(authorityContainer, destinationTrackEnd, trainPosition, stopSignal);
 
             return authorityContainer.CreateMovementAuthority(trainPosition);
         }
 
-        private void RegisterSpeedsForCurrentTrack(MovementAuthorityContainer authorityContainer, bool isMovingUp) => RegisterSpeedsForCurrentTrack(authorityContainer, isMovingUp, -1);
-        private void RegisterSpeedsForCurrentTrack(MovementAuthorityContainer authorityContainer, bool isMovingUp, RailwaySignal stopSignal) => RegisterSpeedsForCurrentTrack(authorityContainer, isMovingUp, stopSignal.DistanceFromTrackStart);
+        private void RegisterSpeedsForCurrentTrack(MovementAuthorityContainer authorityContainer, TrackEnd destinationTrackEnd) => RegisterSpeedsForCurrentTrack(authorityContainer, destinationTrackEnd, -1);
+        private void RegisterSpeedsForCurrentTrack(MovementAuthorityContainer authorityContainer, TrackEnd destinationTrackEnd, RailwaySignal stopSignal) => RegisterSpeedsForCurrentTrack(authorityContainer, destinationTrackEnd, stopSignal.DistanceFromTrackStart);
 
-        private void RegisterSpeedsForCurrentTrack(MovementAuthorityContainer authorityContainer, bool isMovingUp, double stopKilometerOnTrack)
+        private void RegisterSpeedsForCurrentTrack(MovementAuthorityContainer authorityContainer, TrackEnd destinationTrackEnd, double stopKilometerOnTrack)
         {
             Track currentTrack = authorityContainer.CurrentTrack!;
             double currentKilometer = authorityContainer.CurrentKilometer;
             double distanceSoFar = authorityContainer.DistanceSoFar;
+            bool isMovingUp = destinationTrackEnd == TrackEnd.RIGHT;
             double currentTrackMaxSpeed = isMovingUp ? currentTrack.MaxUpSpeed : currentTrack.MaxDownSpeed;
             if (stopKilometerOnTrack == -1)
                 stopKilometerOnTrack = isMovingUp ? currentTrack.Length : 0;
@@ -129,32 +133,30 @@ namespace EtcsServer.DecisionExecutors
             ));
         }
 
-        private void UpdateTravelledDistance(MovementAuthorityContainer authorityContainer, bool isMovingUp, TrainPosition originalTrainPosition)
+        private void UpdateTravelledDistance(MovementAuthorityContainer authorityContainer, TrackEnd destinationTrackEnd, TrainPosition originalTrainPosition)
         {
             Track currentTrack = authorityContainer.CurrentTrack!;
             if (currentTrack.TrackageElementId == authorityContainer.StartingTrackId)
-                authorityContainer.DistanceSoFar += isMovingUp ? (currentTrack.Kilometer + currentTrack.Length) - originalTrainPosition.Kilometer : originalTrainPosition.Kilometer - currentTrack.Kilometer;
+                authorityContainer.DistanceSoFar += (destinationTrackEnd == TrackEnd.RIGHT) ? (currentTrack.Kilometer + currentTrack.Length) - originalTrainPosition.Kilometer : originalTrainPosition.Kilometer - currentTrack.Kilometer;
             else authorityContainer.DistanceSoFar += currentTrack.Length;
         }
 
-        private void UpdateTravelledDistance(MovementAuthorityContainer authorityContainer, bool isMovingUp, TrainPosition originalTrainPosition, RailwaySignal stopSignal)
+        private void UpdateTravelledDistance(MovementAuthorityContainer authorityContainer, TrackEnd destinationTrackEnd, TrainPosition originalTrainPosition, RailwaySignal stopSignal)
         {
+            bool isMovingUp = destinationTrackEnd == TrackEnd.RIGHT;
             Track currentTrack = authorityContainer.CurrentTrack!;
             if (currentTrack.TrackageElementId == authorityContainer.StartingTrackId)
                 authorityContainer.DistanceSoFar += isMovingUp ? stopSignal.DistanceFromTrackStart - originalTrainPosition.Kilometer : originalTrainPosition.Kilometer - stopSignal.DistanceFromTrackStart;
             else authorityContainer.DistanceSoFar += isMovingUp ? stopSignal.DistanceFromTrackStart : currentTrack.Length - stopSignal.DistanceFromTrackStart;
         }
 
-        private void HandleNextTrackageElement(MovementAuthorityContainer authorityContainer, bool isMovingUp)
+        private void HandleNextTrackageElement(MovementAuthorityContainer authorityContainer, TrackEnd currentTrackEnd)
         {
             Track currentTrack = authorityContainer.CurrentTrack!;
-            TrackageElement? nextTrackageElement = trackHelper.GetNextTrackageElement(currentTrack.TrackageElementId, isMovingUp);
+            TrackageElement? nextTrackageElement = trackHelper.GetNextTrackageElement(currentTrack.TrackageElementId, currentTrackEnd);
             if (nextTrackageElement is Switch trainSwitch)
             {
-                RegisterMaxSpeedForSwitch(trainSwitch, authorityContainer);
-                int nextTrackId = switchStates.GetNextTrackId(trainSwitch.TrackageElementId, currentTrack.TrackageElementId);
-                authorityContainer.CurrentTrack = trackHelper.GetTrackById(nextTrackId)!;
-                authorityContainer.CurrentKilometer = authorityContainer.CurrentTrack.Kilometer;
+                HandleSwitch(trainSwitch, currentTrack.TrackageElementId, authorityContainer);
             }
             else if (nextTrackageElement is Track track)
             {
@@ -164,28 +166,51 @@ namespace EtcsServer.DecisionExecutors
             else authorityContainer.CurrentTrack = null;
         }
 
-        private void RegisterMaxSpeedForSwitch(Switch trainSwitch, MovementAuthorityContainer authorityContainer)
+        private void HandleSwitch(Switch trainSwitch, int trackFromId, MovementAuthorityContainer authorityContainer)
         {
-            double distanceSoFar = authorityContainer.DistanceSoFar;
-            double? switchMaxSpeed = switchStates.GetMaxSpeed(trainSwitch.TrackageElementId, authorityContainer.CurrentTrack!.TrackageElementId);
-            double? switchLength = switchStates.GetSwitchLength(trainSwitch.TrackageElementId, authorityContainer.CurrentTrack!.TrackageElementId);
-            double? maxSpeedBeforeSwitch = authorityContainer.Speeds.LastOrDefault();
+            int nextTrackId = switchStates.GetNextTrackId(trainSwitch.TrackageElementId, trackFromId);
+            TrackageElement trackageElementAfterSwitch = trackHelper.GetTrackageElement(nextTrackId);
 
-            if (switchMaxSpeed.HasValue && switchLength.HasValue)
+            while (trackageElementAfterSwitch != null && trackageElementAfterSwitch is not Track)
             {
-                authorityContainer.RegisterSpeed(switchMaxSpeed.Value, distanceSoFar);
-                authorityContainer.DistanceSoFar += switchLength.Value;
-                if (maxSpeedBeforeSwitch.HasValue)
-                    authorityContainer.RegisterSpeed(maxSpeedBeforeSwitch.Value, distanceSoFar);
+                if (trackageElementAfterSwitch is SwitchingTrack switchingTrack)
+                {
+                    TrackEnd currentSwitchingTrackEnd = switchingTrack.RightSideElementId == trainSwitch.TrackageElementId ? TrackEnd.RIGHT : TrackEnd.LEFT;
+                    RegisterSwitchingTrack(switchingTrack, currentSwitchingTrackEnd, authorityContainer);
+                    trainSwitch = (Switch)switchingTrack.GetNext(currentSwitchingTrackEnd.GetOppositeEnd())!;
+                    nextTrackId = switchStates.GetNextTrackId(trainSwitch.TrackageElementId, switchingTrack.TrackageElementId);
+                    trackageElementAfterSwitch = trackHelper.GetTrackageElement(nextTrackId);
+                }
+                else throw new Exception("Trackage element after switch is neither a track or a switching track");
+            }
+
+            if (trackageElementAfterSwitch is Track track)
+            {
+                authorityContainer.CurrentTrack = track;
+                authorityContainer.CurrentKilometer = track.Kilometer;
+            } else
+            {
+                authorityContainer.CurrentTrack = null;
             }
         }
 
-        private void UpdateMovementAuthorityUntilStopSignalIsReached(MovementAuthorityContainer authorityContainer, bool isMovingUp, TrainPosition trainPosition, RailwaySignal stopSignal)
+
+        private void RegisterSwitchingTrack(SwitchingTrack switchingTrack, TrackEnd startingTrackEnd, MovementAuthorityContainer authorityContainer)
         {
-            RegisterSpeedsForCurrentTrack(authorityContainer, isMovingUp, stopSignal);
+            double distanceSoFar = authorityContainer.DistanceSoFar;
+            double gradient = startingTrackEnd == TrackEnd.LEFT ? switchingTrack.Gradient : -1 * switchingTrack.Gradient;
+
+            authorityContainer.RegisterSpeed(switchingTrack.MaxSpeed, distanceSoFar);
+            authorityContainer.RegisterGradient(gradient, distanceSoFar);
+            authorityContainer.DistanceSoFar += switchingTrack.Length;
+        }
+
+        private void UpdateMovementAuthorityUntilStopSignalIsReached(MovementAuthorityContainer authorityContainer, TrackEnd destinationTrackEnd, TrainPosition trainPosition, RailwaySignal stopSignal)
+        {
+            RegisterSpeedsForCurrentTrack(authorityContainer, destinationTrackEnd, stopSignal);
             authorityContainer.RegisterGradient(authorityContainer.CurrentTrack!.Gradient, authorityContainer.DistanceSoFar);
             authorityContainer.RegisterLine();
-            UpdateTravelledDistance(authorityContainer, isMovingUp, trainPosition, stopSignal);
+            UpdateTravelledDistance(authorityContainer, destinationTrackEnd, trainPosition, stopSignal);
         }
 
         class MovementAuthorityContainer(TrainDto train)

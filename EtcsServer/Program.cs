@@ -50,6 +50,7 @@ namespace EtcsServer
                 scope.ServiceProvider.GetRequiredService<IHolder<RailwaySignal>>();
                 scope.ServiceProvider.GetRequiredService<IHolder<SwitchRoute>>();
                 scope.ServiceProvider.GetRequiredService<IHolder<Track>>();
+                scope.ServiceProvider.GetRequiredService<IHolder<TrackageElement>>();
                 scope.ServiceProvider.GetRequiredService<IHolder<Train>>();
 
                 scope.ServiceProvider.GetRequiredService<ITrainPositionTracker>();

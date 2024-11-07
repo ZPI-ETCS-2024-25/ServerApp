@@ -1,4 +1,6 @@
-﻿namespace EtcsServer.Database.Entity
+﻿using EtcsServer.InMemoryData;
+
+namespace EtcsServer.Database.Entity
 {
     public class Track : TrackageElement
     {
@@ -11,5 +13,6 @@
         public double Gradient {  get; set; }
         public TrackPosition TrackPosition { get; set; }
 
+        public double GetMaxSpeed(TrackEnd startingTrackEnd) => startingTrackEnd == TrackEnd.LEFT ? MaxUpSpeed : MaxDownSpeed;
     }
 }
