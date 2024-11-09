@@ -3,6 +3,7 @@ using EtcsServer.DecisionMakers.Contract;
 using EtcsServer.DriverAppDto;
 using EtcsServer.DriverDataCollectors.Contract;
 using EtcsServer.InMemoryData.Contract;
+using EtcsServer.Security;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using static EtcsServer.Controllers.TestController;
@@ -15,10 +16,12 @@ namespace EtcsServer.Controllers
     public class DriverAppController : ControllerBase
     {
          private readonly ILogger<TestController> _logger;
+         private readonly SecurityManager securityManager;
 
-        public DriverAppController(ILogger<TestController> logger)
+        public DriverAppController(ILogger<TestController> logger, SecurityManager securityManager)
         {
             _logger = logger;
+            this.securityManager = securityManager;
         }
 
         [HttpPost("register")]
@@ -73,7 +76,7 @@ namespace EtcsServer.Controllers
                 movementAuthorityProvider.ProvideMovementAuthorityToEtcsBorder(movementAuthorityRequest.TrainId) :
                 movementAuthorityProvider.ProvideMovementAuthority(movementAuthorityRequest.TrainId, validationOutcome.NextStopSignal!);
             
-            return Ok(movementAuthority);                
+            return Ok(new EncryptedResponse(securityManager.Encrypt(movementAuthority)));                
         }
 
         [HttpPost("speedupdate")]

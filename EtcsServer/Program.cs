@@ -14,6 +14,7 @@ using EtcsServer.Helpers.Contract;
 using EtcsServer.InMemoryData;
 using EtcsServer.InMemoryData.Contract;
 using EtcsServer.InMemoryHolders;
+using EtcsServer.Security;
 using Microsoft.EntityFrameworkCore;
 
 namespace EtcsServer
@@ -31,10 +32,10 @@ namespace EtcsServer
                 options.UseSqlServer(connectionString);
             });
 
+            builder.Services.Configure<ServerProperties>(builder.Configuration.GetSection("ServerProperties"));
+            builder.Services.Configure<SecurityConfiguration>(builder.Configuration.GetSection("Security"));
 
             builder.Services.AddProjectServices();
-
-            builder.Services.Configure<ServerProperties>(builder.Configuration.GetSection("ServerProperties"));
             builder.Services.AddControllers();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -63,6 +64,8 @@ namespace EtcsServer
 
                 scope.ServiceProvider.GetRequiredService<IMovementAuthorityValidator>();
                 scope.ServiceProvider.GetRequiredService<IMovementAuthorityProvider>();
+
+                scope.ServiceProvider.GetRequiredService<SecurityManager>();
 
             }
 

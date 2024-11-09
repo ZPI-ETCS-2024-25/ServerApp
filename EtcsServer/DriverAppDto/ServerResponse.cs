@@ -2,6 +2,6 @@
 {
     public class ServerResponse
     {
-        public DateTime Timestamp { get; set; }
+        public DateTime Timestamp { get; set; } = DateTime.Now;
     }
 }

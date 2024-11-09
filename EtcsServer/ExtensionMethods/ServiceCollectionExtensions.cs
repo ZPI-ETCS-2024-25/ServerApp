@@ -10,6 +10,7 @@ using EtcsServer.Helpers;
 using EtcsServer.InMemoryData.Contract;
 using EtcsServer.InMemoryData;
 using EtcsServer.InMemoryHolders;
+using EtcsServer.Security;
 
 namespace EtcsServer.ExtensionMethods
 {
@@ -35,6 +36,8 @@ namespace EtcsServer.ExtensionMethods
 
             services.AddSingleton<IMovementAuthorityValidator, MovementAuthorityValidator>();
             services.AddSingleton<IMovementAuthorityProvider, MovementAuthorityProvider>();
+
+            services.AddSingleton<SecurityManager, SecurityManager>();
 
             return services;
         }
