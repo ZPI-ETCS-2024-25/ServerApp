@@ -29,7 +29,7 @@ namespace EtcsServer.Helpers
         {
             Track? currentTrack = trackHelper.GetTrackByTrainPosition(trainPosition);
             double currentKilometer = trainPosition.Kilometer;
-            double currentTrackKilometer = trainPosition.Kilometer;
+            double currentTrackKilometer = trainPosition.Kilometer - currentTrack!.Kilometer;
             bool isMovingUp = movementDirection == MovementDirection.UP;
 
             while (currentTrack != null)

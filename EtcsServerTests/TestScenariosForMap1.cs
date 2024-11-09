@@ -4,6 +4,7 @@ using EtcsServer.DecisionExecutors;
 using EtcsServer.DecisionExecutors.Contract;
 using EtcsServer.DecisionMakers.Contract;
 using EtcsServer.DriverAppDto;
+using EtcsServer.DriverDataCollectors.Contract;
 using EtcsServer.InMemoryData;
 using EtcsServer.InMemoryData.Contract;
 using EtcsServer.Security;
@@ -32,7 +33,8 @@ namespace EtcsServerTests
             serviceProvider = testMap.GetTestMapServiceProvider();
             driverAppController = serviceProvider.GetRequiredService<DriverAppController>();
             securityManager = serviceProvider.GetRequiredService<SecurityManager>();
-            
+
+            A.CallTo(() => testMap.TrainPositionTracker.GetMovementDirection(testMap.Train.TrainId)).Returns(MovementDirection.UP);
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(A<int>.Ignored)).Returns(RailwaySignalMessage.STOP);
             A.CallTo(() => testMap.SwitchStates.GetNextTrackId(4, 3)).Returns(6);
             A.CallTo(() => testMap.SwitchStates.GetNextTrackId(7, 6)).Returns(9);
@@ -123,7 +125,7 @@ namespace EtcsServerTests
             };
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(23)).Returns(RailwaySignalMessage.GO);
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(3)).Returns(RailwaySignalMessage.GO);
-            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(A<string>.That.Matches(s => s.Equals(trainId)))).Returns(trainPosition);
+            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
 
             //When
             MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
@@ -160,7 +162,7 @@ namespace EtcsServerTests
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(3)).Returns(RailwaySignalMessage.GO);
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(33)).Returns(RailwaySignalMessage.GO);
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(4)).Returns(RailwaySignalMessage.GO);
-            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(A<string>.That.Matches(s => s.Equals(trainId)))).Returns(trainPosition);
+            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
 
             //When
             MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
@@ -196,7 +198,8 @@ namespace EtcsServerTests
             };
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(33)).Returns(RailwaySignalMessage.GO);
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(4)).Returns(RailwaySignalMessage.GO);
-            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(A<string>.That.Matches(s => s.Equals(trainId)))).Returns(trainPosition);
+            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
+            A.CallTo(() => testMap.TrainPositionTracker.GetMovementDirection(trainId)).Returns(MovementDirection.DOWN);
 
             //When
             MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
@@ -233,7 +236,7 @@ namespace EtcsServerTests
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(7)).Returns(RailwaySignalMessage.GO);
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(1516)).Returns(RailwaySignalMessage.GO);
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(1617)).Returns(RailwaySignalMessage.GO);
-            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(A<string>.That.Matches(s => s.Equals(trainId)))).Returns(trainPosition);
+            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
 
             //When
             MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
@@ -268,7 +271,7 @@ namespace EtcsServerTests
                 Direction = "up"
             };
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(7)).Returns(RailwaySignalMessage.GO);
-            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(A<string>.That.Matches(s => s.Equals(trainId)))).Returns(trainPosition);
+            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
 
             //When
             MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });

@@ -38,7 +38,7 @@ namespace EtcsServer.Helpers
             return trackEnd == TrackEnd.RIGHT ? trackageElement.RightSideElement : trackageElement.LeftSideElement;
         }
 
-        public Track? GetNextTrack(int trackId, MovementDirection movementDirection) => GetNextTrack(trackId, TrackEnd.RIGHT);
+        public Track? GetNextTrack(int trackId, MovementDirection movementDirection) => GetNextTrack(trackId, movementDirection == MovementDirection.UP ? TrackEnd.RIGHT : TrackEnd.LEFT);
 
         public Track? GetNextTrack(int trackId, TrackEnd currentTrackEnd)
         {
