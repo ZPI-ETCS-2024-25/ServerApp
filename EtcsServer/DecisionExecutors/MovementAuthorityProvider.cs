@@ -274,16 +274,22 @@ namespace EtcsServer.DecisionExecutors
             public MovementAuthority CreateMovementAuthority(TrainPosition trainPosition)
             {
                 RegisterSpeed(0, DistanceSoFar);
+                if (GradientsDistances.Last() == DistanceSoFar * 1000)
+                {
+                    Gradients.RemoveAt(Gradients.Count-1);
+                }
+                else GradientsDistances.Add(DistanceSoFar * 1000);
+                
                 LinesDistances.Add(DistanceSoFar * 1000);
-                GradientsDistances.Add(DistanceSoFar * 1000);
+                
                 return new MovementAuthority()
                 {
                     Speeds = Speeds.ToArray(),
                     SpeedDistances = SpeedsDistances.ToArray(),
                     Gradients = Gradients.ToArray(),
                     GradientDistances = GradientsDistances.ToArray(),
-                    Messages = ["Travel safe"],
-                    MessageDistances = [0],
+                    Messages = [],
+                    MessageDistances = [],
                     Lines = Lines.ToArray(),
                     LinesDistances = LinesDistances.ToArray(),
                     ServerPosition = trainPosition.Kilometer

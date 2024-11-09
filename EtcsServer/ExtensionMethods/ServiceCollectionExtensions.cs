@@ -11,13 +11,17 @@ using EtcsServer.InMemoryData.Contract;
 using EtcsServer.InMemoryData;
 using EtcsServer.InMemoryHolders;
 using EtcsServer.Security;
+using EtcsServer.Configuration;
 
 namespace EtcsServer.ExtensionMethods
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddProjectServices(this IServiceCollection services)
+        public static IServiceCollection AddProjectServices(this IServiceCollection services, IConfiguration configuration)
         {
+            services.Configure<ServerProperties>(configuration.GetSection("ServerProperties"));
+            services.Configure<SecurityConfiguration>(configuration.GetSection("Security"));
+
             services.AddSingleton<IHolder<Crossing>, CrossingsHolder>();
             services.AddSingleton<IHolder<RailroadSign>, RailroadSignsHolder>();
             services.AddSingleton<IHolder<RailwaySignal>, RailwaySignalsHolder>();

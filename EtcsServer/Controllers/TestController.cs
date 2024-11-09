@@ -1,4 +1,5 @@
 using EtcsServer.Configuration;
+using EtcsServer.Security;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Runtime.CompilerServices;
@@ -93,6 +94,20 @@ namespace EtcsServer.Controllers
             {
                 return await stream.ReadToEndAsync();
             }
+        }
+
+        [HttpGet]
+        [Route("/encrypt")]
+        public async Task<ActionResult> Encrypt(string text, [FromServices] SecurityManager securityManager)
+        {
+            return Ok(new JsonResponse() { message = securityManager.Encrypt(text) });
+        }
+
+        [HttpGet]
+        [Route("/decrypt")]
+        public async Task<ActionResult> Decrypt(string text, [FromServices] SecurityManager securityManager)
+        {
+            return Ok(new JsonResponse() { message = securityManager.Decrypt(text) });
         }
     }
 }

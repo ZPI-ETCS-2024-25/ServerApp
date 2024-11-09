@@ -32,10 +32,7 @@ namespace EtcsServer
                 options.UseSqlServer(connectionString);
             });
 
-            builder.Services.Configure<ServerProperties>(builder.Configuration.GetSection("ServerProperties"));
-            builder.Services.Configure<SecurityConfiguration>(builder.Configuration.GetSection("Security"));
-
-            builder.Services.AddProjectServices();
+            builder.Services.AddProjectServices(builder.Configuration);
             builder.Services.AddControllers();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
