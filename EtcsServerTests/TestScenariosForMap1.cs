@@ -32,15 +32,11 @@ namespace EtcsServerTests
             serviceProvider = testMap.GetTestMapServiceProvider();
             driverAppController = serviceProvider.GetRequiredService<DriverAppController>();
             securityManager = serviceProvider.GetRequiredService<SecurityManager>();
+            
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(A<int>.Ignored)).Returns(RailwaySignalMessage.STOP);
-        }
-
-        [Fact]
-        public void MapTest()
-        {
-            Assert.True(testMap.TrackageElementHolder.GetValues()[3] is Track);
-            Assert.True(testMap.TrackageElementHolder.GetValues()[4] is Switch);
-            Assert.True(testMap.TrackageElementHolder.GetValues()[9] is SwitchingTrack);
+            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(4, 3)).Returns(6);
+            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(7, 6)).Returns(9);
+            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(12, 11)).Returns(15);
         }
 
         [Fact]
@@ -56,7 +52,7 @@ namespace EtcsServerTests
                 Track = "1",
                 Direction = "up"
             };
-            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(A<string>.That.Matches(s => s.Equals(trainId)))).Returns(trainPosition);
+            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
 
             //When
             MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
@@ -77,7 +73,223 @@ namespace EtcsServerTests
             Assert.Equal(expected, movementAuthority);
         }
 
-        public MovementAuthority? PostValidMovementAuthorityRequest(MovementAuthorityRequest request)
+        [Fact]
+        public void IMovementAuthorityProvider_ProvideMovementAuthority_IncomingFromOutsideOfTheZone()
+        {
+            //Given
+            string trainId = testMap.Train.TrainId;
+            TrainPosition trainPosition = new TrainPosition()
+            {
+                TrainId = trainId,
+                Kilometer = 0.5,
+                LineNumber = 1,
+                Track = "1",
+                Direction = "up"
+            };
+            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(12)).Returns(RailwaySignalMessage.GO);
+            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
+
+            //When
+            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+
+            //Then
+            MovementAuthority expected = new()
+            {
+                Speeds = [200, 180, 0],
+                SpeedDistances = [0, 1500, 2500],
+                Gradients = [20, 18],
+                GradientDistances = [0, 1500, 2500],
+                Lines = [1],
+                LinesDistances = [0, 2500],
+                Messages = [],
+                MessageDistances = [],
+                ServerPosition = 0.5
+            };
+            Assert.Equal(expected, movementAuthority);
+        }
+
+        [Fact]
+        public void IMovementAuthorityProvider_ProvideMovementAuthority_IncomingFromIncomingEtcsZoneThroughTwoSignals()
+        {
+            //Given
+            string trainId = testMap.Train.TrainId;
+            TrainPosition trainPosition = new TrainPosition()
+            {
+                TrainId = trainId,
+                Kilometer = 2.5,
+                LineNumber = 1,
+                Track = "1",
+                Direction = "up"
+            };
+            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(23)).Returns(RailwaySignalMessage.GO);
+            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(3)).Returns(RailwaySignalMessage.GO);
+            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(A<string>.That.Matches(s => s.Equals(trainId)))).Returns(trainPosition);
+
+            //When
+            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+
+            //Then
+            MovementAuthority expected = new()
+            {
+                Speeds = [180, 70, 0],
+                SpeedDistances = [0, 500, 5500],
+                Gradients = [18, 7],
+                GradientDistances = [0, 500, 5500],
+                Lines = [1],
+                LinesDistances = [0, 5500],
+                Messages = [],
+                MessageDistances = [],
+                ServerPosition = 2.5
+            };
+            Assert.Equal(expected, movementAuthority);
+        }
+
+        [Fact]
+        public void IMovementAuthorityProvider_ProvideMovementAuthority_MaThroughSwitchWithStopSignalAtTrainFrontPosition()
+        {
+            //Given
+            string trainId = testMap.Train.TrainId;
+            TrainPosition trainPosition = new TrainPosition()
+            {
+                TrainId = trainId,
+                Kilometer = 5.5,
+                LineNumber = 1,
+                Track = "1",
+                Direction = "up"
+            };
+            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(3)).Returns(RailwaySignalMessage.GO);
+            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(33)).Returns(RailwaySignalMessage.GO);
+            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(4)).Returns(RailwaySignalMessage.GO);
+            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(A<string>.That.Matches(s => s.Equals(trainId)))).Returns(trainPosition);
+
+            //When
+            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+
+            //Then
+            MovementAuthority expected = new()
+            {
+                Speeds = [70, 30, 0],
+                SpeedDistances = [0, 2500, 3500],
+                Gradients = [7, 3],
+                GradientDistances = [0, 2500, 3500],
+                Lines = [1, 2],
+                LinesDistances = [0, 2500, 3500],
+                Messages = [],
+                MessageDistances = [],
+                ServerPosition = 5.5
+            };
+            Assert.Equal(expected, movementAuthority);
+        }
+
+        [Fact]
+        public void IMovementAuthorityProvider_ProvideMovementAuthority_MaForTrainDrivingTheOtherWayRound()
+        {
+            //Given
+            string trainId = testMap.Train.TrainId;
+            TrainPosition trainPosition = new TrainPosition()
+            {
+                TrainId = trainId,
+                Kilometer = 7,
+                LineNumber = 1,
+                Track = "1",
+                Direction = "down"
+            };
+            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(33)).Returns(RailwaySignalMessage.GO);
+            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(4)).Returns(RailwaySignalMessage.GO);
+            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(A<string>.That.Matches(s => s.Equals(trainId)))).Returns(trainPosition);
+
+            //When
+            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+
+            //Then
+            MovementAuthority expected = new()
+            {
+                Speeds = [70, 0],
+                SpeedDistances = [0, 4000],
+                Gradients = [ -7 ],
+                GradientDistances = [0, 4000],
+                Lines = [1],
+                LinesDistances = [0, 4000],
+                Messages = [],
+                MessageDistances = [],
+                ServerPosition = 7
+            };
+            Assert.Equal(expected, movementAuthority);
+        }
+
+        [Fact]
+        public void IMovementAuthorityProvider_ProvideMovementAuthority_MaToEtcsBorderWithGoSignal()
+        {
+            //Given
+            string trainId = testMap.Train.TrainId;
+            TrainPosition trainPosition = new TrainPosition()
+            {
+                TrainId = trainId,
+                Kilometer = 0.8,
+                LineNumber = 2,
+                Track = "1",
+                Direction = "up"
+            };
+            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(7)).Returns(RailwaySignalMessage.GO);
+            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(1516)).Returns(RailwaySignalMessage.GO);
+            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(1617)).Returns(RailwaySignalMessage.GO);
+            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(A<string>.That.Matches(s => s.Equals(trainId)))).Returns(trainPosition);
+
+            //When
+            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+
+            //Then
+            MovementAuthority expected = new()
+            {
+                Speeds = [30, 20, 50, 80],
+                SpeedDistances = [0, 200, 1300, 2250],
+                Gradients = [3, 2, 5, 6.5],
+                GradientDistances = [0, 200, 500, 1500, 2250],
+                Lines = [2],
+                LinesDistances = [0, 2250],
+                Messages = [],
+                MessageDistances = [],
+                ServerPosition = 0.8
+            };
+            Assert.Equal(expected, movementAuthority);
+        }
+
+        [Fact]
+        public void IMovementAuthorityProvider_ProvideMovementAuthority_MaToEtcsBorderWithStopSignal()
+        {
+            //Given
+            string trainId = testMap.Train.TrainId;
+            TrainPosition trainPosition = new TrainPosition()
+            {
+                TrainId = trainId,
+                Kilometer = 0.8,
+                LineNumber = 2,
+                Track = "1",
+                Direction = "up"
+            };
+            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(7)).Returns(RailwaySignalMessage.GO);
+            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(A<string>.That.Matches(s => s.Equals(trainId)))).Returns(trainPosition);
+
+            //When
+            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+
+            //Then
+            MovementAuthority expected = new()
+            {
+                Speeds = [30, 20, 50, 0],
+                SpeedDistances = [0, 200, 1300, 2250],
+                Gradients = [3, 2, 5, 6.5],
+                GradientDistances = [0, 200, 500, 1500, 2250],
+                Lines = [2],
+                LinesDistances = [0, 2250],
+                Messages = [],
+                MessageDistances = [],
+                ServerPosition = 0.8
+            };
+            Assert.Equal(expected, movementAuthority);
+        }
+
+        private MovementAuthority? PostValidMovementAuthorityRequest(MovementAuthorityRequest request)
         {
             ActionResult response = driverAppController.PostMovementAuthorityRequest(
                 request,
@@ -94,40 +306,5 @@ namespace EtcsServerTests
             }
             return null;
         }
-
-        //[Fact]
-        //public void IMovementAuthorityProvider_ProvideMovementAuthority_IncomingFromOutsideOfTheZone()
-        //{
-        //    //Given
-        //    string trainId = testMap.Train.TrainId;
-        //    TrainPosition trainPosition = new TrainPosition()
-        //    {
-        //        TrainId = trainId,
-        //        Kilometer = 0.5,
-        //        LineNumber = 1,
-        //        Track = "1",
-        //        Direction = "up"
-        //    };
-        //    A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(A<int>.That.Matches(id => id == 12))).Returns(RailwaySignalMessage.GO);
-        //    A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(A<string>.That.Matches(s => s.Equals(trainId)))).Returns(trainPosition);
-
-        //    //When
-        //    MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
-
-        //    //Then
-        //    MovementAuthority expected = new()
-        //    {
-        //        Speeds = [200, 0],
-        //        SpeedDistances = [0, 1500],
-        //        Gradients = [20],
-        //        GradientDistances = [0, 1500],
-        //        Lines = [1],
-        //        LinesDistances = [0, 1500],
-        //        Messages = [],
-        //        MessageDistances = [],
-        //        ServerPosition = 0.5
-        //    };
-        //    Assert.Equal(expected, movementAuthority);
-        //}
     }
 }
