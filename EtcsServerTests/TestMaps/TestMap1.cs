@@ -12,12 +12,21 @@ namespace EtcsServerTests.TestMaps
 {
     class TestMap1 : MockTestMap
     {
+        public TrainDto Train { get; set; }
+
         public TestMap1()
         {
+            this.Train = new()
+            {
+                TrainId = "123",
+                LengthMeters = "800",
+                MaxSpeed = "200",
+                BrakeWeight = "500"
+            };
             InitializeHolders();
         }
 
-        private void InitializeHolders()
+        protected override void InitializeHolders()
         {
             List<TrackageElement> trackageElements = [
                 new Track() {
@@ -283,21 +292,13 @@ namespace EtcsServerTests.TestMaps
                 {12, new() { SwitchRouteId = 12, SwitchId = 12, Switch = (Switch)trackageElementsLookup[12], TrackFromId = 15, TrackFrom = trackageElementsLookup[15], TrackToId = 11, TrackTo = trackageElementsLookup[11] } },
             };
 
-            TrainDto train = new()
-            {
-                TrainId = "123",
-                LengthMeters = "800",
-                MaxSpeed = "200",
-                BrakeWeight = "500"
-            };
-
             A.CallTo(() => TrackageElementHolder.GetValues()).Returns(trackageElementsLookup);
             A.CallTo(() => TrackHolder.GetValues()).Returns(tracksLookup);
             A.CallTo(() => CrossingHolder.GetValues()).Returns([]);
             A.CallTo(() => RailroadSignHolder.GetValues()).Returns(signsLookup);
             A.CallTo(() => RailwaySignalHolder.GetValues()).Returns(railwaySignalsLookup);
             A.CallTo(() => SwitchRouteHolder.GetValues()).Returns(switchRoutesLookup);
-            A.CallTo(() => RegisteredTrainsTracker.GetRegisteredTrain(A<string>.Ignored)).Returns(train);
+            A.CallTo(() => RegisteredTrainsTracker.GetRegisteredTrain(A<string>.Ignored)).Returns(Train);
         }
     }
 }

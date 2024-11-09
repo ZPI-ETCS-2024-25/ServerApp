@@ -2,6 +2,7 @@
 using EtcsServer.InMemoryData;
 using EtcsServer.InMemoryData.Contract;
 using EtcsServer.InMemoryHolders;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,5 +20,7 @@ namespace EtcsServerTests.TestMaps
         IHolder<Track> TrackHolder { get; set; }
         IHolder<TrackageElement> TrackageElementHolder { get; set; }
         IRegisteredTrainsTracker RegisteredTrainsTracker { get; set; }
+
+        ServiceProvider GetTestMapServiceProvider();
     }
 }
