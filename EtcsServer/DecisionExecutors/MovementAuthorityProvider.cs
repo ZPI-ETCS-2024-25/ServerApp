@@ -252,8 +252,12 @@ namespace EtcsServer.DecisionExecutors
                     }
                     else if (meter < SpeedsDistances.Last())
                     {
-                        Speeds[Speeds.Count - 1] = speed;
-                        SpeedsDistances[SpeedsDistances.Count - 1] = meter;
+                        while (meter < SpeedsDistances.Last())
+                        {
+                            Speeds.RemoveAt(Speeds.Count - 1);
+                            SpeedsDistances.RemoveAt(SpeedsDistances.Count - 1);
+                        };
+                        RegisterSpeedWithMeterComparison(speed, meter);
                     }
                     else
                     {
