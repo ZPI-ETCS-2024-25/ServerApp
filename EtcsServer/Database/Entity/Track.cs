@@ -14,5 +14,7 @@ namespace EtcsServer.Database.Entity
         public TrackPosition TrackPosition { get; set; }
 
         public double GetMaxSpeed(TrackEnd startingTrackEnd) => startingTrackEnd == TrackEnd.LEFT ? MaxUpSpeed : MaxDownSpeed;
+        public int GetMeter() => Convert.ToInt32(Kilometer * 1000);
+        public int GetLengthMeters() => Convert.ToInt32(Length * 1000);
     }
 }

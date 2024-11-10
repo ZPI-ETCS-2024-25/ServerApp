@@ -7,5 +7,6 @@
         public Track Track { get; set; }
         public double DistanceFromTrackStart { get; set; }
         public bool IsFacedUp { get; set; }
+        public int GetDistanceFromStartMeters() => Convert.ToInt32(DistanceFromTrackStart * 1000);
     }
 }

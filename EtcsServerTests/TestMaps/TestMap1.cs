@@ -290,6 +290,8 @@ namespace EtcsServerTests.TestMaps
                 {10, new() { SwitchRouteId = 10, SwitchId = 12, Switch = (Switch)trackageElementsLookup[12], TrackFromId = 11, TrackFrom = trackageElementsLookup[11], TrackToId = 15, TrackTo = trackageElementsLookup[15] } },
                 {11, new() { SwitchRouteId = 11, SwitchId = 12, Switch = (Switch)trackageElementsLookup[12], TrackFromId = 14, TrackFrom = trackageElementsLookup[14], TrackToId = 11, TrackTo = trackageElementsLookup[11] } },
                 {12, new() { SwitchRouteId = 12, SwitchId = 12, Switch = (Switch)trackageElementsLookup[12], TrackFromId = 15, TrackFrom = trackageElementsLookup[15], TrackToId = 11, TrackTo = trackageElementsLookup[11] } },
+                {13, new() { SwitchRouteId = 13, SwitchId = 10, Switch = (Switch)trackageElementsLookup[10], TrackFromId = 9, TrackFrom = trackageElementsLookup[9], TrackToId = 11, TrackTo = trackageElementsLookup[11] } },
+                {15, new() { SwitchRouteId = 15, SwitchId = 10, Switch = (Switch)trackageElementsLookup[10], TrackFromId = 11, TrackFrom = trackageElementsLookup[11], TrackToId = 9, TrackTo = trackageElementsLookup[9] } },
             };
 
             A.CallTo(() => TrackageElementHolder.GetValues()).Returns(trackageElementsLookup);

@@ -49,8 +49,6 @@ namespace EtcsServer.Helpers
                     return null;
                 case Switch trainSwitch:
                     return GetNextTrackBySwitch(trainSwitch.TrackageElementId, trackId);
-                case SwitchingTrack switchingTrack:
-                    return GetNextTrackBySwitchingTrack(switchingTrack, currentTrackEnd);
                 case Track nextTrack:
                     return nextTrack;
                 default:
@@ -80,12 +78,17 @@ namespace EtcsServer.Helpers
         private Track? GetNextTrackBySwitch(int switchId, int trackFromId)
         {
             int nextTrackId = switchStates.GetNextTrackId(switchId, trackFromId);
-            return GetTrackById(nextTrackId);
+            TrackageElement trackageElement = GetTrackageElement(nextTrackId);
+            if (trackageElement is Track track)
+                return track;
+            else if (trackageElement is SwitchingTrack switchingTrack)
+                return GetNextTrackBySwitchingTrack(switchingTrack, switchId);
+            return null;
         }
 
-        private Track? GetNextTrackBySwitchingTrack(SwitchingTrack switchingTrack, TrackEnd startingTrackEnd)
+        private Track? GetNextTrackBySwitchingTrack(SwitchingTrack switchingTrack, int switchFromId)
         {
-            TrackageElement? nextElement = startingTrackEnd == TrackEnd.LEFT ? switchingTrack.RightSideElement : switchingTrack.LeftSideElement;
+            TrackageElement? nextElement = switchingTrack.LeftSideElementId == switchFromId ? switchingTrack.RightSideElement : switchingTrack.LeftSideElement;
             if (nextElement != null && nextElement is Switch trainSwitch)
                 return GetNextTrackBySwitch(trainSwitch.TrackageElementId, switchingTrack.TrackageElementId);
             else throw new Exception("Switching track " + switchingTrack.TrackageElementId + " is not connected to a switch from both sides");

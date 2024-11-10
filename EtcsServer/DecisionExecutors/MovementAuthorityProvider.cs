@@ -7,6 +7,7 @@ using EtcsServer.Helpers.Contract;
 using EtcsServer.InMemoryData;
 using EtcsServer.InMemoryData.Contract;
 using EtcsServer.InMemoryHolders;
+using System.Collections;
 using System.Runtime.ConstrainedExecution;
 using System.Security.AccessControl;
 
@@ -46,7 +47,7 @@ namespace EtcsServer.DecisionExecutors
             MovementAuthorityContainer authorityContainer = new(train)
             {
                 StartingTrackId = track!.TrackageElementId,
-                CurrentKilometer = trainPosition.Kilometer,
+                CurrentMeter = trainPosition.GetMeter(),
                 CurrentTrack = track
             };
 
@@ -57,7 +58,8 @@ namespace EtcsServer.DecisionExecutors
 
                 RegisterSpeedsForCurrentTrack(authorityContainer, destinationTrackEnd);
 
-                authorityContainer.RegisterGradient(authorityContainer.CurrentTrack.Gradient, authorityContainer.DistanceSoFar);
+                double gradient = destinationTrackEnd == TrackEnd.RIGHT ? authorityContainer.CurrentTrack.Gradient : -1 * authorityContainer.CurrentTrack.Gradient;
+                authorityContainer.RegisterGradient(gradient, authorityContainer.MetersSoFar);
                 authorityContainer.RegisterLine();
 
                 UpdateTravelledDistance(authorityContainer, destinationTrackEnd, trainPosition);
@@ -65,7 +67,8 @@ namespace EtcsServer.DecisionExecutors
                 HandleNextTrackageElement(authorityContainer, destinationTrackEnd);
             }
 
-            return authorityContainer.CreateMovementAuthority(trainPosition);
+            double finishingSpeed = authorityContainer.CurrentTrack == null ? 0 : authorityContainer.CurrentTrack.GetMaxSpeed(destinationTrackEnd);
+            return authorityContainer.CreateMovementAuthority(trainPosition, finishingSpeed);
         }
 
         public MovementAuthority ProvideMovementAuthority(string trainId, RailwaySignal stopSignal)
@@ -78,7 +81,7 @@ namespace EtcsServer.DecisionExecutors
             MovementAuthorityContainer authorityContainer = new(train)
             {
                 StartingTrackId = track!.TrackageElementId,
-                CurrentKilometer = trainPosition.Kilometer,
+                CurrentMeter = trainPosition.GetMeter(),
                 CurrentTrack = track
             };
 
@@ -87,7 +90,7 @@ namespace EtcsServer.DecisionExecutors
                 RegisterSpeedsForCurrentTrack(authorityContainer, destinationTrackEnd);
 
                 double gradient = destinationTrackEnd == TrackEnd.RIGHT ? authorityContainer.CurrentTrack.Gradient : -1 * authorityContainer.CurrentTrack.Gradient;
-                authorityContainer.RegisterGradient(gradient, authorityContainer.DistanceSoFar);
+                authorityContainer.RegisterGradient(gradient, authorityContainer.MetersSoFar);
                 authorityContainer.RegisterLine();
 
                 UpdateTravelledDistance(authorityContainer, destinationTrackEnd, trainPosition);
@@ -97,7 +100,7 @@ namespace EtcsServer.DecisionExecutors
 
             UpdateMovementAuthorityUntilStopSignalIsReached(authorityContainer, destinationTrackEnd, trainPosition, stopSignal);
 
-            return authorityContainer.CreateMovementAuthority(trainPosition);
+            return authorityContainer.CreateMovementAuthority(trainPosition, 0);
         }
 
         private void RegisterSpeedsForCurrentTrack(MovementAuthorityContainer authorityContainer, TrackEnd destinationTrackEnd) => RegisterSpeedsForCurrentTrack(authorityContainer, destinationTrackEnd, -1);
@@ -106,8 +109,8 @@ namespace EtcsServer.DecisionExecutors
         private void RegisterSpeedsForCurrentTrack(MovementAuthorityContainer authorityContainer, TrackEnd destinationTrackEnd, double stopKilometerOnTrack)
         {
             Track currentTrack = authorityContainer.CurrentTrack!;
-            double currentKilometer = authorityContainer.CurrentKilometer;
-            double distanceSoFar = authorityContainer.DistanceSoFar;
+            int currentMeter = authorityContainer.CurrentMeter;
+            int metersSoFar = authorityContainer.MetersSoFar;
             bool isMovingUp = destinationTrackEnd == TrackEnd.RIGHT;
             double currentTrackMaxSpeed = isMovingUp ? currentTrack.MaxUpSpeed : currentTrack.MaxDownSpeed;
             if (stopKilometerOnTrack == -1)
@@ -120,17 +123,17 @@ namespace EtcsServer.DecisionExecutors
                 .Where(s => isMovingUp ? s.DistanceFromTrackStart <= stopKilometerOnTrack : s.DistanceFromTrackStart >= stopKilometerOnTrack)
                 .OrderBy(s => isMovingUp ? s.DistanceFromTrackStart : -1 * s.DistanceFromTrackStart)
                 .ToList();
-            List<RailroadSign> signsAhead = signsOnCurrentTrack.Where(s => isMovingUp ? s.DistanceFromTrackStart > currentKilometer : s.DistanceFromTrackStart < currentKilometer).ToList();
+            List<RailroadSign> signsAhead = signsOnCurrentTrack.Where(s => isMovingUp ? s.GetDistanceFromStartMeters() > currentMeter : s.GetDistanceFromStartMeters() < currentMeter).ToList();
 
             double startingPointMaxSpeed = currentTrackMaxSpeed;
-            RailroadSign? previousSign = signsOnCurrentTrack.LastOrDefault(s => isMovingUp ? s.DistanceFromTrackStart <= currentKilometer : s.DistanceFromTrackStart >= currentKilometer);
+            RailroadSign? previousSign = signsOnCurrentTrack.LastOrDefault(s => isMovingUp ? s.GetDistanceFromStartMeters() <= currentMeter : s.GetDistanceFromStartMeters() >= currentMeter);
             if (previousSign != null)
                 startingPointMaxSpeed = previousSign.MaxSpeed;
 
-            authorityContainer.RegisterSpeed(startingPointMaxSpeed, distanceSoFar);
+            authorityContainer.RegisterSpeed(startingPointMaxSpeed, metersSoFar);
             signsAhead.ForEach(s => authorityContainer.RegisterSpeed(
                 s.MaxSpeed,
-                isMovingUp ? distanceSoFar + (s.DistanceFromTrackStart + currentTrack.Kilometer - currentKilometer) : distanceSoFar + (currentKilometer - s.DistanceFromTrackStart - currentTrack.Kilometer)
+                isMovingUp ? metersSoFar + (s.GetDistanceFromStartMeters() + currentTrack.GetMeter() - currentMeter) : metersSoFar + (currentMeter - s.GetDistanceFromStartMeters() - currentTrack.GetMeter())
             ));
         }
 
@@ -138,8 +141,8 @@ namespace EtcsServer.DecisionExecutors
         {
             Track currentTrack = authorityContainer.CurrentTrack!;
             if (currentTrack.TrackageElementId == authorityContainer.StartingTrackId)
-                authorityContainer.DistanceSoFar += (destinationTrackEnd == TrackEnd.RIGHT) ? (currentTrack.Kilometer + currentTrack.Length) - originalTrainPosition.Kilometer : originalTrainPosition.Kilometer - currentTrack.Kilometer;
-            else authorityContainer.DistanceSoFar += currentTrack.Length;
+                authorityContainer.MetersSoFar += (destinationTrackEnd == TrackEnd.RIGHT) ? currentTrack.GetMeter() + currentTrack.GetLengthMeters() - originalTrainPosition.GetMeter() : originalTrainPosition.GetMeter() - currentTrack.GetMeter();
+            else authorityContainer.MetersSoFar += currentTrack.GetLengthMeters();
         }
 
         private void UpdateTravelledDistance(MovementAuthorityContainer authorityContainer, TrackEnd destinationTrackEnd, TrainPosition originalTrainPosition, RailwaySignal stopSignal)
@@ -147,8 +150,8 @@ namespace EtcsServer.DecisionExecutors
             bool isMovingUp = destinationTrackEnd == TrackEnd.RIGHT;
             Track currentTrack = authorityContainer.CurrentTrack!;
             if (currentTrack.TrackageElementId == authorityContainer.StartingTrackId)
-                authorityContainer.DistanceSoFar += isMovingUp ? stopSignal.DistanceFromTrackStart - originalTrainPosition.Kilometer : originalTrainPosition.Kilometer - stopSignal.DistanceFromTrackStart;
-            else authorityContainer.DistanceSoFar += isMovingUp ? stopSignal.DistanceFromTrackStart : currentTrack.Length - stopSignal.DistanceFromTrackStart;
+                authorityContainer.MetersSoFar += isMovingUp ? stopSignal.GetDistanceFromStartMeters()- originalTrainPosition.GetMeter() : originalTrainPosition.GetMeter() - stopSignal.GetDistanceFromStartMeters();
+            else authorityContainer.MetersSoFar += isMovingUp ? stopSignal.GetDistanceFromStartMeters() : currentTrack.GetLengthMeters() - stopSignal.GetDistanceFromStartMeters();
         }
 
         private void HandleNextTrackageElement(MovementAuthorityContainer authorityContainer, TrackEnd currentTrackEnd)
@@ -162,7 +165,7 @@ namespace EtcsServer.DecisionExecutors
             else if (nextTrackageElement is Track track)
             {
                 authorityContainer.CurrentTrack = track;
-                authorityContainer.CurrentKilometer = track.Kilometer;
+                authorityContainer.CurrentMeter = track.GetMeter();
             }
             else authorityContainer.CurrentTrack = null;
         }
@@ -188,7 +191,7 @@ namespace EtcsServer.DecisionExecutors
             if (trackageElementAfterSwitch is Track track)
             {
                 authorityContainer.CurrentTrack = track;
-                authorityContainer.CurrentKilometer = track.Kilometer;
+                authorityContainer.CurrentMeter = track.GetMeter();
             } else
             {
                 authorityContainer.CurrentTrack = null;
@@ -198,18 +201,18 @@ namespace EtcsServer.DecisionExecutors
 
         private void RegisterSwitchingTrack(SwitchingTrack switchingTrack, TrackEnd startingTrackEnd, MovementAuthorityContainer authorityContainer)
         {
-            double distanceSoFar = authorityContainer.DistanceSoFar;
+            int metersSoFar = authorityContainer.MetersSoFar;
             double gradient = startingTrackEnd == TrackEnd.LEFT ? switchingTrack.Gradient : -1 * switchingTrack.Gradient;
 
-            authorityContainer.RegisterSpeed(switchingTrack.MaxSpeed, distanceSoFar);
-            authorityContainer.RegisterGradient(gradient, distanceSoFar);
-            authorityContainer.DistanceSoFar += switchingTrack.Length;
+            authorityContainer.RegisterSpeed(switchingTrack.MaxSpeed, metersSoFar);
+            authorityContainer.RegisterGradient(gradient, metersSoFar);
+            authorityContainer.MetersSoFar += switchingTrack.GetLengthMeters();
         }
 
         private void UpdateMovementAuthorityUntilStopSignalIsReached(MovementAuthorityContainer authorityContainer, TrackEnd destinationTrackEnd, TrainPosition trainPosition, RailwaySignal stopSignal)
         {
             RegisterSpeedsForCurrentTrack(authorityContainer, destinationTrackEnd, stopSignal);
-            authorityContainer.RegisterGradient(authorityContainer.CurrentTrack!.Gradient, authorityContainer.DistanceSoFar);
+            authorityContainer.RegisterGradient(authorityContainer.CurrentTrack!.Gradient, authorityContainer.MetersSoFar);
             authorityContainer.RegisterLine();
             UpdateTravelledDistance(authorityContainer, destinationTrackEnd, trainPosition, stopSignal);
         }
@@ -226,40 +229,45 @@ namespace EtcsServer.DecisionExecutors
             public List<double> LinesDistances { get; set; } = [];
 
             public int StartingTrackId { get; set; }
-            public double CurrentKilometer { get; set; }
-            public double DistanceSoFar { get; set; }
+            public int CurrentMeter { get; set; }
+            public int MetersSoFar { get; set; }
             public Track? CurrentTrack { get; set; }
 
-            public void RegisterSpeed(double speed, double kilometer)
+            public void RegisterSpeed(double speed, int meter)
             {
-                int distance = (int)(kilometer * 1000);
                 if (Speeds.Count > 0 && Speeds.Last() < speed)
-                    distance += Int32.Parse(_train.LengthMeters) / 1000;
+                    meter += Int32.Parse(_train.LengthMeters);
 
+                RegisterSpeedWithMeterComparison(speed, meter);
+            }
+
+            public void RegisterSpeedWithMeterComparison(double speed, int meter)
+            {
                 if (Speeds.Count == 0 || speed != Speeds.Last())
                 {
-                    if (SpeedsDistances.Count == 0 || distance > SpeedsDistances.Last())
+                    if (SpeedsDistances.Count == 0 || meter > SpeedsDistances.Last())
                     {
                         Speeds.Add(speed);
-                        SpeedsDistances.Add(distance);
-                    } else if (distance < SpeedsDistances.Last())
+                        SpeedsDistances.Add(meter);
+                    }
+                    else if (meter < SpeedsDistances.Last())
                     {
                         Speeds[Speeds.Count - 1] = speed;
-                        SpeedsDistances[SpeedsDistances.Count - 1] = distance;
-                    } else
+                        SpeedsDistances[SpeedsDistances.Count - 1] = meter;
+                    }
+                    else
                     {
                         Speeds[Speeds.Count - 1] = Math.Min(Speeds.Last(), speed);
                     }
                 }
             }
 
-            public void RegisterGradient(double gradient, double kilometer)
+            public void RegisterGradient(double gradient, int meter)
             {
-                int distance = (int)(kilometer * 1000);
                 if (Gradients.Count == 0 || gradient != Gradients.Last())
                 {
                     Gradients.Add(gradient);
-                    GradientsDistances.Add(distance);
+                    GradientsDistances.Add(meter);
                 }
             }
 
@@ -268,20 +276,20 @@ namespace EtcsServer.DecisionExecutors
                 if (CurrentTrack != null && (Lines.Count == 0 || CurrentTrack.LineNumber != Lines.Last()))
                 {
                     Lines.Add(CurrentTrack.LineNumber);
-                    LinesDistances.Add(DistanceSoFar * 1000);
+                    LinesDistances.Add(MetersSoFar);
                 }
             }
 
-            public MovementAuthority CreateMovementAuthority(TrainPosition trainPosition)
+            public MovementAuthority CreateMovementAuthority(TrainPosition trainPosition, double finishingSpeed)
             {
-                RegisterSpeed(0, DistanceSoFar);
-                if (GradientsDistances.Last() == DistanceSoFar * 1000)
+                RegisterSpeedWithMeterComparison(finishingSpeed, MetersSoFar);
+                if (GradientsDistances.Last() == MetersSoFar)
                 {
-                    Gradients.RemoveAt(Gradients.Count-1);
+                    Gradients.RemoveAt(Gradients.Count - 1);
                 }
-                else GradientsDistances.Add(DistanceSoFar * 1000);
-                
-                LinesDistances.Add(DistanceSoFar * 1000);
+                else GradientsDistances.Add(MetersSoFar);
+
+                LinesDistances.Add(MetersSoFar);
                 
                 return new MovementAuthority()
                 {

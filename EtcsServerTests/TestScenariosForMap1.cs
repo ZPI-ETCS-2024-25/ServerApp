@@ -38,6 +38,7 @@ namespace EtcsServerTests
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(A<int>.Ignored)).Returns(RailwaySignalMessage.STOP);
             A.CallTo(() => testMap.SwitchStates.GetNextTrackId(4, 3)).Returns(6);
             A.CallTo(() => testMap.SwitchStates.GetNextTrackId(7, 6)).Returns(9);
+            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(10, 9)).Returns(11);
             A.CallTo(() => testMap.SwitchStates.GetNextTrackId(12, 11)).Returns(15);
         }
 
