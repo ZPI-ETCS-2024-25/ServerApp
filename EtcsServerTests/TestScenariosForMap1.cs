@@ -293,6 +293,47 @@ namespace EtcsServerTests
             Assert.Equal(expected, movementAuthority);
         }
 
+        [Fact]
+        public void IMovementAuthorityProvider_ProvideMovementAuthority_MaWhenSwitchIsInInvalidState()
+        {
+            //Given
+            string trainId = testMap.Train.TrainId;
+            TrainPosition trainPosition = new TrainPosition()
+            {
+                TrainId = trainId,
+                Kilometer = 2,
+                LineNumber = 2,
+                Track = "1",
+                Direction = "down"
+            };
+            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(77)).Returns(RailwaySignalMessage.GO);
+            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(44)).Returns(RailwaySignalMessage.GO);
+            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(4, 3)).Returns(5);
+            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(4, 6)).Returns(3);
+            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(7, 6)).Returns(9);
+            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(7, 8)).Returns(6);
+            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
+            A.CallTo(() => testMap.TrainPositionTracker.GetMovementDirection(trainId)).Returns(MovementDirection.DOWN);
+
+            //When
+            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+
+            //Then
+            MovementAuthority expected = new()
+            {
+                Speeds = [90, 30, 70, 0],
+                SpeedDistances = [0, 1000, 2800, 4500],
+                Gradients = [-9, -3, -7],
+                GradientDistances = [0, 1000, 2000, 4500],
+                Lines = [2, 1],
+                LinesDistances = [0, 2000, 4500],
+                Messages = [],
+                MessageDistances = [],
+                ServerPosition = 2
+            };
+            Assert.Equal(expected, movementAuthority);
+        }
+
         private MovementAuthority? PostValidMovementAuthorityRequest(MovementAuthorityRequest request)
         {
             ActionResult response = driverAppController.PostMovementAuthorityRequest(
