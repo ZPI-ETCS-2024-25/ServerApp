@@ -58,8 +58,7 @@ namespace EtcsServer.DecisionExecutors
 
                 RegisterSpeedsForCurrentTrack(authorityContainer, destinationTrackEnd);
 
-                double gradient = destinationTrackEnd == TrackEnd.RIGHT ? authorityContainer.CurrentTrack.Gradient : -1 * authorityContainer.CurrentTrack.Gradient;
-                authorityContainer.RegisterGradient(gradient, authorityContainer.MetersSoFar);
+                RegisterGradient(authorityContainer, destinationTrackEnd);
                 authorityContainer.RegisterLine();
 
                 UpdateTravelledDistance(authorityContainer, destinationTrackEnd, trainPosition);
@@ -89,8 +88,7 @@ namespace EtcsServer.DecisionExecutors
             {
                 RegisterSpeedsForCurrentTrack(authorityContainer, destinationTrackEnd);
 
-                double gradient = destinationTrackEnd == TrackEnd.RIGHT ? authorityContainer.CurrentTrack.Gradient : -1 * authorityContainer.CurrentTrack.Gradient;
-                authorityContainer.RegisterGradient(gradient, authorityContainer.MetersSoFar);
+                RegisterGradient(authorityContainer, destinationTrackEnd);
                 authorityContainer.RegisterLine();
 
                 UpdateTravelledDistance(authorityContainer, destinationTrackEnd, trainPosition);
@@ -135,6 +133,12 @@ namespace EtcsServer.DecisionExecutors
                 s.MaxSpeed,
                 isMovingUp ? metersSoFar + (s.GetDistanceFromStartMeters() + currentTrack.GetMeter() - currentMeter) : metersSoFar + (currentMeter - s.GetDistanceFromStartMeters() - currentTrack.GetMeter())
             ));
+        }
+
+        private void RegisterGradient(MovementAuthorityContainer authorityContainer, TrackEnd destinationTrackEnd)
+        {
+            double gradient = destinationTrackEnd == TrackEnd.RIGHT ? authorityContainer.CurrentTrack!.Gradient : -1 * authorityContainer.CurrentTrack!.Gradient;
+            authorityContainer.RegisterGradient(gradient, authorityContainer.MetersSoFar);
         }
 
         private void UpdateTravelledDistance(MovementAuthorityContainer authorityContainer, TrackEnd destinationTrackEnd, TrainPosition originalTrainPosition)
@@ -212,7 +216,7 @@ namespace EtcsServer.DecisionExecutors
         private void UpdateMovementAuthorityUntilStopSignalIsReached(MovementAuthorityContainer authorityContainer, TrackEnd destinationTrackEnd, TrainPosition trainPosition, RailwaySignal stopSignal)
         {
             RegisterSpeedsForCurrentTrack(authorityContainer, destinationTrackEnd, stopSignal);
-            authorityContainer.RegisterGradient(authorityContainer.CurrentTrack!.Gradient, authorityContainer.MetersSoFar);
+            RegisterGradient(authorityContainer, destinationTrackEnd);
             authorityContainer.RegisterLine();
             UpdateTravelledDistance(authorityContainer, destinationTrackEnd, trainPosition, stopSignal);
         }
