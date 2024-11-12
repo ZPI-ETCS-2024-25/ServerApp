@@ -29,10 +29,11 @@ namespace EtcsServerTests.TestMaps
         protected override void InitializeHolders()
         {
 
-            double switchingTrackSpeed = 20;
             double switchingTrackLength = 0.05;
             double shortBetweenSwitches = 0.1;
             double longBetweenSwitches = 0.2;
+            double lowSwitchingSpeed = 40;
+            double highSwitchingSpeed = 60;
 
             List<TrackageElement> trackageElements = [
                 new Switch() {
@@ -57,6 +58,11 @@ namespace EtcsServerTests.TestMaps
                 },
                 new Switch() {
                     TrackageElementId = 115,
+                    LeftSideElementId = null,
+                    RightSideElementId = null
+                },
+                new Switch() {
+                    TrackageElementId = 116,
                     LeftSideElementId = null,
                     RightSideElementId = null
                 },
@@ -150,6 +156,16 @@ namespace EtcsServerTests.TestMaps
                     LeftSideElementId = null,
                     RightSideElementId = null
                 },
+                new Switch() {
+                    TrackageElementId = 157,
+                    LeftSideElementId = null,
+                    RightSideElementId = null
+                },
+                new Switch() {
+                    TrackageElementId = 158,
+                    LeftSideElementId = null,
+                    RightSideElementId = null
+                },
                 new Track() {
                     TrackageElementId = 1,
                     LeftSideElementId = null,
@@ -183,9 +199,18 @@ namespace EtcsServerTests.TestMaps
                     LineNumber = 1,
                     TrackNumber = "4",
                     Kilometer = 0,
-                    Length = 0.2,
+                    Length = 0.17,
                     MaxUpSpeed = 120,
                     MaxDownSpeed = 40,
+                    Gradient = 0,
+                    TrackPosition = TrackPosition.INSIDE_ZONE
+                },
+                new SwitchingTrack() {
+                    TrackageElementId = 240,
+                    LeftSideElementId = 116,
+                    RightSideElementId = 112,
+                    Length = switchingTrackLength,
+                    MaxSpeed = lowSwitchingSpeed,
                     Gradient = 0,
                     TrackPosition = TrackPosition.INSIDE_ZONE
                 },
@@ -220,7 +245,7 @@ namespace EtcsServerTests.TestMaps
                     LeftSideElementId = 111,
                     RightSideElementId = 113,
                     Length = switchingTrackLength,
-                    MaxSpeed = switchingTrackSpeed,
+                    MaxSpeed = lowSwitchingSpeed,
                     Gradient = 0,
                     TrackPosition = TrackPosition.INSIDE_ZONE
                 },
@@ -242,7 +267,7 @@ namespace EtcsServerTests.TestMaps
                     LeftSideElementId = 114,
                     RightSideElementId = 115,
                     Length = switchingTrackLength,
-                    MaxSpeed = switchingTrackSpeed,
+                    MaxSpeed = lowSwitchingSpeed,
                     Gradient = 0,
                     TrackPosition = TrackPosition.INSIDE_ZONE
                 },
@@ -342,7 +367,7 @@ namespace EtcsServerTests.TestMaps
                     LeftSideElementId = 121,
                     RightSideElementId = 122,
                     Length = switchingTrackLength,
-                    MaxSpeed = switchingTrackSpeed,
+                    MaxSpeed = highSwitchingSpeed,
                     Gradient = 0,
                     TrackPosition = TrackPosition.INSIDE_ZONE
                 },
@@ -364,7 +389,7 @@ namespace EtcsServerTests.TestMaps
                     LeftSideElementId = 123,
                     RightSideElementId = 124,
                     Length = switchingTrackLength,
-                    MaxSpeed = switchingTrackSpeed,
+                    MaxSpeed = highSwitchingSpeed,
                     Gradient = 0,
                     TrackPosition = TrackPosition.INSIDE_ZONE
                 },
@@ -375,7 +400,7 @@ namespace EtcsServerTests.TestMaps
                     LineNumber = 1,
                     TrackNumber = "1",
                     Kilometer = 3.65,
-                    Length = 5.4,
+                    Length = 5.396,
                     MaxUpSpeed = 160,
                     MaxDownSpeed = 160,
                     Gradient = 0,
@@ -388,7 +413,7 @@ namespace EtcsServerTests.TestMaps
                     LineNumber = 1,
                     TrackNumber = "2",
                     Kilometer = 3.6,
-                    Length = 5.5,
+                    Length = 5.496,
                     MaxUpSpeed = 160,
                     MaxDownSpeed = 160,
                     Gradient = 0,
@@ -400,7 +425,7 @@ namespace EtcsServerTests.TestMaps
                     RightSideElementId = 134,
                     LineNumber = 1,
                     TrackNumber = "1",
-                    Kilometer = 9.05,
+                    Kilometer = 9.046,
                     Length = longBetweenSwitches,
                     MaxUpSpeed = 160,
                     MaxDownSpeed = 160,
@@ -412,7 +437,7 @@ namespace EtcsServerTests.TestMaps
                     LeftSideElementId = 131,
                     RightSideElementId = 132,
                     Length = switchingTrackLength,
-                    MaxSpeed = switchingTrackSpeed,
+                    MaxSpeed = highSwitchingSpeed,
                     Gradient = 0,
                     TrackPosition = TrackPosition.INSIDE_ZONE
                 },
@@ -422,7 +447,7 @@ namespace EtcsServerTests.TestMaps
                     RightSideElementId = 133,
                     LineNumber = 1,
                     TrackNumber = "2",
-                    Kilometer = 9.1,
+                    Kilometer = 9.096,
                     Length = shortBetweenSwitches,
                     MaxUpSpeed = 160,
                     MaxDownSpeed = 160,
@@ -434,7 +459,7 @@ namespace EtcsServerTests.TestMaps
                     LeftSideElementId = 133,
                     RightSideElementId = 134,
                     Length = switchingTrackLength,
-                    MaxSpeed = switchingTrackSpeed,
+                    MaxSpeed = highSwitchingSpeed,
                     Gradient = 0,
                     TrackPosition = TrackPosition.INSIDE_ZONE
                 },
@@ -444,7 +469,7 @@ namespace EtcsServerTests.TestMaps
                     RightSideElementId = 21,
                     LineNumber = 1,
                     TrackNumber = "1",
-                    Kilometer = 9.25,
+                    Kilometer = 9.246,
                     Length = 0.1,
                     MaxUpSpeed = 160,
                     MaxDownSpeed = 160,
@@ -457,7 +482,7 @@ namespace EtcsServerTests.TestMaps
                     RightSideElementId = 224,
                     LineNumber = 1,
                     TrackNumber = "1",
-                    Kilometer = 9.35,
+                    Kilometer = 9.346,
                     Length = 1.1,
                     MaxUpSpeed = 140,
                     MaxDownSpeed = 140,
@@ -470,7 +495,7 @@ namespace EtcsServerTests.TestMaps
                     RightSideElementId = 226,
                     LineNumber = 1,
                     TrackNumber = "1",
-                    Kilometer = 10.45,
+                    Kilometer = 10.446,
                     Length = 0.02,
                     MaxUpSpeed = 40,
                     MaxDownSpeed = 40,
@@ -483,7 +508,7 @@ namespace EtcsServerTests.TestMaps
                     RightSideElementId = 228,
                     LineNumber = 1,
                     TrackNumber = "1",
-                    Kilometer = 10.47,
+                    Kilometer = 10.466,
                     Length = 0.02,
                     MaxUpSpeed = 60,
                     MaxDownSpeed = 60,
@@ -496,7 +521,7 @@ namespace EtcsServerTests.TestMaps
                     RightSideElementId = 230,
                     LineNumber = 1,
                     TrackNumber = "1",
-                    Kilometer = 10.49,
+                    Kilometer = 10.486,
                     Length = 1.11,
                     MaxUpSpeed = 120,
                     MaxDownSpeed = 120,
@@ -509,7 +534,7 @@ namespace EtcsServerTests.TestMaps
                     RightSideElementId = 141,
                     LineNumber = 1,
                     TrackNumber = "1",
-                    Kilometer = 11.6,
+                    Kilometer = 11.596,
                     Length = 0.1,
                     MaxUpSpeed = 80,
                     MaxDownSpeed = 80,
@@ -522,7 +547,7 @@ namespace EtcsServerTests.TestMaps
                     RightSideElementId = 22,
                     LineNumber = 1,
                     TrackNumber = "2",
-                    Kilometer = 9.2,
+                    Kilometer = 9.196,
                     Length = 0.15,
                     MaxUpSpeed = 160,
                     MaxDownSpeed = 160,
@@ -535,7 +560,7 @@ namespace EtcsServerTests.TestMaps
                     RightSideElementId = 223,
                     LineNumber = 1,
                     TrackNumber = "2",
-                    Kilometer = 9.35,
+                    Kilometer = 9.346,
                     Length = 1.1,
                     MaxUpSpeed = 140,
                     MaxDownSpeed = 140,
@@ -548,7 +573,7 @@ namespace EtcsServerTests.TestMaps
                     RightSideElementId = 225,
                     LineNumber = 1,
                     TrackNumber = "2",
-                    Kilometer = 10.45,
+                    Kilometer = 10.446,
                     Length = 0.02,
                     MaxUpSpeed = 40,
                     MaxDownSpeed = 40,
@@ -561,7 +586,7 @@ namespace EtcsServerTests.TestMaps
                     RightSideElementId = 227,
                     LineNumber = 1,
                     TrackNumber = "2",
-                    Kilometer = 10.47,
+                    Kilometer = 10.466,
                     Length = 0.02,
                     MaxUpSpeed = 60,
                     MaxDownSpeed = 60,
@@ -574,7 +599,7 @@ namespace EtcsServerTests.TestMaps
                     RightSideElementId = 229,
                     LineNumber = 1,
                     TrackNumber = "2",
-                    Kilometer = 10.49,
+                    Kilometer = 10.486,
                     Length = 1.11,
                     MaxUpSpeed = 120,
                     MaxDownSpeed = 120,
@@ -587,7 +612,7 @@ namespace EtcsServerTests.TestMaps
                     RightSideElementId = 142,
                     LineNumber = 1,
                     TrackNumber = "2",
-                    Kilometer = 11.6,
+                    Kilometer = 11.596,
                     Length = 0.15,
                     MaxUpSpeed = 80,
                     MaxDownSpeed = 80,
@@ -600,7 +625,7 @@ namespace EtcsServerTests.TestMaps
                     RightSideElementId = 144,
                     LineNumber = 1,
                     TrackNumber = "1",
-                    Kilometer = 11.7,
+                    Kilometer = 11.696,
                     Length = longBetweenSwitches,
                     MaxUpSpeed = 80,
                     MaxDownSpeed = 80,
@@ -612,7 +637,7 @@ namespace EtcsServerTests.TestMaps
                     LeftSideElementId = 141,
                     RightSideElementId = 142,
                     Length = switchingTrackLength,
-                    MaxSpeed = switchingTrackSpeed,
+                    MaxSpeed = lowSwitchingSpeed,
                     Gradient = 0,
                     TrackPosition = TrackPosition.INSIDE_ZONE
                 },
@@ -622,7 +647,7 @@ namespace EtcsServerTests.TestMaps
                     RightSideElementId = 143,
                     LineNumber = 1,
                     TrackNumber = "2",
-                    Kilometer = 11.75,
+                    Kilometer = 11.746,
                     Length = shortBetweenSwitches,
                     MaxUpSpeed = 80,
                     MaxDownSpeed = 80,
@@ -634,7 +659,7 @@ namespace EtcsServerTests.TestMaps
                     LeftSideElementId = 143,
                     RightSideElementId = 144,
                     Length = switchingTrackLength,
-                    MaxSpeed = switchingTrackSpeed,
+                    MaxSpeed = lowSwitchingSpeed,
                     Gradient = 0,
                     TrackPosition = TrackPosition.INSIDE_ZONE
                 },
@@ -644,7 +669,7 @@ namespace EtcsServerTests.TestMaps
                     RightSideElementId = 227,
                     LineNumber = 1,
                     TrackNumber = "1",
-                    Kilometer = 11.9,
+                    Kilometer = 11.896,
                     Length = 1.75,
                     MaxUpSpeed = 80,
                     MaxDownSpeed = 80,
@@ -653,12 +678,12 @@ namespace EtcsServerTests.TestMaps
                 },
 
                 new Track() {
-                    TrackageElementId = 227,
+                    TrackageElementId = 237,
                     LeftSideElementId = 27,
                     RightSideElementId = 151,
                     LineNumber = 1,
                     TrackNumber = "1",
-                    Kilometer = 13.65,
+                    Kilometer = 13.646,
                     Length = 0.15,
                     MaxUpSpeed = 40,
                     MaxDownSpeed = 80,
@@ -671,7 +696,7 @@ namespace EtcsServerTests.TestMaps
                     RightSideElementId = 228,
                     LineNumber = 1,
                     TrackNumber = "2",
-                    Kilometer = 11.85,
+                    Kilometer = 11.846,
                     Length = 1.8,
                     MaxUpSpeed = 80,
                     MaxDownSpeed = 80,
@@ -679,12 +704,12 @@ namespace EtcsServerTests.TestMaps
                     TrackPosition = TrackPosition.INSIDE_ZONE
                 },
                 new Track() {
-                    TrackageElementId = 228,
+                    TrackageElementId = 238,
                     LeftSideElementId = 28,
                     RightSideElementId = 152,
                     LineNumber = 1,
                     TrackNumber = "2",
-                    Kilometer = 13.65,
+                    Kilometer = 13.646,
                     Length = 0.2,
                     MaxUpSpeed = 40,
                     MaxDownSpeed = 80,
@@ -697,7 +722,7 @@ namespace EtcsServerTests.TestMaps
                     RightSideElementId = 154,
                     LineNumber = 1,
                     TrackNumber = "1",
-                    Kilometer = 13.8,
+                    Kilometer = 13.796,
                     Length = longBetweenSwitches,
                     MaxUpSpeed = 40,
                     MaxDownSpeed = 80,
@@ -709,7 +734,7 @@ namespace EtcsServerTests.TestMaps
                     LeftSideElementId = 151,
                     RightSideElementId = 152,
                     Length = switchingTrackLength,
-                    MaxSpeed = switchingTrackSpeed,
+                    MaxSpeed = lowSwitchingSpeed,
                     Gradient = 0,
                     TrackPosition = TrackPosition.INSIDE_ZONE
                 },
@@ -719,7 +744,7 @@ namespace EtcsServerTests.TestMaps
                     RightSideElementId = 153,
                     LineNumber = 1,
                     TrackNumber = "2",
-                    Kilometer = 13.85,
+                    Kilometer = 13.846,
                     Length = shortBetweenSwitches,
                     MaxUpSpeed = 40,
                     MaxDownSpeed = 80,
@@ -731,7 +756,7 @@ namespace EtcsServerTests.TestMaps
                     LeftSideElementId = 153,
                     RightSideElementId = 154,
                     Length = switchingTrackLength,
-                    MaxSpeed = switchingTrackSpeed,
+                    MaxSpeed = lowSwitchingSpeed,
                     Gradient = 0,
                     TrackPosition = TrackPosition.INSIDE_ZONE
                 },
@@ -741,7 +766,7 @@ namespace EtcsServerTests.TestMaps
                     RightSideElementId = 155,
                     LineNumber = 1,
                     TrackNumber = "1",
-                    Kilometer = 14,
+                    Kilometer = 13.996,
                     Length = 0.1,
                     MaxUpSpeed = 40,
                     MaxDownSpeed = 80,
@@ -754,21 +779,39 @@ namespace EtcsServerTests.TestMaps
                     RightSideElementId = 156,
                     LineNumber = 1,
                     TrackNumber = "2",
-                    Kilometer = 13.95,
+                    Kilometer = 13.946,
                     Length = 0.15,
                     MaxUpSpeed = 40,
                     MaxDownSpeed = 80,
                     Gradient = 0,
                     TrackPosition = TrackPosition.INSIDE_ZONE
                 },
+                new SwitchingTrack() {
+                    TrackageElementId = 241,
+                    LeftSideElementId = 155,
+                    RightSideElementId = 157,
+                    Length = switchingTrackLength,
+                    MaxSpeed = lowSwitchingSpeed,
+                    Gradient = 0,
+                    TrackPosition = TrackPosition.INSIDE_ZONE
+                },
+                new SwitchingTrack() {
+                    TrackageElementId = 242,
+                    LeftSideElementId = 156,
+                    RightSideElementId = 158,
+                    Length = switchingTrackLength,
+                    MaxSpeed = lowSwitchingSpeed,
+                    Gradient = 0,
+                    TrackPosition = TrackPosition.INSIDE_ZONE
+                },
                 new Track() {
                     TrackageElementId = 35,
-                    LeftSideElementId = 155,
+                    LeftSideElementId = 157,
                     RightSideElementId = null,
                     LineNumber = 1,
                     TrackNumber = "3",
-                    Kilometer = 14.1,
-                    Length = 0.25,
+                    Kilometer = 14.146,
+                    Length = 0.2,
                     MaxUpSpeed = 40,
                     MaxDownSpeed = 80,
                     Gradient = 0,
@@ -780,7 +823,7 @@ namespace EtcsServerTests.TestMaps
                     RightSideElementId = null,
                     LineNumber = 1,
                     TrackNumber = "1",
-                    Kilometer = 14.1,
+                    Kilometer = 14.096,
                     Length = 0.25,
                     MaxUpSpeed = 40,
                     MaxDownSpeed = 80,
@@ -793,7 +836,7 @@ namespace EtcsServerTests.TestMaps
                     RightSideElementId = null,
                     LineNumber = 1,
                     TrackNumber = "2",
-                    Kilometer = 14.1,
+                    Kilometer = 14.096,
                     Length = 0.25,
                     MaxUpSpeed = 40,
                     MaxDownSpeed = 80,
@@ -802,12 +845,12 @@ namespace EtcsServerTests.TestMaps
                 },
                 new Track() {
                     TrackageElementId = 38,
-                    LeftSideElementId = 156,
+                    LeftSideElementId = 158,
                     RightSideElementId = null,
                     LineNumber = 1,
                     TrackNumber = "4",
-                    Kilometer = 14.1,
-                    Length = 0.25,
+                    Kilometer = 14.146,
+                    Length = 0.2,
                     MaxUpSpeed = 40,
                     MaxDownSpeed = 80,
                     Gradient = 0,
@@ -818,75 +861,51 @@ namespace EtcsServerTests.TestMaps
             Dictionary<int, TrackageElement> trackageElementsLookup = trackageElements.ToDictionary(te => te.TrackageElementId, te => te);
             Dictionary<int, Track> tracksLookup = trackageElements.Where(te => te is Track).ToDictionary(te => te.TrackageElementId, te => (Track)te);
 
-            //trackageElementsLookup[1].RightSideElement = trackageElementsLookup[trackageElementsLookup[1].RightSideElementId!.Value];
-            //trackageElementsLookup[2].RightSideElement = trackageElementsLookup[trackageElementsLookup[2].RightSideElementId!.Value];
-            //trackageElementsLookup[3].RightSideElement = trackageElementsLookup[trackageElementsLookup[3].RightSideElementId!.Value];
-            //trackageElementsLookup[6].RightSideElement = trackageElementsLookup[trackageElementsLookup[6].RightSideElementId!.Value];
-            //trackageElementsLookup[8].RightSideElement = trackageElementsLookup[trackageElementsLookup[8].RightSideElementId!.Value];
-            //trackageElementsLookup[9].RightSideElement = trackageElementsLookup[trackageElementsLookup[9].RightSideElementId!.Value];
-            //trackageElementsLookup[11].RightSideElement = trackageElementsLookup[trackageElementsLookup[11].RightSideElementId!.Value];
-            //trackageElementsLookup[14].RightSideElement = trackageElementsLookup[trackageElementsLookup[14].RightSideElementId!.Value];
-            //trackageElementsLookup[15].RightSideElement = trackageElementsLookup[trackageElementsLookup[15].RightSideElementId!.Value];
-            //trackageElementsLookup[16].RightSideElement = trackageElementsLookup[trackageElementsLookup[16].RightSideElementId!.Value];
+            trackageElementsLookup
+                .Where(kvp => kvp.Value.RightSideElementId != null)
+                .ToList()
+                .ForEach(element => element.Value.RightSideElement = trackageElementsLookup[element.Value.RightSideElementId!.Value]);
 
-            //trackageElementsLookup[2].LeftSideElement = trackageElementsLookup[trackageElementsLookup[2].LeftSideElementId!.Value];
-            //trackageElementsLookup[3].LeftSideElement = trackageElementsLookup[trackageElementsLookup[3].LeftSideElementId!.Value];
-            //trackageElementsLookup[5].LeftSideElement = trackageElementsLookup[trackageElementsLookup[5].LeftSideElementId!.Value];
-            //trackageElementsLookup[6].LeftSideElement = trackageElementsLookup[trackageElementsLookup[6].LeftSideElementId!.Value];
-            //trackageElementsLookup[8].LeftSideElement = trackageElementsLookup[trackageElementsLookup[8].LeftSideElementId!.Value];
-            //trackageElementsLookup[9].LeftSideElement = trackageElementsLookup[trackageElementsLookup[9].LeftSideElementId!.Value];
-            //trackageElementsLookup[11].LeftSideElement = trackageElementsLookup[trackageElementsLookup[11].LeftSideElementId!.Value];
-            //trackageElementsLookup[14].LeftSideElement = trackageElementsLookup[trackageElementsLookup[14].LeftSideElementId!.Value];
-            //trackageElementsLookup[15].LeftSideElement = trackageElementsLookup[trackageElementsLookup[15].LeftSideElementId!.Value];
-            //trackageElementsLookup[16].LeftSideElement = trackageElementsLookup[trackageElementsLookup[16].LeftSideElementId!.Value];
-            //trackageElementsLookup[17].LeftSideElement = trackageElementsLookup[trackageElementsLookup[17].LeftSideElementId!.Value];
+            trackageElementsLookup
+                .Where(kvp => kvp.Value.LeftSideElementId != null)
+                .ToList()
+                .ForEach(element => element.Value.LeftSideElement = trackageElementsLookup[element.Value.LeftSideElementId!.Value]);
 
-            //Dictionary<int, RailroadSign> signsLookup = [];
-            //int signsCounter = 1;
-            //trackageElements.ForEach(te =>
-            //{
-            //    if (te is Track track)
-            //    {
-            //        signsCounter++;
-            //        signsLookup.Add(signsCounter, new RailroadSign()
-            //        {
-            //            RailroadSignId = signsCounter,
-            //            TrackId = te.TrackageElementId,
-            //            Track = track,
-            //            DistanceFromTrackStart = 0,
-            //            IsFacedUp = true,
-            //            MaxSpeed = track.MaxUpSpeed
-            //        });
-            //        signsCounter++;
-            //        signsLookup.Add(signsCounter, new RailroadSign()
-            //        {
-            //            RailroadSignId = signsCounter,
-            //            TrackId = te.TrackageElementId,
-            //            Track = track,
-            //            DistanceFromTrackStart = track.Length,
-            //            IsFacedUp = false,
-            //            MaxSpeed = track.MaxDownSpeed
-            //        });
-            //    }
-            //});
+            Dictionary<int, RailroadSign> signsLookup = [];
 
-            //Dictionary<int, RailwaySignal> railwaySignalsLookup = new()
-            //{
-            //    { 12, new() { RailwaySignalId = 12, TrackId = 2, Track = tracksLookup[2], DistanceFromTrackStart = 0, IsFacedUp = true } },
-            //    { 21, new() { RailwaySignalId = 21, TrackId = 1, Track = tracksLookup[1], DistanceFromTrackStart = tracksLookup[1].Length, IsFacedUp = false } },
-            //    { 23, new() { RailwaySignalId = 23, TrackId = 3, Track = tracksLookup[3], DistanceFromTrackStart = 0, IsFacedUp = true } },
-            //    { 32, new() { RailwaySignalId = 32, TrackId = 2, Track = tracksLookup[2], DistanceFromTrackStart = tracksLookup[2].Length, IsFacedUp = false } },
-            //    { 3, new() { RailwaySignalId = 3, TrackId = 3, Track = tracksLookup[3], DistanceFromTrackStart = 2.5, IsFacedUp = true } },
-            //    { 33, new() { RailwaySignalId = 33, TrackId = 3, Track = tracksLookup[3], DistanceFromTrackStart = 2.5, IsFacedUp = false } },
-            //    { 4, new() { RailwaySignalId = 4, TrackId = 3, Track = tracksLookup[3], DistanceFromTrackStart = tracksLookup[3].Length, IsFacedUp = true } },
-            //    { 44, new() { RailwaySignalId = 44, TrackId = 3, Track = tracksLookup[3], DistanceFromTrackStart = tracksLookup[3].Length, IsFacedUp = false } },
-            //    { 7, new() { RailwaySignalId = 7, TrackId = 6, Track = tracksLookup[6], DistanceFromTrackStart = tracksLookup[6].Length, IsFacedUp = true } },
-            //    { 77, new() { RailwaySignalId = 77, TrackId = 6, Track = tracksLookup[6], DistanceFromTrackStart = tracksLookup[6].Length, IsFacedUp = false } },
-            //    { 1516, new() { RailwaySignalId = 1516, TrackId = 16, Track = tracksLookup[16], DistanceFromTrackStart = 0, IsFacedUp = true } },
-            //    { 1615, new() { RailwaySignalId = 1615, TrackId = 15, Track = tracksLookup[15], DistanceFromTrackStart = tracksLookup[15].Length, IsFacedUp = false } },
-            //    { 1617, new() { RailwaySignalId = 1617, TrackId = 17, Track = tracksLookup[17], DistanceFromTrackStart = 0, IsFacedUp = true } },
-            //    { 1716, new() { RailwaySignalId = 1716, TrackId = 16, Track = tracksLookup[16], DistanceFromTrackStart = tracksLookup[16].Length, IsFacedUp = false } },
-            //};
+            Dictionary<int, RailwaySignal> railwaySignalsLookup = new()
+            {
+                { 1, new() { RailwaySignalId = 1, TrackId = 1, Track = tracksLookup[1], DistanceFromTrackStart = 0, IsFacedUp = false } },
+                { 2, new() { RailwaySignalId = 2, TrackId = 2, Track = tracksLookup[2], DistanceFromTrackStart = 0, IsFacedUp = false } },
+                { 4, new() { RailwaySignalId = 4, TrackId = 4, Track = tracksLookup[4], DistanceFromTrackStart = 0, IsFacedUp = false } },
+                { 11, new() { RailwaySignalId = 11, TrackId = 1, Track = tracksLookup[1], DistanceFromTrackStart = 0.15, IsFacedUp = true } },
+                { 22, new() { RailwaySignalId = 22, TrackId = 2, Track = tracksLookup[2], DistanceFromTrackStart = 0.15, IsFacedUp = true } },
+                { 44, new() { RailwaySignalId = 44, TrackId = 4, Track = tracksLookup[4], DistanceFromTrackStart = 0.15, IsFacedUp = true } },
+                { 9209, new() { RailwaySignalId = 9209, TrackId = 9, Track = tracksLookup[9], DistanceFromTrackStart = tracksLookup[9].Length, IsFacedUp = false } },
+                { 10210, new() { RailwaySignalId = 10210, TrackId = 10, Track = tracksLookup[10], DistanceFromTrackStart = tracksLookup[10].Length, IsFacedUp = false } },
+                { 213, new() { RailwaySignalId = 213, TrackId = 213, Track = tracksLookup[213], DistanceFromTrackStart = 1.55, IsFacedUp = true } },
+                { 211, new() { RailwaySignalId = 211, TrackId = 211, Track = tracksLookup[211], DistanceFromTrackStart = 1.55, IsFacedUp = true } },
+                { 15, new() { RailwaySignalId = 15, TrackId = 15, Track = tracksLookup[15], DistanceFromTrackStart = 0.1, IsFacedUp = false } },
+                { 16, new() { RailwaySignalId = 16, TrackId = 16, Track = tracksLookup[16], DistanceFromTrackStart = 0.15, IsFacedUp = false } },
+                { 1515, new() { RailwaySignalId = 1515, TrackId = 15, Track = tracksLookup[15], DistanceFromTrackStart = 5.298, IsFacedUp = true } },
+                { 1616, new() { RailwaySignalId = 1616, TrackId = 16, Track = tracksLookup[16], DistanceFromTrackStart = 5.348, IsFacedUp = true } },
+                { 22222, new() { RailwaySignalId = 22222, TrackId = 22, Track = tracksLookup[22], DistanceFromTrackStart = 0, IsFacedUp = false } },
+                { 21221, new() { RailwaySignalId = 21221, TrackId = 21, Track = tracksLookup[21], DistanceFromTrackStart = 0, IsFacedUp = false } },
+                { 227229, new() { RailwaySignalId = 227229, TrackId = 227, Track = tracksLookup[227], DistanceFromTrackStart = tracksLookup[227].Length, IsFacedUp = true } },
+                { 228230, new() { RailwaySignalId = 228230, TrackId = 228, Track = tracksLookup[228], DistanceFromTrackStart = tracksLookup[228].Length, IsFacedUp = true } },
+                { 28, new() { RailwaySignalId = 28, TrackId = 28, Track = tracksLookup[28], DistanceFromTrackStart = 0.15, IsFacedUp = false } },
+                { 27, new() { RailwaySignalId = 27, TrackId = 27, Track = tracksLookup[27], DistanceFromTrackStart = 0.1, IsFacedUp = false } },
+                { 28238, new() { RailwaySignalId = 28238, TrackId = 28, Track = tracksLookup[28], DistanceFromTrackStart = tracksLookup[28].Length, IsFacedUp = false } },
+                { 27237, new() { RailwaySignalId = 27237, TrackId = 27, Track = tracksLookup[27], DistanceFromTrackStart = tracksLookup[27].Length, IsFacedUp = false } },
+                { 3838, new() { RailwaySignalId = 3838, TrackId = 38, Track = tracksLookup[38], DistanceFromTrackStart = 0, IsFacedUp = false } },
+                { 3737, new() { RailwaySignalId = 3737, TrackId = 37, Track = tracksLookup[37], DistanceFromTrackStart = 0.05, IsFacedUp = false } },
+                { 3636, new() { RailwaySignalId = 3636, TrackId = 36, Track = tracksLookup[36], DistanceFromTrackStart = 0.05, IsFacedUp = false } },
+                { 3535, new() { RailwaySignalId = 3535, TrackId = 35, Track = tracksLookup[35], DistanceFromTrackStart = 0, IsFacedUp = false } },
+                { 38, new() { RailwaySignalId = 38, TrackId = 38, Track = tracksLookup[38], DistanceFromTrackStart = tracksLookup[38].Length, IsFacedUp = true } },
+                { 37, new() { RailwaySignalId = 37, TrackId = 37, Track = tracksLookup[37], DistanceFromTrackStart = tracksLookup[37].Length, IsFacedUp = true } },
+                { 36, new() { RailwaySignalId = 36, TrackId = 36, Track = tracksLookup[36], DistanceFromTrackStart = tracksLookup[36].Length, IsFacedUp = true } },
+                { 35, new() { RailwaySignalId = 35, TrackId = 35, Track = tracksLookup[35], DistanceFromTrackStart = tracksLookup[35].Length, IsFacedUp = true } },
+            };
 
             //Dictionary<int, SwitchRoute> switchRoutesLookup = new()
             //{

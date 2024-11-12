@@ -26,9 +26,9 @@ namespace EtcsServerTests
             TrainDto trainDto = new TrainDto()
             {
                 TrainId = "Test",
-                LengthMeters = "100",
-                MaxSpeed = "50",
-                BrakeWeight = "500"
+                LengthMeters = 100,
+                MaxSpeed = 50,
+                BrakeWeight = 500
             };
 
             //When
