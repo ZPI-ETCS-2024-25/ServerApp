@@ -32,6 +32,7 @@ namespace EtcsServerTests.TestMaps
     public abstract class MockTestMap : ITestMap
     {
         public IHolder<Crossing> CrossingHolder { get; set; }
+        public IHolder<CrossingTrack> CrossingTracksHolder { get; set; }
         public IHolder<RailroadSign> RailroadSignHolder { get; set; }
         public IHolder<RailwaySignal> RailwaySignalHolder { get; set; }
         public IHolder<SwitchRoute> SwitchRouteHolder { get; set; }
@@ -49,6 +50,7 @@ namespace EtcsServerTests.TestMaps
             TrackHolder = A.Fake<IHolder<Track>>();
             TrackageElementHolder = A.Fake<IHolder<TrackageElement>>();
             CrossingHolder = A.Fake<IHolder<Crossing>>();
+            CrossingTracksHolder = A.Fake<IHolder<CrossingTrack>>();
             RailroadSignHolder = A.Fake<IHolder<RailroadSign>>();
             RailwaySignalHolder = A.Fake<IHolder<RailwaySignal>>();
             SwitchRouteHolder = A.Fake<IHolder<SwitchRoute>>();
@@ -70,6 +72,7 @@ namespace EtcsServerTests.TestMaps
             serviceCollection.AddProjectServices(new TestConfiguration().Configuration);
 
             serviceCollection.AddSingleton<IHolder<Crossing>>(CrossingHolder);
+            serviceCollection.AddSingleton<IHolder<CrossingTrack>>(CrossingTracksHolder);
             serviceCollection.AddSingleton<IHolder<RailroadSign>>(RailroadSignHolder);
             serviceCollection.AddSingleton<IHolder<RailwaySignal>>(RailwaySignalHolder);
             serviceCollection.AddSingleton<IHolder<SwitchRoute>>(SwitchRouteHolder);

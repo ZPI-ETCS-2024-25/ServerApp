@@ -907,31 +907,128 @@ namespace EtcsServerTests.TestMaps
                 { 35, new() { RailwaySignalId = 35, TrackId = 35, Track = tracksLookup[35], DistanceFromTrackStart = tracksLookup[35].Length, IsFacedUp = true } },
             };
 
-            //Dictionary<int, SwitchRoute> switchRoutesLookup = new()
-            //{
-            //    {1, new() { SwitchRouteId = 1, SwitchId = 4, Switch = (Switch)trackageElementsLookup[4], TrackFromId = 3, TrackFrom = trackageElementsLookup[3], TrackToId = 5, TrackTo = trackageElementsLookup[5] } },
-            //    {2, new() { SwitchRouteId = 2, SwitchId = 4, Switch = (Switch)trackageElementsLookup[4], TrackFromId = 3, TrackFrom = trackageElementsLookup[3], TrackToId = 6, TrackTo = trackageElementsLookup[6] } },
-            //    {3, new() { SwitchRouteId = 3, SwitchId = 4, Switch = (Switch)trackageElementsLookup[4], TrackFromId = 5, TrackFrom = trackageElementsLookup[5], TrackToId = 3, TrackTo = trackageElementsLookup[3] } },
-            //    {4, new() { SwitchRouteId = 4, SwitchId = 4, Switch = (Switch)trackageElementsLookup[4], TrackFromId = 6, TrackFrom = trackageElementsLookup[6], TrackToId = 3, TrackTo = trackageElementsLookup[3] } },
-            //    {5, new() { SwitchRouteId = 5, SwitchId = 7, Switch = (Switch)trackageElementsLookup[7], TrackFromId = 6, TrackFrom = trackageElementsLookup[6], TrackToId = 9, TrackTo = trackageElementsLookup[9] } },
-            //    {6, new() { SwitchRouteId = 6, SwitchId = 7, Switch = (Switch)trackageElementsLookup[7], TrackFromId = 6, TrackFrom = trackageElementsLookup[6], TrackToId = 8, TrackTo = trackageElementsLookup[8] } },
-            //    {7, new() { SwitchRouteId = 7, SwitchId = 7, Switch = (Switch)trackageElementsLookup[7], TrackFromId = 8, TrackFrom = trackageElementsLookup[8], TrackToId = 6, TrackTo = trackageElementsLookup[6] } },
-            //    {8, new() { SwitchRouteId = 8, SwitchId = 7, Switch = (Switch)trackageElementsLookup[7], TrackFromId = 9, TrackFrom = trackageElementsLookup[9], TrackToId = 6, TrackTo = trackageElementsLookup[6] } },
-            //    {9, new() { SwitchRouteId = 9, SwitchId = 12, Switch = (Switch)trackageElementsLookup[12], TrackFromId = 11, TrackFrom = trackageElementsLookup[11], TrackToId = 14, TrackTo = trackageElementsLookup[14] } },
-            //    {10, new() { SwitchRouteId = 10, SwitchId = 12, Switch = (Switch)trackageElementsLookup[12], TrackFromId = 11, TrackFrom = trackageElementsLookup[11], TrackToId = 15, TrackTo = trackageElementsLookup[15] } },
-            //    {11, new() { SwitchRouteId = 11, SwitchId = 12, Switch = (Switch)trackageElementsLookup[12], TrackFromId = 14, TrackFrom = trackageElementsLookup[14], TrackToId = 11, TrackTo = trackageElementsLookup[11] } },
-            //    {12, new() { SwitchRouteId = 12, SwitchId = 12, Switch = (Switch)trackageElementsLookup[12], TrackFromId = 15, TrackFrom = trackageElementsLookup[15], TrackToId = 11, TrackTo = trackageElementsLookup[11] } },
-            //    {13, new() { SwitchRouteId = 13, SwitchId = 10, Switch = (Switch)trackageElementsLookup[10], TrackFromId = 9, TrackFrom = trackageElementsLookup[9], TrackToId = 11, TrackTo = trackageElementsLookup[11] } },
-            //    {15, new() { SwitchRouteId = 15, SwitchId = 10, Switch = (Switch)trackageElementsLookup[10], TrackFromId = 11, TrackFrom = trackageElementsLookup[11], TrackToId = 9, TrackTo = trackageElementsLookup[9] } },
-            //};
+            Dictionary<int, SwitchRoute> switchRoutesLookup = new()
+            {
+                {1, new() { SwitchRouteId = 1, SwitchId = 111, Switch = (Switch)trackageElementsLookup[111], TrackFromId = 1, TrackFrom = trackageElementsLookup[1], TrackToId = 5, TrackTo = trackageElementsLookup[5] } },
+                {2, new() { SwitchRouteId = 2, SwitchId = 111, Switch = (Switch)trackageElementsLookup[111], TrackFromId = 1, TrackFrom = trackageElementsLookup[1], TrackToId = 6, TrackTo = trackageElementsLookup[6] } },
+                {3, new() { SwitchRouteId = 3, SwitchId = 111, Switch = (Switch)trackageElementsLookup[111], TrackFromId = 5, TrackFrom = trackageElementsLookup[5], TrackToId = 1, TrackTo = trackageElementsLookup[1] } },
+                {4, new() { SwitchRouteId = 4, SwitchId = 111, Switch = (Switch)trackageElementsLookup[111], TrackFromId = 6, TrackFrom = trackageElementsLookup[6], TrackToId = 1, TrackTo = trackageElementsLookup[1] } },
+                {95, new() { SwitchRouteId = 95, SwitchId = 112, Switch = (Switch)trackageElementsLookup[112], TrackFromId = 2, TrackFrom = trackageElementsLookup[2], TrackToId = 4, TrackTo = trackageElementsLookup[4] } },
+                {96, new() { SwitchRouteId = 96, SwitchId = 112, Switch = (Switch)trackageElementsLookup[112], TrackFromId = 240, TrackFrom = trackageElementsLookup[240], TrackToId = 4, TrackTo = trackageElementsLookup[4] } },
+                {97, new() { SwitchRouteId = 97, SwitchId = 112, Switch = (Switch)trackageElementsLookup[112], TrackFromId = 4, TrackFrom = trackageElementsLookup[4], TrackToId = 2, TrackTo = trackageElementsLookup[2] } },
+                {98, new() { SwitchRouteId = 98, SwitchId = 112, Switch = (Switch)trackageElementsLookup[112], TrackFromId = 4, TrackFrom = trackageElementsLookup[4], TrackToId = 240, TrackTo = trackageElementsLookup[240] } },
+                {5, new() { SwitchRouteId = 5, SwitchId = 113, Switch = (Switch)trackageElementsLookup[113], TrackFromId = 4, TrackFrom = trackageElementsLookup[4], TrackToId = 7, TrackTo = trackageElementsLookup[7] } },
+                {6, new() { SwitchRouteId = 6, SwitchId = 113, Switch = (Switch)trackageElementsLookup[113], TrackFromId = 6, TrackFrom = trackageElementsLookup[6], TrackToId = 7, TrackTo = trackageElementsLookup[7] } },
+                {7, new() { SwitchRouteId = 7, SwitchId = 113, Switch = (Switch)trackageElementsLookup[113], TrackFromId = 7, TrackFrom = trackageElementsLookup[7], TrackToId = 4, TrackTo = trackageElementsLookup[4] } },
+                {8, new() { SwitchRouteId = 8, SwitchId = 113, Switch = (Switch)trackageElementsLookup[113], TrackFromId = 7, TrackFrom = trackageElementsLookup[7], TrackToId = 6, TrackTo = trackageElementsLookup[6] } },
+                {9, new() { SwitchRouteId = 9, SwitchId = 114, Switch = (Switch)trackageElementsLookup[114], TrackFromId = 7, TrackFrom = trackageElementsLookup[7], TrackToId = 210, TrackTo = trackageElementsLookup[210] } },
+                {10, new() { SwitchRouteId = 10, SwitchId = 114, Switch = (Switch)trackageElementsLookup[114], TrackFromId = 7, TrackFrom = trackageElementsLookup[7], TrackToId = 8, TrackTo = trackageElementsLookup[8] } },
+                {11, new() { SwitchRouteId = 11, SwitchId = 114, Switch = (Switch)trackageElementsLookup[114], TrackFromId = 210, TrackFrom = trackageElementsLookup[210], TrackToId = 7, TrackTo = trackageElementsLookup[7] } },
+                {12, new() { SwitchRouteId = 12, SwitchId = 114, Switch = (Switch)trackageElementsLookup[114], TrackFromId = 8, TrackFrom = trackageElementsLookup[8], TrackToId = 7, TrackTo = trackageElementsLookup[7] } },
+                {13, new() { SwitchRouteId = 13, SwitchId = 115, Switch = (Switch)trackageElementsLookup[115], TrackFromId = 5, TrackFrom = trackageElementsLookup[5], TrackToId = 209, TrackTo = trackageElementsLookup[209] } },
+                {14, new() { SwitchRouteId = 14, SwitchId = 115, Switch = (Switch)trackageElementsLookup[115], TrackFromId = 8, TrackFrom = trackageElementsLookup[8], TrackToId = 209, TrackTo = trackageElementsLookup[209] } },
+                {15, new() { SwitchRouteId = 15, SwitchId = 115, Switch = (Switch)trackageElementsLookup[115], TrackFromId = 209, TrackFrom = trackageElementsLookup[209], TrackToId = 5, TrackTo = trackageElementsLookup[5] } },
+                {16, new() { SwitchRouteId = 16, SwitchId = 115, Switch = (Switch)trackageElementsLookup[115], TrackFromId = 209, TrackFrom = trackageElementsLookup[209], TrackToId = 8, TrackTo = trackageElementsLookup[8] } },
+                {17, new() { SwitchRouteId = 17, SwitchId = 116, Switch = (Switch)trackageElementsLookup[116], TrackFromId = 3, TrackFrom = trackageElementsLookup[2], TrackToId = 240, TrackTo = trackageElementsLookup[4] } },
+                {18, new() { SwitchRouteId = 18, SwitchId = 116, Switch = (Switch)trackageElementsLookup[116], TrackFromId = 240, TrackFrom = trackageElementsLookup[240], TrackToId = 3, TrackTo = trackageElementsLookup[4] } },
+                {19, new() { SwitchRouteId = 19, SwitchId = 121, Switch = (Switch)trackageElementsLookup[121], TrackFromId = 211, TrackFrom = trackageElementsLookup[211], TrackToId = 11, TrackTo = trackageElementsLookup[11] } },
+                {20, new() { SwitchRouteId = 20, SwitchId = 121, Switch = (Switch)trackageElementsLookup[121], TrackFromId = 211, TrackFrom = trackageElementsLookup[211], TrackToId = 12, TrackTo = trackageElementsLookup[12] } },
+                {21, new() { SwitchRouteId = 21, SwitchId = 121, Switch = (Switch)trackageElementsLookup[121], TrackFromId = 11, TrackFrom = trackageElementsLookup[11], TrackToId = 211, TrackTo = trackageElementsLookup[211] } },
+                {22, new() { SwitchRouteId = 22, SwitchId = 121, Switch = (Switch)trackageElementsLookup[121], TrackFromId = 12, TrackFrom = trackageElementsLookup[12], TrackToId = 211, TrackTo = trackageElementsLookup[211] } },
+                {23, new() { SwitchRouteId = 23, SwitchId = 122, Switch = (Switch)trackageElementsLookup[122], TrackFromId = 213, TrackFrom = trackageElementsLookup[213], TrackToId = 13, TrackTo = trackageElementsLookup[13] } },
+                {24, new() { SwitchRouteId = 24, SwitchId = 122, Switch = (Switch)trackageElementsLookup[122], TrackFromId = 12, TrackFrom = trackageElementsLookup[12], TrackToId = 13, TrackTo = trackageElementsLookup[13] } },
+                {25, new() { SwitchRouteId = 25, SwitchId = 122, Switch = (Switch)trackageElementsLookup[122], TrackFromId = 13, TrackFrom = trackageElementsLookup[13], TrackToId = 12, TrackTo = trackageElementsLookup[12] } },
+                {26, new() { SwitchRouteId = 26, SwitchId = 122, Switch = (Switch)trackageElementsLookup[122], TrackFromId = 13, TrackFrom = trackageElementsLookup[13], TrackToId = 213, TrackTo = trackageElementsLookup[213] } },
+                {27, new() { SwitchRouteId = 27, SwitchId = 123, Switch = (Switch)trackageElementsLookup[123], TrackFromId = 13, TrackFrom = trackageElementsLookup[13], TrackToId = 14, TrackTo = trackageElementsLookup[14] } },
+                {28, new() { SwitchRouteId = 28, SwitchId = 123, Switch = (Switch)trackageElementsLookup[123], TrackFromId = 13, TrackFrom = trackageElementsLookup[13], TrackToId = 16, TrackTo = trackageElementsLookup[16] } },
+                {29, new() { SwitchRouteId = 29, SwitchId = 123, Switch = (Switch)trackageElementsLookup[123], TrackFromId = 14, TrackFrom = trackageElementsLookup[14], TrackToId = 13, TrackTo = trackageElementsLookup[13] } },
+                {30, new() { SwitchRouteId = 30, SwitchId = 123, Switch = (Switch)trackageElementsLookup[123], TrackFromId = 16, TrackFrom = trackageElementsLookup[16], TrackToId = 13, TrackTo = trackageElementsLookup[13] } },
+                {31, new() { SwitchRouteId = 31, SwitchId = 124, Switch = (Switch)trackageElementsLookup[124], TrackFromId = 15, TrackFrom = trackageElementsLookup[15], TrackToId = 11, TrackTo = trackageElementsLookup[11] } },
+                {32, new() { SwitchRouteId = 32, SwitchId = 124, Switch = (Switch)trackageElementsLookup[124], TrackFromId = 15, TrackFrom = trackageElementsLookup[15], TrackToId = 14, TrackTo = trackageElementsLookup[14] } },
+                {33, new() { SwitchRouteId = 33, SwitchId = 124, Switch = (Switch)trackageElementsLookup[124], TrackFromId = 11, TrackFrom = trackageElementsLookup[11], TrackToId = 15, TrackTo = trackageElementsLookup[15] } },
+                {34, new() { SwitchRouteId = 34, SwitchId = 124, Switch = (Switch)trackageElementsLookup[124], TrackFromId = 14, TrackFrom = trackageElementsLookup[14], TrackToId = 15, TrackTo = trackageElementsLookup[15] } },
+                {35, new() { SwitchRouteId = 35, SwitchId = 131, Switch = (Switch)trackageElementsLookup[131], TrackFromId = 15, TrackFrom = trackageElementsLookup[15], TrackToId = 17, TrackTo = trackageElementsLookup[17] } },
+                {36, new() { SwitchRouteId = 36, SwitchId = 131, Switch = (Switch)trackageElementsLookup[131], TrackFromId = 15, TrackFrom = trackageElementsLookup[15], TrackToId = 18, TrackTo = trackageElementsLookup[18] } },
+                {37, new() { SwitchRouteId = 37, SwitchId = 131, Switch = (Switch)trackageElementsLookup[131], TrackFromId = 17, TrackFrom = trackageElementsLookup[17], TrackToId = 15, TrackTo = trackageElementsLookup[15] } },
+                {38, new() { SwitchRouteId = 38, SwitchId = 131, Switch = (Switch)trackageElementsLookup[131], TrackFromId = 18, TrackFrom = trackageElementsLookup[18], TrackToId = 15, TrackTo = trackageElementsLookup[15] } },
+                {39, new() { SwitchRouteId = 39, SwitchId = 132, Switch = (Switch)trackageElementsLookup[132], TrackFromId = 19, TrackFrom = trackageElementsLookup[19], TrackToId = 16, TrackTo = trackageElementsLookup[16] } },
+                {40, new() { SwitchRouteId = 40, SwitchId = 132, Switch = (Switch)trackageElementsLookup[132], TrackFromId = 19, TrackFrom = trackageElementsLookup[19], TrackToId = 18, TrackTo = trackageElementsLookup[18] } },
+                {41, new() { SwitchRouteId = 41, SwitchId = 132, Switch = (Switch)trackageElementsLookup[132], TrackFromId = 16, TrackFrom = trackageElementsLookup[16], TrackToId = 19, TrackTo = trackageElementsLookup[19] } },
+                {42, new() { SwitchRouteId = 42, SwitchId = 132, Switch = (Switch)trackageElementsLookup[132], TrackFromId = 18, TrackFrom = trackageElementsLookup[18], TrackToId = 19, TrackTo = trackageElementsLookup[19] } },
+                {43, new() { SwitchRouteId = 43, SwitchId = 133, Switch = (Switch)trackageElementsLookup[133], TrackFromId = 19, TrackFrom = trackageElementsLookup[19], TrackToId = 20, TrackTo = trackageElementsLookup[20] } },
+                {44, new() { SwitchRouteId = 44, SwitchId = 133, Switch = (Switch)trackageElementsLookup[133], TrackFromId = 19, TrackFrom = trackageElementsLookup[19], TrackToId = 222, TrackTo = trackageElementsLookup[222] } },
+                {45, new() { SwitchRouteId = 45, SwitchId = 133, Switch = (Switch)trackageElementsLookup[133], TrackFromId = 20, TrackFrom = trackageElementsLookup[20], TrackToId = 19, TrackTo = trackageElementsLookup[19] } },
+                {46, new() { SwitchRouteId = 46, SwitchId = 133, Switch = (Switch)trackageElementsLookup[133], TrackFromId = 222, TrackFrom = trackageElementsLookup[222], TrackToId = 19, TrackTo = trackageElementsLookup[19] } },
+                {47, new() { SwitchRouteId = 47, SwitchId = 134, Switch = (Switch)trackageElementsLookup[134], TrackFromId = 221, TrackFrom = trackageElementsLookup[221], TrackToId = 17, TrackTo = trackageElementsLookup[17] } },
+                {48, new() { SwitchRouteId = 48, SwitchId = 134, Switch = (Switch)trackageElementsLookup[134], TrackFromId = 221, TrackFrom = trackageElementsLookup[221], TrackToId = 20, TrackTo = trackageElementsLookup[20] } },
+                {49, new() { SwitchRouteId = 49, SwitchId = 134, Switch = (Switch)trackageElementsLookup[134], TrackFromId = 17, TrackFrom = trackageElementsLookup[17], TrackToId = 221, TrackTo = trackageElementsLookup[221] } },
+                {50, new() { SwitchRouteId = 50, SwitchId = 134, Switch = (Switch)trackageElementsLookup[134], TrackFromId = 20, TrackFrom = trackageElementsLookup[20], TrackToId = 221, TrackTo = trackageElementsLookup[221] } },
+                {51, new() { SwitchRouteId = 51, SwitchId = 141, Switch = (Switch)trackageElementsLookup[141], TrackFromId = 230, TrackFrom = trackageElementsLookup[230], TrackToId = 23, TrackTo = trackageElementsLookup[23] } },
+                {52, new() { SwitchRouteId = 52, SwitchId = 141, Switch = (Switch)trackageElementsLookup[141], TrackFromId = 230, TrackFrom = trackageElementsLookup[230], TrackToId = 24, TrackTo = trackageElementsLookup[24] } },
+                {53, new() { SwitchRouteId = 53, SwitchId = 141, Switch = (Switch)trackageElementsLookup[141], TrackFromId = 23, TrackFrom = trackageElementsLookup[23], TrackToId = 230, TrackTo = trackageElementsLookup[230] } },
+                {54, new() { SwitchRouteId = 54, SwitchId = 141, Switch = (Switch)trackageElementsLookup[141], TrackFromId = 24, TrackFrom = trackageElementsLookup[24], TrackToId = 230, TrackTo = trackageElementsLookup[230] } },
+                {55, new() { SwitchRouteId = 55, SwitchId = 142, Switch = (Switch)trackageElementsLookup[142], TrackFromId = 25, TrackFrom = trackageElementsLookup[25], TrackToId = 24, TrackTo = trackageElementsLookup[24] } },
+                {56, new() { SwitchRouteId = 56, SwitchId = 142, Switch = (Switch)trackageElementsLookup[142], TrackFromId = 25, TrackFrom = trackageElementsLookup[25], TrackToId = 229, TrackTo = trackageElementsLookup[229] } },
+                {57, new() { SwitchRouteId = 57, SwitchId = 142, Switch = (Switch)trackageElementsLookup[142], TrackFromId = 24, TrackFrom = trackageElementsLookup[24], TrackToId = 25, TrackTo = trackageElementsLookup[25] } },
+                {58, new() { SwitchRouteId = 58, SwitchId = 142, Switch = (Switch)trackageElementsLookup[142], TrackFromId = 229, TrackFrom = trackageElementsLookup[229], TrackToId = 25, TrackTo = trackageElementsLookup[25] } },
+                {59, new() { SwitchRouteId = 59, SwitchId = 143, Switch = (Switch)trackageElementsLookup[143], TrackFromId = 25, TrackFrom = trackageElementsLookup[25], TrackToId = 26, TrackTo = trackageElementsLookup[26] } },
+                {60, new() { SwitchRouteId = 60, SwitchId = 143, Switch = (Switch)trackageElementsLookup[143], TrackFromId = 25, TrackFrom = trackageElementsLookup[25], TrackToId = 28, TrackTo = trackageElementsLookup[28] } },
+                {61, new() { SwitchRouteId = 61, SwitchId = 143, Switch = (Switch)trackageElementsLookup[143], TrackFromId = 26, TrackFrom = trackageElementsLookup[26], TrackToId = 25, TrackTo = trackageElementsLookup[25] } },
+                {62, new() { SwitchRouteId = 62, SwitchId = 143, Switch = (Switch)trackageElementsLookup[143], TrackFromId = 28, TrackFrom = trackageElementsLookup[28], TrackToId = 25, TrackTo = trackageElementsLookup[25] } },
+                {63, new() { SwitchRouteId = 63, SwitchId = 144, Switch = (Switch)trackageElementsLookup[144], TrackFromId = 27, TrackFrom = trackageElementsLookup[27], TrackToId = 23, TrackTo = trackageElementsLookup[23] } },
+                {64, new() { SwitchRouteId = 64, SwitchId = 144, Switch = (Switch)trackageElementsLookup[144], TrackFromId = 27, TrackFrom = trackageElementsLookup[27], TrackToId = 26, TrackTo = trackageElementsLookup[26] } },
+                {65, new() { SwitchRouteId = 65, SwitchId = 144, Switch = (Switch)trackageElementsLookup[144], TrackFromId = 23, TrackFrom = trackageElementsLookup[23], TrackToId = 27, TrackTo = trackageElementsLookup[27] } },
+                {66, new() { SwitchRouteId = 66, SwitchId = 144, Switch = (Switch)trackageElementsLookup[144], TrackFromId = 26, TrackFrom = trackageElementsLookup[26], TrackToId = 27, TrackTo = trackageElementsLookup[27] } },
+                {67, new() { SwitchRouteId = 67, SwitchId = 151, Switch = (Switch)trackageElementsLookup[151], TrackFromId = 237, TrackFrom = trackageElementsLookup[237], TrackToId = 29, TrackTo = trackageElementsLookup[29] } },
+                {68, new() { SwitchRouteId = 68, SwitchId = 151, Switch = (Switch)trackageElementsLookup[151], TrackFromId = 237, TrackFrom = trackageElementsLookup[237], TrackToId = 30, TrackTo = trackageElementsLookup[30] } },
+                {69, new() { SwitchRouteId = 69, SwitchId = 151, Switch = (Switch)trackageElementsLookup[151], TrackFromId = 29, TrackFrom = trackageElementsLookup[29], TrackToId = 237, TrackTo = trackageElementsLookup[237] } },
+                {70, new() { SwitchRouteId = 70, SwitchId = 151, Switch = (Switch)trackageElementsLookup[151], TrackFromId = 30, TrackFrom = trackageElementsLookup[30], TrackToId = 237, TrackTo = trackageElementsLookup[237] } },
+                {71, new() { SwitchRouteId = 71, SwitchId = 152, Switch = (Switch)trackageElementsLookup[152], TrackFromId = 31, TrackFrom = trackageElementsLookup[31], TrackToId = 30, TrackTo = trackageElementsLookup[30] } },
+                {72, new() { SwitchRouteId = 72, SwitchId = 152, Switch = (Switch)trackageElementsLookup[152], TrackFromId = 31, TrackFrom = trackageElementsLookup[31], TrackToId = 238, TrackTo = trackageElementsLookup[238] } },
+                {73, new() { SwitchRouteId = 73, SwitchId = 152, Switch = (Switch)trackageElementsLookup[152], TrackFromId = 30, TrackFrom = trackageElementsLookup[30], TrackToId = 31, TrackTo = trackageElementsLookup[31] } },
+                {74, new() { SwitchRouteId = 74, SwitchId = 152, Switch = (Switch)trackageElementsLookup[152], TrackFromId = 238, TrackFrom = trackageElementsLookup[238], TrackToId = 31, TrackTo = trackageElementsLookup[31] } },
+                {75, new() { SwitchRouteId = 75, SwitchId = 153, Switch = (Switch)trackageElementsLookup[153], TrackFromId = 31, TrackFrom = trackageElementsLookup[31], TrackToId = 32, TrackTo = trackageElementsLookup[32] } },
+                {76, new() { SwitchRouteId = 76, SwitchId = 153, Switch = (Switch)trackageElementsLookup[153], TrackFromId = 31, TrackFrom = trackageElementsLookup[31], TrackToId = 34, TrackTo = trackageElementsLookup[34] } },
+                {77, new() { SwitchRouteId = 77, SwitchId = 153, Switch = (Switch)trackageElementsLookup[153], TrackFromId = 32, TrackFrom = trackageElementsLookup[32], TrackToId = 31, TrackTo = trackageElementsLookup[31] } },
+                {78, new() { SwitchRouteId = 78, SwitchId = 153, Switch = (Switch)trackageElementsLookup[153], TrackFromId = 34, TrackFrom = trackageElementsLookup[34], TrackToId = 31, TrackTo = trackageElementsLookup[31] } },
+                {79, new() { SwitchRouteId = 79, SwitchId = 154, Switch = (Switch)trackageElementsLookup[154], TrackFromId = 33, TrackFrom = trackageElementsLookup[33], TrackToId = 29, TrackTo = trackageElementsLookup[29] } },
+                {80, new() { SwitchRouteId = 80, SwitchId = 154, Switch = (Switch)trackageElementsLookup[154], TrackFromId = 33, TrackFrom = trackageElementsLookup[33], TrackToId = 32, TrackTo = trackageElementsLookup[32] } },
+                {81, new() { SwitchRouteId = 81, SwitchId = 154, Switch = (Switch)trackageElementsLookup[154], TrackFromId = 29, TrackFrom = trackageElementsLookup[29], TrackToId = 33, TrackTo = trackageElementsLookup[33] } },
+                {82, new() { SwitchRouteId = 82, SwitchId = 154, Switch = (Switch)trackageElementsLookup[154], TrackFromId = 32, TrackFrom = trackageElementsLookup[32], TrackToId = 33, TrackTo = trackageElementsLookup[33] } },
+                {83, new() { SwitchRouteId = 83, SwitchId = 155, Switch = (Switch)trackageElementsLookup[155], TrackFromId = 33, TrackFrom = trackageElementsLookup[33], TrackToId = 241, TrackTo = trackageElementsLookup[241] } },
+                {84, new() { SwitchRouteId = 84, SwitchId = 155, Switch = (Switch)trackageElementsLookup[155], TrackFromId = 33, TrackFrom = trackageElementsLookup[33], TrackToId = 35, TrackTo = trackageElementsLookup[35] } },
+                {85, new() { SwitchRouteId = 85, SwitchId = 155, Switch = (Switch)trackageElementsLookup[155], TrackFromId = 241, TrackFrom = trackageElementsLookup[241], TrackToId = 33, TrackTo = trackageElementsLookup[33] } },
+                {86, new() { SwitchRouteId = 86, SwitchId = 155, Switch = (Switch)trackageElementsLookup[155], TrackFromId = 35, TrackFrom = trackageElementsLookup[35], TrackToId = 33, TrackTo = trackageElementsLookup[33] } },
+                {87, new() { SwitchRouteId = 87, SwitchId = 156, Switch = (Switch)trackageElementsLookup[156], TrackFromId = 34, TrackFrom = trackageElementsLookup[34], TrackToId = 37, TrackTo = trackageElementsLookup[37] } },
+                {88, new() { SwitchRouteId = 88, SwitchId = 156, Switch = (Switch)trackageElementsLookup[156], TrackFromId = 34, TrackFrom = trackageElementsLookup[34], TrackToId = 242, TrackTo = trackageElementsLookup[24232] } },
+                {89, new() { SwitchRouteId = 89, SwitchId = 156, Switch = (Switch)trackageElementsLookup[156], TrackFromId = 37, TrackFrom = trackageElementsLookup[37], TrackToId = 34, TrackTo = trackageElementsLookup[34] } },
+                {90, new() { SwitchRouteId = 90, SwitchId = 156, Switch = (Switch)trackageElementsLookup[156], TrackFromId = 242, TrackFrom = trackageElementsLookup[242], TrackToId = 34, TrackTo = trackageElementsLookup[34] } },
+                {91, new() { SwitchRouteId = 91, SwitchId = 157, Switch = (Switch)trackageElementsLookup[157], TrackFromId = 241, TrackFrom = trackageElementsLookup[241], TrackToId = 35, TrackTo = trackageElementsLookup[35] } },
+                {92, new() { SwitchRouteId = 92, SwitchId = 157, Switch = (Switch)trackageElementsLookup[157], TrackFromId = 35, TrackFrom = trackageElementsLookup[35], TrackToId = 241, TrackTo = trackageElementsLookup[241] } },
+                {93, new() { SwitchRouteId = 93, SwitchId = 158, Switch = (Switch)trackageElementsLookup[158], TrackFromId = 242, TrackFrom = trackageElementsLookup[242], TrackToId = 38, TrackTo = trackageElementsLookup[38] } },
+                {94, new() { SwitchRouteId = 94, SwitchId = 158, Switch = (Switch)trackageElementsLookup[158], TrackFromId = 38, TrackFrom = trackageElementsLookup[38], TrackToId = 242, TrackTo = trackageElementsLookup[242] } },
+            };
+
+
+            Dictionary<int, Crossing> crossingLookup = new()
+            {
+                {1, new() { CrossingId = 1 } }
+            };
+
+            Dictionary<int, CrossingTrack> crossingTracksLookup = new()
+            {
+                {1, new() { CrossingTrackId = 1, CrossingId = 1, TrackId = 15, Track = tracksLookup[15], DistanceFromTrackStart = 2.698 } },
+                {2, new() { CrossingTrackId = 2, CrossingId = 1, TrackId = 16, Track = tracksLookup[16], DistanceFromTrackStart = 2.748 } },
+            };
 
             A.CallTo(() => TrackageElementHolder.GetValues()).Returns(trackageElementsLookup);
             A.CallTo(() => TrackHolder.GetValues()).Returns(tracksLookup);
-            //A.CallTo(() => CrossingHolder.GetValues()).Returns([]);
-            //A.CallTo(() => RailroadSignHolder.GetValues()).Returns(signsLookup);
-            //A.CallTo(() => RailwaySignalHolder.GetValues()).Returns(railwaySignalsLookup);
-            //A.CallTo(() => SwitchRouteHolder.GetValues()).Returns(switchRoutesLookup);
-            //A.CallTo(() => RegisteredTrainsTracker.GetRegisteredTrain(A<string>.Ignored)).Returns(Train);
+            A.CallTo(() => CrossingHolder.GetValues()).Returns(crossingLookup);
+            A.CallTo(() => CrossingTracksHolder.GetValues()).Returns(crossingTracksLookup);
+            A.CallTo(() => RailroadSignHolder.GetValues()).Returns(signsLookup);
+            A.CallTo(() => RailwaySignalHolder.GetValues()).Returns(railwaySignalsLookup);
+            A.CallTo(() => SwitchRouteHolder.GetValues()).Returns(switchRoutesLookup);
+            A.CallTo(() => RegisteredTrainsTracker.GetRegisteredTrain(A<string>.Ignored)).Returns(Train);
         }
     }
 }

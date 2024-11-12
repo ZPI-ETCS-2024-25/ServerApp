@@ -14,6 +14,7 @@ namespace EtcsServerTests.TestMaps
     public interface ITestMap
     {
         IHolder<Crossing> CrossingHolder { get; set; }
+        IHolder<CrossingTrack> CrossingTracksHolder { get; set; }
         IHolder<RailroadSign> RailroadSignHolder { get; set; }
         IHolder<RailwaySignal> RailwaySignalHolder { get; set; }
         IHolder<SwitchRoute> SwitchRouteHolder { get; set; }

@@ -297,6 +297,7 @@ namespace EtcsServerTests.TestMaps
             A.CallTo(() => TrackageElementHolder.GetValues()).Returns(trackageElementsLookup);
             A.CallTo(() => TrackHolder.GetValues()).Returns(tracksLookup);
             A.CallTo(() => CrossingHolder.GetValues()).Returns([]);
+            A.CallTo(() => CrossingTracksHolder.GetValues()).Returns([]);
             A.CallTo(() => RailroadSignHolder.GetValues()).Returns(signsLookup);
             A.CallTo(() => RailwaySignalHolder.GetValues()).Returns(railwaySignalsLookup);
             A.CallTo(() => SwitchRouteHolder.GetValues()).Returns(switchRoutesLookup);
