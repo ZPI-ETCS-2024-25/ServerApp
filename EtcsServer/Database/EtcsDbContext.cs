@@ -25,6 +25,7 @@ namespace EtcsServer.Database
 
             modelBuilder.Entity<Track>().ToTable(nameof(Track));
             modelBuilder.Entity<Switch>().ToTable(nameof(Switch));
+            modelBuilder.Entity<SwitchingTrack>().ToTable(nameof(SwitchingTrack));
 
             modelBuilder.Entity<TrackageElement>()
                 .HasOne(te => te.RightSideElement)
