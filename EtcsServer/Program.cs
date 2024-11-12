@@ -14,6 +14,7 @@ using EtcsServer.Helpers.Contract;
 using EtcsServer.InMemoryData;
 using EtcsServer.InMemoryData.Contract;
 using EtcsServer.InMemoryHolders;
+using EtcsServer.MapLoading;
 using EtcsServer.Security;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,20 +27,37 @@ namespace EtcsServer
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            var connectionString = builder.Configuration.GetConnectionString("EtcsDbConnectionString");
+            //var connectionString = builder.Configuration.GetConnectionString("EtcsDbConnectionString");
+            //builder.Services.AddDbContext<EtcsDbContext>(options =>
+            //{
+            //    options.UseSqlServer(connectionString);
+            //});
             builder.Services.AddDbContext<EtcsDbContext>(options =>
             {
-                options.UseSqlServer(connectionString);
+                options.UseInMemoryDatabase("EtcsInMemoryDatabase");
             });
 
             builder.Services.AddProjectServices(builder.Configuration);
             builder.Services.AddControllers();
+
+            //register map
+            builder.Services.AddSingleton<ITrackageMap, UnityTrackageMap>();
+            builder.Services.AddSingleton<IMapLoader, MapLoader>();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
+
+            //map loading
+            using (var scope = app.Services.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<EtcsDbContext>();
+                var mapLoader = scope.ServiceProvider.GetRequiredService<IMapLoader>();
+                var trackageMap = scope.ServiceProvider.GetRequiredService<ITrackageMap>();
+                mapLoader.LoadMapIntoDatabase(dbContext, trackageMap);
+            }
 
             using (var scope = app.Services.CreateScope())
             {
