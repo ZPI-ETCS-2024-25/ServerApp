@@ -30,12 +30,7 @@ namespace EtcsServer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CrossingId"));
 
-                    b.Property<int>("TrackId")
-                        .HasColumnType("int");
-
                     b.HasKey("CrossingId");
-
-                    b.HasIndex("TrackId");
 
                     b.ToTable("Crossings");
                 });
@@ -235,17 +230,6 @@ namespace EtcsServer.Migrations
                         .HasColumnType("int");
 
                     b.ToTable("Track", (string)null);
-                });
-
-            modelBuilder.Entity("EtcsServer.Database.Entity.Crossing", b =>
-                {
-                    b.HasOne("EtcsServer.Database.Entity.Track", "Track")
-                        .WithMany()
-                        .HasForeignKey("TrackId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Track");
                 });
 
             modelBuilder.Entity("EtcsServer.Database.Entity.RailroadSign", b =>
