@@ -37,8 +37,8 @@ namespace EtcsServer.DriverDataCollectors
                 return MovementDirection.UNKNOWN;
             return lastKnownTrainPosition.Direction switch
             {
-                "up" => MovementDirection.UP,
-                "down" => MovementDirection.DOWN,
+                "N" => MovementDirection.UP,
+                "P" => MovementDirection.DOWN,
                 _ => MovementDirection.UNKNOWN
             };
         }

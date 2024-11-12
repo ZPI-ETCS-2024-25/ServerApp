@@ -40,7 +40,7 @@ namespace EtcsServer.DecisionExecutors
         {
             TrainDto train = registeredTrainsTracker.GetRegisteredTrain(trainId)!;
             TrainPosition trainPosition = lastKnownPositionsTracker.GetLastKnownTrainPosition(trainId)!;
-            TrackEnd destinationTrackEnd = trainPosition.Direction.Equals("up") ? TrackEnd.RIGHT : TrackEnd.LEFT;
+            TrackEnd destinationTrackEnd = lastKnownPositionsTracker.GetMovementDirection(trainId) == MovementDirection.UP ? TrackEnd.RIGHT : TrackEnd.LEFT;
             Track? track = trackHelper.GetTrackByTrainPosition(trainPosition);
             bool wasInsideEtcsBorder = false;
 
@@ -74,7 +74,7 @@ namespace EtcsServer.DecisionExecutors
         {
             TrainDto train = registeredTrainsTracker.GetRegisteredTrain(trainId)!;
             TrainPosition trainPosition = lastKnownPositionsTracker.GetLastKnownTrainPosition(trainId)!;
-            TrackEnd destinationTrackEnd = trainPosition.Direction.Equals("up") ? TrackEnd.RIGHT : TrackEnd.LEFT;
+            TrackEnd destinationTrackEnd = lastKnownPositionsTracker.GetMovementDirection(trainId) == MovementDirection.UP ? TrackEnd.RIGHT : TrackEnd.LEFT;
             Track? track = trackHelper.GetTrackByTrainPosition(trainPosition);
 
             MovementAuthorityContainer authorityContainer = new(train)

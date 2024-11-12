@@ -53,7 +53,7 @@ namespace EtcsServerTests
                 Kilometer = 0.5,
                 LineNumber = 1,
                 Track = "1",
-                Direction = "up"
+                Direction = "N"
             };
             A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
 
@@ -87,7 +87,7 @@ namespace EtcsServerTests
                 Kilometer = 0.5,
                 LineNumber = 1,
                 Track = "1",
-                Direction = "up"
+                Direction = "N"
             };
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(12)).Returns(RailwaySignalMessage.GO);
             A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
@@ -122,7 +122,7 @@ namespace EtcsServerTests
                 Kilometer = 2.5,
                 LineNumber = 1,
                 Track = "1",
-                Direction = "up"
+                Direction = "N"
             };
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(23)).Returns(RailwaySignalMessage.GO);
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(3)).Returns(RailwaySignalMessage.GO);
@@ -158,7 +158,7 @@ namespace EtcsServerTests
                 Kilometer = 5.5,
                 LineNumber = 1,
                 Track = "1",
-                Direction = "up"
+                Direction = "N"
             };
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(3)).Returns(RailwaySignalMessage.GO);
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(33)).Returns(RailwaySignalMessage.GO);
@@ -195,7 +195,7 @@ namespace EtcsServerTests
                 Kilometer = 7,
                 LineNumber = 1,
                 Track = "1",
-                Direction = "down"
+                Direction = "P"
             };
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(33)).Returns(RailwaySignalMessage.GO);
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(4)).Returns(RailwaySignalMessage.GO);
@@ -232,7 +232,7 @@ namespace EtcsServerTests
                 Kilometer = 0.8,
                 LineNumber = 2,
                 Track = "1",
-                Direction = "up"
+                Direction = "N"
             };
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(7)).Returns(RailwaySignalMessage.GO);
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(1516)).Returns(RailwaySignalMessage.GO);
@@ -269,7 +269,7 @@ namespace EtcsServerTests
                 Kilometer = 0.8,
                 LineNumber = 2,
                 Track = "1",
-                Direction = "up"
+                Direction = "N"
             };
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(7)).Returns(RailwaySignalMessage.GO);
             A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
@@ -304,7 +304,7 @@ namespace EtcsServerTests
                 Kilometer = 2,
                 LineNumber = 2,
                 Track = "1",
-                Direction = "down"
+                Direction = "P"
             };
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(77)).Returns(RailwaySignalMessage.GO);
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(44)).Returns(RailwaySignalMessage.GO);
