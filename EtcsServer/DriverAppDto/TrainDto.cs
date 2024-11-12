@@ -3,9 +3,9 @@
     public class TrainDto
     {
         public string TrainId { get; set; }
-        public string LengthMeters { get; set; }
-        public string MaxSpeed { get; set; }
-        public string BrakeWeight { get; set; }
+        public int LengthMeters { get; set; }
+        public int MaxSpeed { get; set; }
+        public int BrakeWeight { get; set; }
 
     }
 }

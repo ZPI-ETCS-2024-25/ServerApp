@@ -240,7 +240,7 @@ namespace EtcsServer.DecisionExecutors
             public void RegisterSpeed(double speed, int meter)
             {
                 if (Speeds.Count > 0 && Speeds.Last() < speed)
-                    meter += Int32.Parse(_train.LengthMeters);
+                    meter += _train.LengthMeters;
 
                 RegisterSpeedWithMeterComparison(speed, meter);
             }

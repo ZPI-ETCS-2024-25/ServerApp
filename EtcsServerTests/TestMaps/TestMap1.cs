@@ -19,9 +19,9 @@ namespace EtcsServerTests.TestMaps
             this.Train = new()
             {
                 TrainId = "123",
-                LengthMeters = "800",
-                MaxSpeed = "200",
-                BrakeWeight = "500"
+                LengthMeters = 800,
+                MaxSpeed = 200,
+                BrakeWeight = 500
             };
             InitializeHolders();
         }
