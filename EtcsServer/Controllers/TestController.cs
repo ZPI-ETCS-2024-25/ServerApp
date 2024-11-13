@@ -98,14 +98,14 @@ namespace EtcsServer.Controllers
 
         [HttpGet]
         [Route("/encrypt")]
-        public async Task<ActionResult> Encrypt(string text, [FromServices] SecurityManager securityManager)
+        public async Task<ActionResult> Encrypt(string text, [FromServices] ISecurityManager securityManager)
         {
             return Ok(new JsonResponse() { message = securityManager.Encrypt(text) });
         }
 
         [HttpGet]
         [Route("/decrypt")]
-        public async Task<ActionResult> Decrypt(string text, [FromServices] SecurityManager securityManager)
+        public async Task<ActionResult> Decrypt(string text, [FromServices] ISecurityManager securityManager)
         {
             return Ok(new JsonResponse() { message = securityManager.Decrypt(text) });
         }

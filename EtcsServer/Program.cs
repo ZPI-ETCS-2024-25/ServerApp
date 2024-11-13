@@ -80,7 +80,7 @@ namespace EtcsServer
                 scope.ServiceProvider.GetRequiredService<IMovementAuthorityValidator>();
                 scope.ServiceProvider.GetRequiredService<IMovementAuthorityProvider>();
 
-                scope.ServiceProvider.GetRequiredService<SecurityManager>();
+                scope.ServiceProvider.GetRequiredService<ISecurityManager>();
 
             }
 

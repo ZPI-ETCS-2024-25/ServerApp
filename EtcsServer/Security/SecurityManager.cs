@@ -6,7 +6,7 @@ using System.Text.Json;
 
 namespace EtcsServer.Security
 {
-    public class SecurityManager
+    public class SecurityManager : ISecurityManager
     {
         private readonly IOptions<SecurityConfiguration> securityConfiguration;
         private byte[] key;

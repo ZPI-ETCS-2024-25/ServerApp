@@ -25,14 +25,14 @@ namespace EtcsServerTests
         private TestMap1 testMap;
         private ServiceProvider serviceProvider;
         private DriverAppController driverAppController;
-        private SecurityManager securityManager;
+        private ISecurityManager securityManager;
 
         public TestScenariosForMap1()
         {
             testMap = new TestMap1();
             serviceProvider = testMap.GetTestMapServiceProvider();
             driverAppController = serviceProvider.GetRequiredService<DriverAppController>();
-            securityManager = serviceProvider.GetRequiredService<SecurityManager>();
+            securityManager = serviceProvider.GetRequiredService<ISecurityManager>();
 
             A.CallTo(() => testMap.TrainPositionTracker.GetMovementDirection(testMap.Train.TrainId)).Returns(MovementDirection.UP);
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(A<int>.Ignored)).Returns(RailwaySignalMessage.STOP);

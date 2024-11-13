@@ -16,9 +16,9 @@ namespace EtcsServer.Controllers
     public class DriverAppController : ControllerBase
     {
          private readonly ILogger<TestController> _logger;
-         private readonly SecurityManager securityManager;
+         private readonly ISecurityManager securityManager;
 
-        public DriverAppController(ILogger<TestController> logger, SecurityManager securityManager)
+        public DriverAppController(ILogger<TestController> logger, ISecurityManager securityManager)
         {
             _logger = logger;
             this.securityManager = securityManager;
