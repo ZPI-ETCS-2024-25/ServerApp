@@ -18,7 +18,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EtcsServerTests
+namespace EtcsServerTests.Tests
 {
     public class TestScenariosForMap1
     {
@@ -210,7 +210,7 @@ namespace EtcsServerTests
             {
                 Speeds = [70, 0],
                 SpeedDistances = [0, 4000],
-                Gradients = [ -7 ],
+                Gradients = [-7],
                 GradientDistances = [0, 4000],
                 Lines = [1],
                 LinesDistances = [0, 4000],
