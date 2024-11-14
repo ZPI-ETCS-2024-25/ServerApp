@@ -76,8 +76,6 @@ namespace EtcsServer.Controllers
             MovementAuthority movementAuthority = validationOutcome.NextStopSignal == null ?
                 movementAuthorityProvider.ProvideMovementAuthorityToEtcsBorder(movementAuthorityRequest.TrainId) :
                 movementAuthorityProvider.ProvideMovementAuthority(movementAuthorityRequest.TrainId, validationOutcome.NextStopSignal!);
-
-            movementAuthorityTracker.SetActiveMovementAuthority(movementAuthorityRequest.TrainId, movementAuthority);
             
             return Ok(new EncryptedResponse(securityManager.Encrypt(movementAuthority)));                
         }

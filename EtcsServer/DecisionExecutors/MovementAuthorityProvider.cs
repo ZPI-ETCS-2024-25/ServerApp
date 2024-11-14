@@ -15,6 +15,7 @@ namespace EtcsServer.DecisionExecutors
 {
     public class MovementAuthorityProvider : IMovementAuthorityProvider
     {
+        private IMovementAuthorityTracker movementAuthorityTracker;
         private readonly ITrainPositionTracker lastKnownPositionsTracker;
         private readonly IRegisteredTrainsTracker registeredTrainsTracker;
         private readonly IHolder<RailroadSign> railroadSignsHolder;
@@ -22,6 +23,7 @@ namespace EtcsServer.DecisionExecutors
         private readonly ISwitchStates switchStates;
 
         public MovementAuthorityProvider(
+            IMovementAuthorityTracker movementAuthorityTracker,
             ITrainPositionTracker lastKnownPositionsTracker,
             IRegisteredTrainsTracker registeredTrainsTracker,
             IHolder<RailroadSign> railroadSignsHolder,
@@ -29,6 +31,7 @@ namespace EtcsServer.DecisionExecutors
             ISwitchStates switchStates
             )
         {
+            this.movementAuthorityTracker = movementAuthorityTracker;
             this.lastKnownPositionsTracker = lastKnownPositionsTracker;
             this.registeredTrainsTracker = registeredTrainsTracker;
             this.railroadSignsHolder = railroadSignsHolder;
@@ -44,11 +47,12 @@ namespace EtcsServer.DecisionExecutors
             Track? track = trackHelper.GetTrackByTrainPosition(trainPosition);
             bool wasInsideEtcsBorder = false;
 
-            MovementAuthorityContainer authorityContainer = new(train)
+            MovementAuthorityContainer authorityContainer = new(train, trainPosition)
             {
                 StartingTrackId = track!.TrackageElementId,
                 CurrentMeter = trainPosition.GetMeter(),
-                CurrentTrack = track
+                CurrentTrack = track,
+                TrackageElements = [track!]
             };
 
             while (!wasInsideEtcsBorder || (authorityContainer.CurrentTrack != null && authorityContainer.CurrentTrack.TrackPosition == TrackPosition.INSIDE_ZONE))
@@ -67,7 +71,7 @@ namespace EtcsServer.DecisionExecutors
             }
 
             double finishingSpeed = authorityContainer.CurrentTrack == null ? 0 : authorityContainer.CurrentTrack.GetMaxSpeed(destinationTrackEnd);
-            return authorityContainer.CreateMovementAuthority(trainPosition, finishingSpeed);
+            return CreateMovementAuthority(authorityContainer, finishingSpeed);
         }
 
         public MovementAuthority ProvideMovementAuthority(string trainId, RailwaySignal stopSignal)
@@ -77,11 +81,12 @@ namespace EtcsServer.DecisionExecutors
             TrackEnd destinationTrackEnd = lastKnownPositionsTracker.GetMovementDirection(trainId) == MovementDirection.UP ? TrackEnd.RIGHT : TrackEnd.LEFT;
             Track? track = trackHelper.GetTrackByTrainPosition(trainPosition);
 
-            MovementAuthorityContainer authorityContainer = new(train)
+            MovementAuthorityContainer authorityContainer = new(train, trainPosition)
             {
                 StartingTrackId = track!.TrackageElementId,
                 CurrentMeter = trainPosition.GetMeter(),
-                CurrentTrack = track
+                CurrentTrack = track,
+                TrackageElements = [track!]
             };
 
             while (authorityContainer.CurrentTrack.TrackageElementId != stopSignal.TrackId)
@@ -97,8 +102,7 @@ namespace EtcsServer.DecisionExecutors
             }
 
             UpdateMovementAuthorityUntilStopSignalIsReached(authorityContainer, destinationTrackEnd, trainPosition, stopSignal);
-
-            return authorityContainer.CreateMovementAuthority(trainPosition, 0);
+            return CreateMovementAuthority(authorityContainer, 0);
         }
 
         private void RegisterSpeedsForCurrentTrack(MovementAuthorityContainer authorityContainer, TrackEnd destinationTrackEnd) => RegisterSpeedsForCurrentTrack(authorityContainer, destinationTrackEnd, -1);
@@ -170,6 +174,7 @@ namespace EtcsServer.DecisionExecutors
             {
                 authorityContainer.CurrentTrack = track;
                 authorityContainer.CurrentMeter = track.GetMeter();
+                authorityContainer.TrackageElements.Add(track);
             }
             else authorityContainer.CurrentTrack = null;
         }
@@ -186,6 +191,10 @@ namespace EtcsServer.DecisionExecutors
                     TrackEnd currentSwitchingTrackEnd = switchingTrack.RightSideElementId == trainSwitch.TrackageElementId ? TrackEnd.RIGHT : TrackEnd.LEFT;
                     RegisterSwitchingTrack(switchingTrack, currentSwitchingTrackEnd, authorityContainer);
                     trainSwitch = (Switch)switchingTrack.GetNext(currentSwitchingTrackEnd.GetOppositeEnd())!;
+
+                    authorityContainer.TrackageElements.Add(switchingTrack);
+                    authorityContainer.TrackageElements.Add(trainSwitch);
+
                     nextTrackId = switchStates.GetNextTrackId(trainSwitch.TrackageElementId, switchingTrack.TrackageElementId);
                     trackageElementAfterSwitch = trackHelper.GetTrackageElement(nextTrackId);
                 }
@@ -196,6 +205,7 @@ namespace EtcsServer.DecisionExecutors
             {
                 authorityContainer.CurrentTrack = track;
                 authorityContainer.CurrentMeter = track.GetMeter();
+                authorityContainer.TrackageElements.Add(track);
             } else
             {
                 authorityContainer.CurrentTrack = null;
@@ -221,9 +231,17 @@ namespace EtcsServer.DecisionExecutors
             UpdateTravelledDistance(authorityContainer, destinationTrackEnd, trainPosition, stopSignal);
         }
 
-        class MovementAuthorityContainer(TrainDto train)
+        private MovementAuthority CreateMovementAuthority(MovementAuthorityContainer movementAuthorityContainer, double finishingSpeed)
         {
-            private readonly TrainDto _train = train;
+            MovementAuthority movementAuthority = movementAuthorityContainer.CreateMovementAuthority(finishingSpeed);
+            movementAuthorityTracker.SetActiveMovementAuthority(movementAuthorityContainer.Train.TrainId, movementAuthority, movementAuthorityContainer.TrackageElements);
+            return movementAuthority;
+        }
+
+        class MovementAuthorityContainer(TrainDto train, TrainPosition trainPosition)
+        {
+            public TrainDto Train { get; set; } = train;
+            public TrainPosition TrainPosition { get; set; } = trainPosition;
 
             public List<double> Speeds { get; set; } = [];
             public List<double> SpeedsDistances { get; set; } = [];
@@ -236,11 +254,12 @@ namespace EtcsServer.DecisionExecutors
             public int CurrentMeter { get; set; }
             public int MetersSoFar { get; set; }
             public Track? CurrentTrack { get; set; }
+            public List<TrackageElement> TrackageElements { get; set; } = [];
 
             public void RegisterSpeed(double speed, int meter)
             {
                 if (Speeds.Count > 0 && Speeds.Last() < speed)
-                    meter += _train.LengthMeters;
+                    meter += Train.LengthMeters;
 
                 RegisterSpeedWithMeterComparison(speed, meter);
             }
@@ -288,7 +307,7 @@ namespace EtcsServer.DecisionExecutors
                 }
             }
 
-            public MovementAuthority CreateMovementAuthority(TrainPosition trainPosition, double finishingSpeed)
+            public MovementAuthority CreateMovementAuthority(double finishingSpeed)
             {
                 RegisterSpeedWithMeterComparison(finishingSpeed, MetersSoFar);
                 if (GradientsDistances.Last() == MetersSoFar)
@@ -298,7 +317,7 @@ namespace EtcsServer.DecisionExecutors
                 else GradientsDistances.Add(MetersSoFar);
 
                 LinesDistances.Add(MetersSoFar);
-                
+
                 return new MovementAuthority()
                 {
                     Speeds = Speeds.ToArray(),
@@ -309,7 +328,7 @@ namespace EtcsServer.DecisionExecutors
                     MessageDistances = [],
                     Lines = Lines.ToArray(),
                     LinesDistances = LinesDistances.ToArray(),
-                    ServerPosition = trainPosition.Kilometer
+                    ServerPosition = TrainPosition.Kilometer
                 };
             }
         }
