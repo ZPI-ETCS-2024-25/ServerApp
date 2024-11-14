@@ -25,66 +25,74 @@ namespace EtcsServer.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult> RegisterTrain(TrainDto train, [FromServices] IRegisteredTrainsTracker registeredTrainsTracker)
+        public async Task<ActionResult> RegisterTrain(EncryptedMessage encryptedMessage, [FromServices] IRegisteredTrainsTracker registeredTrainsTracker)
         {
+            TrainDto train = securityManager.Decrypt<TrainDto>(encryptedMessage.Content);
             _logger.LogInformation("Received register request for train {}", train.TrainId);
             bool result = registeredTrainsTracker.Register(train);
             if (result)
-                return Ok(new RegisterTrainResponse());
+                return Ok(GetEncryptedResponse(new RegisterTrainResponse()));
             else
-                return BadRequest(new RegisterTrainResponse() { RegisterSuccess = false });
+                return BadRequest(GetEncryptedResponse(new RegisterTrainResponse() { RegisterSuccess = false }));
         }
 
         [HttpPost("updatedata")]
-        public async Task<ActionResult> UpdateTrainData(UpdateTrain updateTrain, [FromServices] IRegisteredTrainsTracker registeredTrainsTracker)
+        public async Task<ActionResult> UpdateTrainData(EncryptedMessage encryptedMessage, [FromServices] IRegisteredTrainsTracker registeredTrainsTracker)
         {
+            UpdateTrain updateTrain = securityManager.Decrypt<UpdateTrain>(encryptedMessage.Content);
             _logger.LogInformation("Received train data update request for train {}", updateTrain.TrainId);
             bool result = registeredTrainsTracker.Update(updateTrain);
             return result ? Ok() : BadRequest();
         }
 
         [HttpPost("unregister")]
-        public async Task<ActionResult> UnregisterTrain(UnregisterRequest unregisterRequest, [FromServices] IRegisteredTrainsTracker registeredTrainsTracker)
+        public async Task<ActionResult> UnregisterTrain(EncryptedMessage encryptedMessage, [FromServices] IRegisteredTrainsTracker registeredTrainsTracker)
         {
+            UnregisterRequest unregisterRequest = securityManager.Decrypt<UnregisterRequest>(encryptedMessage.Content);
             _logger.LogInformation("Received train unregister request for train {}", unregisterRequest.TrainId);
             bool result = registeredTrainsTracker.Unregister(unregisterRequest.TrainId);
-            return result ? Ok(new UnregisterTrainResponse()) : BadRequest(new UnregisterTrainResponse());
+            return result ? Ok(GetEncryptedResponse(new UnregisterTrainResponse())) : BadRequest(GetEncryptedResponse(new UnregisterTrainResponse()));
         }
 
         [HttpPost("updateposition")]
-        public async Task<ActionResult> UpdateTrainPosition(TrainPosition trainPosition, [FromServices] ITrainPositionTracker positionsTracker)
+        public async Task<ActionResult> UpdateTrainPosition(EncryptedMessage encryptedMessage, [FromServices] ITrainPositionTracker positionsTracker)
         {
+            TrainPosition trainPosition = securityManager.Decrypt<TrainPosition>(encryptedMessage.Content);
             _logger.LogInformation("Received train position for train {}: {}", trainPosition.TrainId, trainPosition.Kilometer);
             positionsTracker.RegisterTrainPosition(trainPosition);
-            return Ok(new JsonResponse() { message = "Server received the location of train with id " + trainPosition.TrainId});
+            return Ok(GetEncryptedResponse(new JsonResponse() { message = "Server received the location of train with id " + trainPosition.TrainId}));
         }
 
         [HttpPost("marequest")]
         public async Task<ActionResult> PostMovementAuthorityRequest(
-            MovementAuthorityRequest movementAuthorityRequest,
+            EncryptedMessage encryptedMessage,
             [FromServices] IMovementAuthorityValidator movementAuthorityValidator,
             [FromServices] IMovementAuthorityProvider movementAuthorityProvider,
             [FromServices] IMovementAuthorityTracker movementAuthorityTracker
             )
         {
+            MovementAuthorityRequest movementAuthorityRequest = securityManager.Decrypt<MovementAuthorityRequest>(encryptedMessage.Content);
             _logger.LogInformation("Received movement authority request for train {}", movementAuthorityRequest.TrainId);
 
             MovementAuthorityValidationOutcome validationOutcome = movementAuthorityValidator.IsTrainValidForMovementAuthority(movementAuthorityRequest.TrainId);
             if (validationOutcome.Result != MovementAuthorityValidationResult.OK)
-                return BadRequest(new JsonResponse() { message = $"Train with id {movementAuthorityRequest.TrainId} is not valid to receive movement authority: {validationOutcome.Result}" });
+                return BadRequest(GetEncryptedResponse(new JsonResponse() { message = $"Train with id {movementAuthorityRequest.TrainId} is not valid to receive movement authority: {validationOutcome.Result}" }));
 
             MovementAuthority movementAuthority = validationOutcome.NextStopSignal == null ?
                 movementAuthorityProvider.ProvideMovementAuthorityToEtcsBorder(movementAuthorityRequest.TrainId) :
                 movementAuthorityProvider.ProvideMovementAuthority(movementAuthorityRequest.TrainId, validationOutcome.NextStopSignal!);
             
-            return Ok(new EncryptedResponse(securityManager.Encrypt(movementAuthority)));                
+            return Ok(GetEncryptedResponse(movementAuthority));                
         }
 
         [HttpPost("speedupdate")]
-        public async Task<ActionResult> PostTrainSpeed(TrainSpeed trainSpeed)
+        public async Task<ActionResult> PostTrainSpeed(EncryptedMessage encryptedMessage)
         {
+            TrainSpeed trainSpeed = securityManager.Decrypt<TrainSpeed>(encryptedMessage.Content);
             _logger.LogInformation("Received train speed ({}) for train {}", trainSpeed.Speed, trainSpeed.TrainId);
             return Ok();
         }
+
+        private string GetEncryptedResponse(object response) => securityManager.Encrypt(response);
     }
 }

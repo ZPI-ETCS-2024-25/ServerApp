@@ -337,17 +337,16 @@ namespace EtcsServerTests.Tests
         private MovementAuthority? PostValidMovementAuthorityRequest(MovementAuthorityRequest request)
         {
             ActionResult response = driverAppController.PostMovementAuthorityRequest(
-                request,
+                new EncryptedMessage() { Content = securityManager.Encrypt(request) },
                 serviceProvider.GetRequiredService<IMovementAuthorityValidator>(),
                 serviceProvider.GetRequiredService<IMovementAuthorityProvider>(),
                 serviceProvider.GetRequiredService<IMovementAuthorityTracker>()
             ).Result;
 
-            if (response is OkObjectResult okObjectResult)
+            if (response is ObjectResult objectResult && objectResult.Value is string encryptedResponse)
             {
-                var encryptedResponse = okObjectResult.Value as EncryptedResponse;
                 if (encryptedResponse != null)
-                    return securityManager.Decrypt<MovementAuthority>(encryptedResponse.EncryptedContent);
+                    return securityManager.Decrypt<MovementAuthority>(encryptedResponse);
                 return null;
             }
             return null;
