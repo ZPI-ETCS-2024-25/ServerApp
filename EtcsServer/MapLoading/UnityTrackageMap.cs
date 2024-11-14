@@ -21,7 +21,7 @@ namespace EtcsServer.MapLoading
 
         public void PrepareDataForInsert()
         {
-            double switchingTrackLength = 0.05;
+            double switchingTrackLength = 0.07;
             double shortBetweenSwitches = 0.1;
             double longBetweenSwitches = 0.2;
             double lowSwitchingSpeed = 40;

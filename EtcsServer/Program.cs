@@ -16,6 +16,7 @@ using EtcsServer.InMemoryData.Contract;
 using EtcsServer.InMemoryHolders;
 using EtcsServer.MapLoading;
 using EtcsServer.Security;
+using EtcsServer.Senders.Contracts;
 using Microsoft.EntityFrameworkCore;
 
 namespace EtcsServer
@@ -82,6 +83,8 @@ namespace EtcsServer
                 scope.ServiceProvider.GetRequiredService<IMovementAuthorityTracker>();
 
                 scope.ServiceProvider.GetRequiredService<ISecurityManager>();
+
+                scope.ServiceProvider.GetRequiredService<IDriverAppSender>();
 
             }
 

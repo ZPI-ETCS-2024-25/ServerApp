@@ -12,6 +12,8 @@ using EtcsServer.InMemoryData;
 using EtcsServer.InMemoryHolders;
 using EtcsServer.Security;
 using EtcsServer.Configuration;
+using EtcsServer.Senders.Contracts;
+using EtcsServer.Senders;
 
 namespace EtcsServer.ExtensionMethods
 {
@@ -43,6 +45,8 @@ namespace EtcsServer.ExtensionMethods
             services.AddSingleton<IMovementAuthorityTracker, MovementAuthorityTracker>();
 
             services.AddSingleton<ISecurityManager, SecurityManager>();
+
+            services.AddSingleton<IDriverAppSender, DriverAppSender>();
 
             return services;
         }
