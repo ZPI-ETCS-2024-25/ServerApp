@@ -63,7 +63,8 @@ namespace EtcsServer.Controllers
         public async Task<ActionResult> PostMovementAuthorityRequest(
             MovementAuthorityRequest movementAuthorityRequest,
             [FromServices] IMovementAuthorityValidator movementAuthorityValidator,
-            [FromServices] IMovementAuthorityProvider movementAuthorityProvider
+            [FromServices] IMovementAuthorityProvider movementAuthorityProvider,
+            [FromServices] IMovementAuthorityTracker movementAuthorityTracker
             )
         {
             _logger.LogInformation("Received movement authority request for train {}", movementAuthorityRequest.TrainId);
@@ -75,6 +76,8 @@ namespace EtcsServer.Controllers
             MovementAuthority movementAuthority = validationOutcome.NextStopSignal == null ?
                 movementAuthorityProvider.ProvideMovementAuthorityToEtcsBorder(movementAuthorityRequest.TrainId) :
                 movementAuthorityProvider.ProvideMovementAuthority(movementAuthorityRequest.TrainId, validationOutcome.NextStopSignal!);
+
+            movementAuthorityTracker.SetActiveMovementAuthority(movementAuthorityRequest.TrainId, movementAuthority);
             
             return Ok(new EncryptedResponse(securityManager.Encrypt(movementAuthority)));                
         }

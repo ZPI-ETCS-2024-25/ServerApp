@@ -40,6 +40,7 @@ namespace EtcsServer.ExtensionMethods
 
             services.AddSingleton<IMovementAuthorityValidator, MovementAuthorityValidator>();
             services.AddSingleton<IMovementAuthorityProvider, MovementAuthorityProvider>();
+            services.AddSingleton<IMovementAuthorityTracker, MovementAuthorityTracker>();
 
             services.AddSingleton<ISecurityManager, SecurityManager>();
 

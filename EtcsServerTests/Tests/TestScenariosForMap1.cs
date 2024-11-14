@@ -339,7 +339,8 @@ namespace EtcsServerTests.Tests
             ActionResult response = driverAppController.PostMovementAuthorityRequest(
                 request,
                 serviceProvider.GetRequiredService<IMovementAuthorityValidator>(),
-                serviceProvider.GetRequiredService<IMovementAuthorityProvider>()
+                serviceProvider.GetRequiredService<IMovementAuthorityProvider>(),
+                serviceProvider.GetRequiredService<IMovementAuthorityTracker>()
             ).Result;
 
             if (response is OkObjectResult okObjectResult)
