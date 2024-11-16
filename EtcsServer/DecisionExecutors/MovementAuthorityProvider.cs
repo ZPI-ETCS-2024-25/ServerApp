@@ -177,7 +177,7 @@ namespace EtcsServer.DecisionExecutors
             bool isMovingUp = destinationTrackEnd == TrackEnd.RIGHT;
             Track currentTrack = authorityContainer.CurrentTrack!;
             if (currentTrack.TrackageElementId == authorityContainer.StartingTrackId)
-                authorityContainer.MetersSoFar += isMovingUp ? stopSignal.GetDistanceFromStartMeters()- originalTrainPosition.GetMeter() : originalTrainPosition.GetMeter() - stopSignal.GetDistanceFromStartMeters();
+                authorityContainer.MetersSoFar += isMovingUp ? currentTrack.GetMeter() + stopSignal.GetDistanceFromStartMeters() - originalTrainPosition.GetMeter() : originalTrainPosition.GetMeter() - (stopSignal.GetDistanceFromStartMeters() + currentTrack.GetMeter());
             else authorityContainer.MetersSoFar += isMovingUp ? stopSignal.GetDistanceFromStartMeters() : currentTrack.GetLengthMeters() - stopSignal.GetDistanceFromStartMeters();
         }
 

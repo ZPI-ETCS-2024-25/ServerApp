@@ -120,8 +120,8 @@ namespace EtcsServerTests.Tests
                 SpeedDistances = [0, 850, 1170],
                 Gradients = [0],
                 GradientDistances = [0, 1170],
-                Lines = [1, 2],
-                LinesDistances = [0, 920, 1170],
+                Lines = [1],
+                LinesDistances = [0, 1170],
                 Messages = [],
                 MessageDistances = [],
                 ServerPosition = 2.6
