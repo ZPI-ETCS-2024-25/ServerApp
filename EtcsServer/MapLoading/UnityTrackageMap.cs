@@ -535,7 +535,7 @@ namespace EtcsServer.MapLoading
                 },
                 new Track() {
                     TrackageElementId = 222,
-                    LeftSideElementId = 233,
+                    LeftSideElementId = 133,
                     RightSideElementId = 22,
                     LineNumber = 1,
                     TrackNumber = "2",

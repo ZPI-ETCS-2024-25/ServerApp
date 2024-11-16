@@ -85,6 +85,7 @@ namespace EtcsServerTests.TestMaps
             serviceCollection.AddSingleton<IRegisteredTrainsTracker>(RegisteredTrainsTracker);
 
             serviceCollection.AddScoped<DriverAppController>();
+            serviceCollection.AddScoped<UnityAppController>();
 
             return serviceCollection.BuildServiceProvider();
         }
