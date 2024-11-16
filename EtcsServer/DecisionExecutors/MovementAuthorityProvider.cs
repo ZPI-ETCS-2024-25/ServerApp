@@ -181,6 +181,7 @@ namespace EtcsServer.DecisionExecutors
 
         private void HandleSwitch(Switch trainSwitch, int trackFromId, MovementAuthorityContainer authorityContainer)
         {
+            authorityContainer.TrackageElements.Add(trainSwitch);
             int nextTrackId = switchStates.GetNextTrackId(trainSwitch.TrackageElementId, trackFromId);
             TrackageElement trackageElementAfterSwitch = trackHelper.GetTrackageElement(nextTrackId);
 
@@ -194,7 +195,7 @@ namespace EtcsServer.DecisionExecutors
 
                     authorityContainer.TrackageElements.Add(switchingTrack);
                     authorityContainer.TrackageElements.Add(trainSwitch);
-
+                    
                     nextTrackId = switchStates.GetNextTrackId(trainSwitch.TrackageElementId, switchingTrack.TrackageElementId);
                     trackageElementAfterSwitch = trackHelper.GetTrackageElement(nextTrackId);
                 }

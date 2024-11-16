@@ -46,7 +46,7 @@ namespace EtcsServer.InMemoryData
 
             return movementAuthorities
                 .Where(kvp => currentPositions[kvp.Item1] != null)
-                .Where(kvp => trainToTrackageElements[kvp.Item1].FindIndex(t => t.TrackageElementId == currentPositions[kvp.Item1]!.TrackageElementId) < trainToTrackageElements[kvp.Item1].FindIndex(t => t.TrackageElementId == currentPositions[kvp.Item1]!.TrackageElementId))
+                .Where(kvp => trainToTrackageElements[kvp.Item1].FindIndex(t => t.TrackageElementId == currentPositions[kvp.Item1]!.TrackageElementId) < trainToTrackageElements[kvp.Item1].FindIndex(t => t.TrackageElementId == switchId))
                 .ToList();
         }
     }
