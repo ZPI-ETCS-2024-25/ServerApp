@@ -9,5 +9,6 @@ namespace EtcsServer.InMemoryData.Contract
         MovementAuthority? GetActiveMovementAuthority(string trainId);
         List<(string, MovementAuthority)> GetActiveMovementAuthorities();
         List<(string, MovementAuthority)> GetMovementAuthoritiesImpactedBySwitch(int switchId);
+        List<(string, MovementAuthority)> GetMovementAuthoritiesImpactedByCrossing(int crossingId);
     }
 }

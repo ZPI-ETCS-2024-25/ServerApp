@@ -3,6 +3,9 @@ using EtcsServer.DriverAppDto;
 using EtcsServer.DriverDataCollectors.Contract;
 using EtcsServer.Helpers.Contract;
 using EtcsServer.InMemoryData.Contract;
+using EtcsServer.InMemoryHolders;
+using System.Diagnostics;
+using System.Linq;
 using System.Runtime.ConstrainedExecution;
 
 namespace EtcsServer.InMemoryData
@@ -11,13 +14,15 @@ namespace EtcsServer.InMemoryData
     {
         private readonly ITrainPositionTracker trainPositionTracker;
         private readonly ITrackHelper trackHelper;
+        private readonly IHolder<CrossingTrack> crossingTracksHolder;
         private Dictionary<string, MovementAuthority> trainToMovementAuthority = [];
         private Dictionary<string, List<TrackageElement>> trainToTrackageElements = [];
 
-        public MovementAuthorityTracker(ITrainPositionTracker trainPositionTracker, ITrackHelper trackHelper)
+        public MovementAuthorityTracker(ITrainPositionTracker trainPositionTracker, ITrackHelper trackHelper, IHolder<CrossingTrack> crossingTracksHolder)
         {
             this.trainPositionTracker = trainPositionTracker;
             this.trackHelper = trackHelper;
+            this.crossingTracksHolder = crossingTracksHolder;
         }
 
         public void SetActiveMovementAuthority(string trainId, MovementAuthority movementAuthority, List<TrackageElement> trackageElements)
@@ -38,16 +43,51 @@ namespace EtcsServer.InMemoryData
 
         public List<(string, MovementAuthority)> GetMovementAuthoritiesImpactedBySwitch(int switchId)
         {
-            List<(string, MovementAuthority)> movementAuthorities = trainToMovementAuthority.Where(kvp => trainToTrackageElements[kvp.Key].Any(t => t.TrackageElementId == switchId))
-                .Select(kvp => (kvp.Key, kvp.Value))
+            List<string> impactedTrains = trainToMovementAuthority.Where(kvp => trainToTrackageElements[kvp.Key].Any(t => t.TrackageElementId == switchId))
+                .Select(kvp => kvp.Key)
                 .ToList();
 
-            Dictionary<string, Track?> currentPositions = movementAuthorities.Select(kvp => (kvp.Item1, trackHelper.GetTrackByTrainPosition(trainPositionTracker.GetLastKnownTrainPosition(kvp.Item1)!))).ToDictionary(kvp => kvp.Item1, kvp => kvp.Item2);
+            Dictionary<string, Track?> currentPositions = impactedTrains.ToDictionary(trainId => trainId, trainId => trackHelper.GetTrackByTrainPosition(trainPositionTracker.GetLastKnownTrainPosition(trainId)!));
 
-            return movementAuthorities
-                .Where(kvp => currentPositions[kvp.Item1] != null)
-                .Where(kvp => trainToTrackageElements[kvp.Item1].FindIndex(t => t.TrackageElementId == currentPositions[kvp.Item1]!.TrackageElementId) < trainToTrackageElements[kvp.Item1].FindIndex(t => t.TrackageElementId == switchId))
+            return impactedTrains
+                .Where(trainId => currentPositions[trainId] != null)
+                .Where(trainId => trainToTrackageElements[trainId].FindIndex(t => t.TrackageElementId == currentPositions[trainId]!.TrackageElementId) < trainToTrackageElements[trainId].FindIndex(t => t.TrackageElementId == switchId))
+                .Select(trainId => (trainId, trainToMovementAuthority[trainId]))
                 .ToList();
+        }
+
+        public List<(string, MovementAuthority)> GetMovementAuthoritiesImpactedByCrossing(int crossingId)
+        {
+            Dictionary<int, double> affectedTracksToDistances = crossingTracksHolder.GetValues().Values
+                .Where(crossingTrack => crossingTrack.CrossingId == crossingId)
+                .ToDictionary(crossingTrack => crossingTrack.TrackId, crossingTrack => crossingTrack.DistanceFromTrackStart);
+            List<int> affectedTracks = affectedTracksToDistances.Keys.ToList();
+
+            List<string> possiblyAffectedTrains = trainToMovementAuthority
+                .Where(kvp => trainToTrackageElements[kvp.Key].Any(t => affectedTracks.Contains(t.TrackageElementId)))
+                .Select(kvp => kvp.Key)
+                .ToList();
+
+            Dictionary<string, TrainPosition> currentPositionsReports = possiblyAffectedTrains.ToDictionary(trainId => trainId, trainId => trainPositionTracker.GetLastKnownTrainPosition(trainId)!);
+            Dictionary<string, Track?> currentPositions = possiblyAffectedTrains.ToDictionary(trainId => trainId, trainId => trackHelper.GetTrackByTrainPosition(currentPositionsReports[trainId]));
+            Dictionary<string, MovementDirection> currentDirections = possiblyAffectedTrains.ToDictionary(trainId => trainId, trainId => trainPositionTracker.GetMovementDirection(trainId)!);
+
+            List<string> trainsImpactedOnCurrentTrack = possiblyAffectedTrains
+                .Where(trainId => currentDirections[trainId] != MovementDirection.UNKNOWN && currentPositions[trainId] != null)
+                .Where(trainId => affectedTracks.Contains(currentPositions[trainId]!.TrackageElementId))
+                .Where(trainId => currentDirections[trainId] == MovementDirection.UP ?
+                        currentPositionsReports[trainId].Kilometer < currentPositions[trainId]!.Kilometer + affectedTracksToDistances[currentPositions[trainId]!.TrackageElementId] :
+                        currentPositionsReports[trainId].Kilometer > currentPositions[trainId]!.Kilometer + affectedTracksToDistances[currentPositions[trainId]!.TrackageElementId])
+                .ToList();
+
+            List<string> trainImpactedOnFutureTracks = possiblyAffectedTrains
+                .Where(trainId => currentDirections[trainId] != MovementDirection.UNKNOWN && currentPositions[trainId] != null && !trainsImpactedOnCurrentTrack.Contains(trainId))
+                .Where(trainId => trainToTrackageElements[trainId]
+                                    .Skip(trainToTrackageElements[trainId].FindIndex(e => e.TrackageElementId == currentPositions[trainId]!.TrackageElementId))
+                                    .Any(e => affectedTracks.Contains(e.TrackageElementId)))
+                .ToList();
+            
+            return trainsImpactedOnCurrentTrack.Concat(trainImpactedOnFutureTracks).Select(trainId => (trainId, trainToMovementAuthority[trainId])).ToList();
         }
     }
 }

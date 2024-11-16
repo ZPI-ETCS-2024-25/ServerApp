@@ -63,6 +63,7 @@ namespace EtcsServer
             using (var scope = app.Services.CreateScope())
             {
                 scope.ServiceProvider.GetRequiredService<IHolder<Crossing>>();
+                scope.ServiceProvider.GetRequiredService<IHolder<CrossingTrack>>();
                 scope.ServiceProvider.GetRequiredService<IHolder<RailroadSign>>();
                 scope.ServiceProvider.GetRequiredService<IHolder<RailwaySignal>>();
                 scope.ServiceProvider.GetRequiredService<IHolder<SwitchRoute>>();
@@ -73,6 +74,7 @@ namespace EtcsServer
                 scope.ServiceProvider.GetRequiredService<ITrainPositionTracker>();
                 scope.ServiceProvider.GetRequiredService<IRailwaySignalStates>();
                 scope.ServiceProvider.GetRequiredService<ISwitchStates>();
+                scope.ServiceProvider.GetRequiredService<ICrossingStates>();
                 scope.ServiceProvider.GetRequiredService<IRegisteredTrainsTracker>();
 
                 scope.ServiceProvider.GetRequiredService<IRailwaySignalHelper>();

@@ -25,6 +25,7 @@ namespace EtcsServer.ExtensionMethods
             services.Configure<SecurityConfiguration>(configuration.GetSection("Security"));
 
             services.AddSingleton<IHolder<Crossing>, CrossingsHolder>();
+            services.AddSingleton<IHolder<CrossingTrack>, CrossingTracksHolder>();
             services.AddSingleton<IHolder<RailroadSign>, RailroadSignsHolder>();
             services.AddSingleton<IHolder<RailwaySignal>, RailwaySignalsHolder>();
             services.AddSingleton<IHolder<SwitchRoute>, SwitchRoutesHolder>();
@@ -35,6 +36,7 @@ namespace EtcsServer.ExtensionMethods
             services.AddSingleton<ITrainPositionTracker, LastKnownPositionsTracker>();
             services.AddSingleton<IRailwaySignalStates, RailwaySignalStates>();
             services.AddSingleton<ISwitchStates, SwitchStates>();
+            services.AddSingleton<ICrossingStates, CrossingStates>();
             services.AddSingleton<IRegisteredTrainsTracker, RegisteredTrainsTracker>();
 
             services.AddSingleton<IRailwaySignalHelper, RailwaySignalHelper>();
