@@ -21,6 +21,7 @@ namespace EtcsServer.DecisionExecutors
         private readonly IHolder<RailroadSign> railroadSignsHolder;
         private readonly ITrackHelper trackHelper;
         private readonly ISwitchStates switchStates;
+        private readonly ICrossingStates crossingStates;
 
         public MovementAuthorityProvider(
             IMovementAuthorityTracker movementAuthorityTracker,
@@ -28,7 +29,8 @@ namespace EtcsServer.DecisionExecutors
             IRegisteredTrainsTracker registeredTrainsTracker,
             IHolder<RailroadSign> railroadSignsHolder,
             ITrackHelper trackHelper,
-            ISwitchStates switchStates
+            ISwitchStates switchStates,
+            ICrossingStates crossingStates
             )
         {
             this.movementAuthorityTracker = movementAuthorityTracker;
@@ -37,6 +39,7 @@ namespace EtcsServer.DecisionExecutors
             this.railroadSignsHolder = railroadSignsHolder;
             this.trackHelper = trackHelper;
             this.switchStates = switchStates;
+            this.crossingStates = crossingStates;
         }
 
         public MovementAuthority ProvideMovementAuthorityToEtcsBorder(string trainId)
@@ -126,7 +129,23 @@ namespace EtcsServer.DecisionExecutors
                 .OrderBy(s => isMovingUp ? s.DistanceFromTrackStart : -1 * s.DistanceFromTrackStart)
                 .ToList();
             List<RailroadSign> signsAhead = signsOnCurrentTrack.Where(s => isMovingUp ? s.GetDistanceFromStartMeters() > currentMeter : s.GetDistanceFromStartMeters() < currentMeter).ToList();
+            
+            List<CrossingTrack> damagedCrossingsOnCurrentTrack = crossingStates.GetDamagedCrossingTracks(currentTrack.TrackageElementId);
+            int maxSpeedOnDamagedCrossing = 20; //TODO move out to config file
+            damagedCrossingsOnCurrentTrack.ForEach(crossing =>
+            {
+                int indexForInsert = isMovingUp ?
+                    signsAhead.FindIndex(sign => sign.DistanceFromTrackStart > crossing.DistanceFromTrackStart) :
+                    signsAhead.FindIndex(sign => sign.DistanceFromTrackStart < crossing.DistanceFromTrackStart);
+                if (indexForInsert == -1)
+                    indexForInsert = signsAhead.Count;
 
+                signsAhead.Insert(
+                indexForInsert,
+                new RailroadSign() { IsFacedUp = isMovingUp, DistanceFromTrackStart = crossing.DistanceFromTrackStart, MaxSpeed = maxSpeedOnDamagedCrossing }
+                );
+            });
+                
             double startingPointMaxSpeed = currentTrackMaxSpeed;
             RailroadSign? previousSign = signsOnCurrentTrack.LastOrDefault(s => isMovingUp ? s.GetDistanceFromStartMeters() <= currentMeter : s.GetDistanceFromStartMeters() >= currentMeter);
             if (previousSign != null)
