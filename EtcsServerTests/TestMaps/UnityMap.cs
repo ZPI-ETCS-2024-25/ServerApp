@@ -20,7 +20,7 @@ namespace EtcsServerTests.TestMaps
             this.Train = new()
             {
                 TrainId = "97888",
-                LengthMeters = 600,
+                LengthMeters = 500,
                 MaxSpeed = 200,
                 BrakeWeight = 1000
             };
