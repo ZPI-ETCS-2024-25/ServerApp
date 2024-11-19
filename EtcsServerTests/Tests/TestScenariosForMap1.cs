@@ -66,11 +66,11 @@ namespace EtcsServerTests.Tests
                 Speeds = [200, 0],
                 SpeedDistances = [0, 1500],
                 Gradients = [20],
-                GradientDistances = [0, 1500],
+                GradientsDistances = [0, 1500],
                 Lines = [1],
                 LinesDistances = [0, 1500],
                 Messages = [],
-                MessageDistances = [],
+                MessagesDistances = [],
                 ServerPosition = 0.5
             };
             Assert.Equal(expected, movementAuthority);
@@ -101,11 +101,11 @@ namespace EtcsServerTests.Tests
                 Speeds = [200, 180, 0],
                 SpeedDistances = [0, 1500, 2500],
                 Gradients = [20, 18],
-                GradientDistances = [0, 1500, 2500],
+                GradientsDistances = [0, 1500, 2500],
                 Lines = [1],
                 LinesDistances = [0, 2500],
                 Messages = [],
-                MessageDistances = [],
+                MessagesDistances = [],
                 ServerPosition = 0.5
             };
             Assert.Equal(expected, movementAuthority);
@@ -137,11 +137,11 @@ namespace EtcsServerTests.Tests
                 Speeds = [180, 70, 0],
                 SpeedDistances = [0, 500, 5500],
                 Gradients = [18, 7],
-                GradientDistances = [0, 500, 5500],
+                GradientsDistances = [0, 500, 5500],
                 Lines = [1],
                 LinesDistances = [0, 5500],
                 Messages = [],
-                MessageDistances = [],
+                MessagesDistances = [],
                 ServerPosition = 2.5
             };
             Assert.Equal(expected, movementAuthority);
@@ -174,11 +174,11 @@ namespace EtcsServerTests.Tests
                 Speeds = [70, 30, 0],
                 SpeedDistances = [0, 2500, 3500],
                 Gradients = [7, 3],
-                GradientDistances = [0, 2500, 3500],
+                GradientsDistances = [0, 2500, 3500],
                 Lines = [1, 2],
                 LinesDistances = [0, 2500, 3500],
                 Messages = [],
-                MessageDistances = [],
+                MessagesDistances = [],
                 ServerPosition = 5.5
             };
             Assert.Equal(expected, movementAuthority);
@@ -211,11 +211,11 @@ namespace EtcsServerTests.Tests
                 Speeds = [70, 0],
                 SpeedDistances = [0, 4000],
                 Gradients = [-7],
-                GradientDistances = [0, 4000],
+                GradientsDistances = [0, 4000],
                 Lines = [1],
                 LinesDistances = [0, 4000],
                 Messages = [],
-                MessageDistances = [],
+                MessagesDistances = [],
                 ServerPosition = 7
             };
             Assert.Equal(expected, movementAuthority);
@@ -248,11 +248,11 @@ namespace EtcsServerTests.Tests
                 Speeds = [30, 20, 50, 80],
                 SpeedDistances = [0, 200, 1300, 2250],
                 Gradients = [3, 2, 5, 6.5],
-                GradientDistances = [0, 200, 500, 1500, 2250],
+                GradientsDistances = [0, 200, 500, 1500, 2250],
                 Lines = [2],
                 LinesDistances = [0, 2250],
                 Messages = [],
-                MessageDistances = [],
+                MessagesDistances = [],
                 ServerPosition = 0.8
             };
             Assert.Equal(expected, movementAuthority);
@@ -283,11 +283,11 @@ namespace EtcsServerTests.Tests
                 Speeds = [30, 20, 50, 0],
                 SpeedDistances = [0, 200, 1300, 2250],
                 Gradients = [3, 2, 5, 6.5],
-                GradientDistances = [0, 200, 500, 1500, 2250],
+                GradientsDistances = [0, 200, 500, 1500, 2250],
                 Lines = [2],
                 LinesDistances = [0, 2250],
                 Messages = [],
-                MessageDistances = [],
+                MessagesDistances = [],
                 ServerPosition = 0.8
             };
             Assert.Equal(expected, movementAuthority);
@@ -324,11 +324,11 @@ namespace EtcsServerTests.Tests
                 Speeds = [90, 30, 70, 0],
                 SpeedDistances = [0, 1000, 2800, 4500],
                 Gradients = [-9, -3, -7],
-                GradientDistances = [0, 1000, 2000, 4500],
+                GradientsDistances = [0, 1000, 2000, 4500],
                 Lines = [2, 1],
                 LinesDistances = [0, 2000, 4500],
                 Messages = [],
-                MessageDistances = [],
+                MessagesDistances = [],
                 ServerPosition = 2
             };
             Assert.Equal(expected, movementAuthority);

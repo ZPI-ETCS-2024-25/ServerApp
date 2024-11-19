@@ -26,7 +26,7 @@ namespace EtcsServer.Senders
 
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri(driverAppUrl);
-            var message = new EncryptedPostMessage(securityManager.Encrypt(movementAuthority));
+            var message = new EncryptedPostMessage(securityManager.Encrypt(new MovementAuthorityWithTimestamp(movementAuthority)));
             var serializedMessage = JsonSerializer.Serialize(message);
             await client.PostAsync("/", new StringContent(serializedMessage));
         }

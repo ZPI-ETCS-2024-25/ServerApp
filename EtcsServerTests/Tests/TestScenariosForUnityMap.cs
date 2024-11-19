@@ -92,11 +92,11 @@ namespace EtcsServerTests.Tests
                 Speeds = [160, 0],
                 SpeedDistances = [0, 1650],
                 Gradients = [0],
-                GradientDistances = [0, 1650],
+                GradientsDistances = [0, 1650],
                 Lines = [1],
                 LinesDistances = [0, 1650],
                 Messages = [],
-                MessageDistances = [],
+                MessagesDistances = [],
                 ServerPosition = 2.1
             };
             Assert.Equal(expected, movementAuthority);
@@ -119,11 +119,11 @@ namespace EtcsServerTests.Tests
                 Speeds = [160, 60, 0],
                 SpeedDistances = [0, 850, 1170],
                 Gradients = [0],
-                GradientDistances = [0, 1170],
+                GradientsDistances = [0, 1170],
                 Lines = [1],
                 LinesDistances = [0, 1170],
                 Messages = [],
-                MessageDistances = [],
+                MessagesDistances = [],
                 ServerPosition = 2.6
             };
             Assert.True(messageToDriver.Timestamp > originalDateTime);
@@ -171,11 +171,11 @@ namespace EtcsServerTests.Tests
                 Speeds = [160, 60, 0],
                 SpeedDistances = [0, 450, 790],
                 Gradients = [0],
-                GradientDistances = [0, 790],
+                GradientsDistances = [0, 790],
                 Lines = [1],
                 LinesDistances = [0, 790],
                 Messages = [],
-                MessageDistances = [],
+                MessagesDistances = [],
                 ServerPosition = 4.1
             };
             Assert.Equal(expected, movementAuthority);
@@ -198,11 +198,11 @@ namespace EtcsServerTests.Tests
                 Speeds = [160, 0],
                 SpeedDistances = [0, 650],
                 Gradients = [0],
-                GradientDistances = [0, 650],
+                GradientsDistances = [0, 650],
                 Lines = [1],
                 LinesDistances = [0, 650],
                 Messages = [],
-                MessageDistances = [],
+                MessagesDistances = [],
                 ServerPosition = 4.0
             };
             Assert.True(messageToDriver.Timestamp > originalDateTime);
@@ -245,11 +245,11 @@ namespace EtcsServerTests.Tests
                 Speeds = [160, 0],
                 SpeedDistances = [0, 3846 ],
                 Gradients = [0],
-                GradientDistances = [0, 3846 ],
+                GradientsDistances = [0, 3846 ],
                 Lines = [1],
                 LinesDistances = [0, 3846],
                 Messages = [],
-                MessageDistances = [],
+                MessagesDistances = [],
                 ServerPosition = 5.1
             };
             Assert.Equal(expected, movementAuthority);
@@ -272,11 +272,11 @@ namespace EtcsServerTests.Tests
                 Speeds = [160, 20, 160, 0],
                 SpeedDistances = [0, 1138, 1658, 3746],
                 Gradients = [0],
-                GradientDistances = [0, 3746],
+                GradientsDistances = [0, 3746],
                 Lines = [1],
                 LinesDistances = [0, 3746],
                 Messages = [],
-                MessageDistances = [],
+                MessagesDistances = [],
                 ServerPosition = 5.2
             };
             Assert.True(messageToDriver.Timestamp > originalDateTime);
@@ -319,11 +319,11 @@ namespace EtcsServerTests.Tests
                 Speeds = [160, 0],
                 SpeedDistances = [0, 1946],
                 Gradients = [0],
-                GradientDistances = [0, 1946],
+                GradientsDistances = [0, 1946],
                 Lines = [1],
                 LinesDistances = [0, 1946],
                 Messages = [],
-                MessageDistances = [],
+                MessagesDistances = [],
                 ServerPosition = 7.0
             };
             Assert.Equal(expected, movementAuthority);

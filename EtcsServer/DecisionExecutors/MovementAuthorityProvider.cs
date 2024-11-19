@@ -364,9 +364,9 @@ namespace EtcsServer.DecisionExecutors
                     Speeds = Speeds.ToArray(),
                     SpeedDistances = SpeedsDistances.ToArray(),
                     Gradients = Gradients.ToArray(),
-                    GradientDistances = GradientsDistances.ToArray(),
+                    GradientsDistances = GradientsDistances.ToArray(),
                     Messages = [],
-                    MessageDistances = [],
+                    MessagesDistances = [],
                     Lines = Lines.ToArray(),
                     LinesDistances = LinesDistances.ToArray(),
                     ServerPosition = TrainPosition.Kilometer

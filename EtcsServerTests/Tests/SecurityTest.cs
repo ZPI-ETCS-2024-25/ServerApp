@@ -43,11 +43,11 @@ namespace EtcsServerTests.Tests
                 Speeds = [200, 0],
                 SpeedDistances = [0, 1500],
                 Gradients = [20],
-                GradientDistances = [0, 1500],
+                GradientsDistances = [0, 1500],
                 Lines = [1],
                 LinesDistances = [0, 1500],
                 Messages = [],
-                MessageDistances = [],
+                MessagesDistances = [],
                 ServerPosition = 0.5
             };
 

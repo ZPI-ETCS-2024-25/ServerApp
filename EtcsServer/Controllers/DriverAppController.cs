@@ -81,8 +81,10 @@ namespace EtcsServer.Controllers
             MovementAuthority movementAuthority = validationOutcome.NextStopSignal == null ?
                 movementAuthorityProvider.ProvideMovementAuthorityToEtcsBorder(movementAuthorityRequest.TrainId) :
                 movementAuthorityProvider.ProvideMovementAuthority(movementAuthorityRequest.TrainId, validationOutcome.NextStopSignal!);
-            
-            return Ok(GetEncryptedResponse(movementAuthority));                
+
+            MovementAuthorityWithTimestamp response = new MovementAuthorityWithTimestamp(movementAuthority);
+
+            return Ok(GetEncryptedResponse(response));                
         }
 
         [HttpPost("speedupdate")]
