@@ -23,6 +23,7 @@ namespace EtcsServer.ExtensionMethods
         {
             services.Configure<ServerProperties>(configuration.GetSection("ServerProperties"));
             services.Configure<SecurityConfiguration>(configuration.GetSection("Security"));
+            services.Configure<EtcsProperties>(configuration.GetSection("EtcsProperties"));
 
             services.AddSingleton<IHolder<Crossing>, CrossingsHolder>();
             services.AddSingleton<IHolder<CrossingTrack>, CrossingTracksHolder>();

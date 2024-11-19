@@ -1,4 +1,5 @@
-﻿using EtcsServer.Database.Entity;
+﻿using EtcsServer.Configuration;
+using EtcsServer.Database.Entity;
 using EtcsServer.DecisionExecutors.Contract;
 using EtcsServer.DriverAppDto;
 using EtcsServer.DriverDataCollectors.Contract;
@@ -7,6 +8,7 @@ using EtcsServer.Helpers.Contract;
 using EtcsServer.InMemoryData;
 using EtcsServer.InMemoryData.Contract;
 using EtcsServer.InMemoryHolders;
+using Microsoft.Extensions.Options;
 using System.Collections;
 using System.Runtime.ConstrainedExecution;
 using System.Security.AccessControl;
@@ -22,6 +24,7 @@ namespace EtcsServer.DecisionExecutors
         private readonly ITrackHelper trackHelper;
         private readonly ISwitchStates switchStates;
         private readonly ICrossingStates crossingStates;
+        private readonly EtcsProperties etcsProperties;
 
         public MovementAuthorityProvider(
             IMovementAuthorityTracker movementAuthorityTracker,
@@ -30,7 +33,8 @@ namespace EtcsServer.DecisionExecutors
             IHolder<RailroadSign> railroadSignsHolder,
             ITrackHelper trackHelper,
             ISwitchStates switchStates,
-            ICrossingStates crossingStates
+            ICrossingStates crossingStates,
+            IOptions<EtcsProperties> etcsProperties
             )
         {
             this.movementAuthorityTracker = movementAuthorityTracker;
@@ -40,6 +44,7 @@ namespace EtcsServer.DecisionExecutors
             this.trackHelper = trackHelper;
             this.switchStates = switchStates;
             this.crossingStates = crossingStates;
+            this.etcsProperties = etcsProperties.Value;
         }
 
         public MovementAuthority ProvideMovementAuthorityToEtcsBorder(string trainId)
@@ -136,8 +141,8 @@ namespace EtcsServer.DecisionExecutors
                 startingPointMaxSpeed = previousSign.MaxSpeed;
 
             List<CrossingTrack> damagedCrossingsOnCurrentTrack = crossingStates.GetDamagedCrossingTracks(currentTrack.TrackageElementId);
-            int maxSpeedOnDamagedCrossing = 20; //TODO move out to config file
-            double kilometersBeforeAndAfterCrossing = 0.01; //TODO move out to config file
+            int maxSpeedOnDamagedCrossing = etcsProperties.MaxSpeedDamagedCrossing;
+            double kilometersBeforeAndAfterCrossing = etcsProperties.DamagedCrossingImpactLength;
             damagedCrossingsOnCurrentTrack.ForEach(crossing =>
             {
                 int indexForInsert = isMovingUp ?
