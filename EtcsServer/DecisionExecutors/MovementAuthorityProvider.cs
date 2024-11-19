@@ -133,17 +133,19 @@ namespace EtcsServer.DecisionExecutors
                 .Where(s => isMovingUp ? s.DistanceFromTrackStart <= stopKilometerOnTrack : s.DistanceFromTrackStart >= stopKilometerOnTrack)
                 .OrderBy(s => isMovingUp ? s.DistanceFromTrackStart : -1 * s.DistanceFromTrackStart)
                 .ToList();
-            List<RailroadSign> signsAhead = signsOnCurrentTrack.Where(s => isMovingUp ? s.GetDistanceFromStartMeters() > currentMeter : s.GetDistanceFromStartMeters() < currentMeter).ToList();
+            List<RailroadSign> signsAhead = signsOnCurrentTrack.Where(s => isMovingUp ? s.GetDistanceFromStartMeters() > (currentMeter - currentTrack.GetMeter()): s.GetDistanceFromStartMeters() < currentMeter - currentTrack.GetMeter()).ToList();
 
             double startingPointMaxSpeed = currentTrackMaxSpeed;
             RailroadSign? previousSign = signsOnCurrentTrack.LastOrDefault(s => isMovingUp ? s.GetDistanceFromStartMeters() <= currentMeter : s.GetDistanceFromStartMeters() >= currentMeter);
             if (previousSign != null)
                 startingPointMaxSpeed = previousSign.MaxSpeed;
 
-            List<CrossingTrack> damagedCrossingsOnCurrentTrack = crossingStates.GetDamagedCrossingTracks(currentTrack.TrackageElementId);
+            List<CrossingTrack> damagedCrossingsAheadOnCurrentTrack = crossingStates.GetDamagedCrossingTracks(currentTrack.TrackageElementId)
+                .Where(c => isMovingUp ? c.GetDistanceFromStartMeters() > (currentMeter - currentTrack.GetMeter()) : c.GetDistanceFromStartMeters() < currentMeter - currentTrack.GetMeter())
+                .ToList();
             int maxSpeedOnDamagedCrossing = etcsProperties.MaxSpeedDamagedCrossing;
             double kilometersBeforeAndAfterCrossing = etcsProperties.DamagedCrossingImpactLength;
-            damagedCrossingsOnCurrentTrack.ForEach(crossing =>
+            damagedCrossingsAheadOnCurrentTrack.ForEach(crossing =>
             {
                 int indexForInsert = isMovingUp ?
                     signsAhead.FindIndex(sign => sign.DistanceFromTrackStart > crossing.DistanceFromTrackStart - kilometersBeforeAndAfterCrossing) :

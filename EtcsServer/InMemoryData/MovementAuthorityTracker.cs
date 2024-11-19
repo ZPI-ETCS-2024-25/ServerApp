@@ -83,7 +83,7 @@ namespace EtcsServer.InMemoryData
             List<string> trainImpactedOnFutureTracks = possiblyAffectedTrains
                 .Where(trainId => currentDirections[trainId] != MovementDirection.UNKNOWN && currentPositions[trainId] != null && !trainsImpactedOnCurrentTrack.Contains(trainId))
                 .Where(trainId => trainToTrackageElements[trainId]
-                                    .Skip(trainToTrackageElements[trainId].FindIndex(e => e.TrackageElementId == currentPositions[trainId]!.TrackageElementId))
+                                    .Skip(1 + trainToTrackageElements[trainId].FindIndex(e => e.TrackageElementId == currentPositions[trainId]!.TrackageElementId))
                                     .Any(e => affectedTracks.Contains(e.TrackageElementId)))
                 .ToList();
             
