@@ -337,6 +337,138 @@ namespace EtcsServerTests.Tests
             Assert.Equal(expected, serviceProvider.GetRequiredService<IMovementAuthorityTracker>().GetActiveMovementAuthority(trainId));
         }
 
+        [Fact]
+        public void IMovementAuthorityProvider_ProvideMovementAuthority_MaOnCrossingStateChangeTrainBeforeCrossingMovingDown()
+        {
+            //Given
+            string trainId = testMap.Train.TrainId;
+            TrainPosition trainPosition = new TrainPosition()
+            {
+                TrainId = trainId,
+                Kilometer = 7.0,
+                LineNumber = 1,
+                Track = "1",
+                Direction = "P"
+            };
+            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
+            A.CallTo(() => testMap.TrainPositionTracker.GetMovementDirection(trainId)).Returns(MovementDirection.DOWN);
+
+            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(15)).Returns(RailwaySignalMessage.STOP);
+            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(124, 15)).Returns(11);
+
+            FakeMessageToDriver messageToDriver = new();
+            DateTime originalDateTime = messageToDriver.Timestamp;
+            A.CallTo(() => driverAppSender.SendNewMovementAuthority(trainId, A<MovementAuthority>.Ignored))
+                .ReturnsLazily((string trainId, MovementAuthority movementAuthority) =>
+                {
+                    messageToDriver.Timestamp = DateTime.Now;
+                    messageToDriver.MovementAuthority = movementAuthority;
+                    return Task.CompletedTask;
+                });
+
+            //When
+            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+
+            //Then
+            MovementAuthority expected = new()
+            {
+                Speeds = [160, 0],
+                SpeedDistances = [0, 3250],
+                Gradients = [0],
+                GradientsDistances = [0, 3250],
+                Lines = [1],
+                LinesDistances = [0, 3250],
+                Messages = [],
+                MessagesDistances = [],
+                ServerPosition = 7.0
+            };
+            Assert.Equal(expected, movementAuthority);
+
+            //When
+            TrainPosition newPosition = new TrainPosition()
+            {
+                TrainId = trainId,
+                Kilometer = 6.8,
+                LineNumber = 1,
+                Track = "1",
+                Direction = "P"
+            };
+            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(newPosition);
+            ImitateReceivingCrossingStateFromUnity(1, false);
+
+            //Then
+            MovementAuthority expectedAfterSwitchChange = new()
+            {
+                Speeds = [160, 20, 160, 0],
+                SpeedDistances = [0, 442, 962, 3050],
+                Gradients = [0],
+                GradientsDistances = [0, 3050],
+                Lines = [1],
+                LinesDistances = [0, 3050],
+                Messages = [],
+                MessagesDistances = [],
+                ServerPosition = 6.8
+            };
+            Assert.True(messageToDriver.Timestamp > originalDateTime);
+            Assert.Equal(expectedAfterSwitchChange, messageToDriver.MovementAuthority);
+        }
+
+        [Fact]
+        public void IMovementAuthorityProvider_ProvideMovementAuthority_MaOnCrossingStateChangeTrainAfterCrossingMovingDown()
+        {
+            //Given
+            string trainId = testMap.Train.TrainId;
+            TrainPosition trainPosition = new TrainPosition()
+            {
+                TrainId = trainId,
+                Kilometer = 6.0,
+                LineNumber = 1,
+                Track = "1",
+                Direction = "P"
+            };
+            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
+            A.CallTo(() => testMap.TrainPositionTracker.GetMovementDirection(trainId)).Returns(MovementDirection.DOWN);
+
+            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(15)).Returns(RailwaySignalMessage.STOP);
+            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(124, 15)).Returns(11);
+
+            FakeMessageToDriver messageToDriver = new();
+            DateTime originalDateTime = messageToDriver.Timestamp;
+            A.CallTo(() => driverAppSender.SendNewMovementAuthority(trainId, A<MovementAuthority>.Ignored))
+                .ReturnsLazily((string trainId, MovementAuthority movementAuthority) =>
+                {
+                    messageToDriver.Timestamp = DateTime.Now;
+                    messageToDriver.MovementAuthority = movementAuthority;
+                    return Task.CompletedTask;
+                });
+
+            //When
+            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+
+            //Then
+            MovementAuthority expected = new()
+            {
+                Speeds = [160, 0],
+                SpeedDistances = [0, 2250],
+                Gradients = [0],
+                GradientsDistances = [0, 2250],
+                Lines = [1],
+                LinesDistances = [0, 2250],
+                Messages = [],
+                MessagesDistances = [],
+                ServerPosition = 6.0
+            };
+            Assert.Equal(expected, movementAuthority);
+
+            //When
+            ImitateReceivingCrossingStateFromUnity(1, false);
+
+            //Then
+            Assert.True(messageToDriver.Timestamp == originalDateTime);
+            Assert.Null(messageToDriver.MovementAuthority);
+            Assert.Equal(expected, serviceProvider.GetRequiredService<IMovementAuthorityTracker>().GetActiveMovementAuthority(trainId));
+        }
+
         private void ImitateReceivingSwitchStateFromUnity(int switchId, int trackFromId, int trackToId)
         {
             ActionResult response = unityAppController.ChangeSwitchState(
