@@ -66,11 +66,6 @@ namespace EtcsServerTests.Tests
             testMap.SwitchStates.SetSwitchState(123, new SwitchFromTo(13, 16));
             testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
 
-            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(121, 211)).Returns(11);
-            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(122, 12)).Returns(13);
-            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(124, 11)).Returns(15);
-            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(123, 13)).Returns(16);
-
             FakeMessageToDriver messageToDriver = new();
             DateTime originalDateTime = messageToDriver.Timestamp;
             A.CallTo(() => driverAppSender.SendNewMovementAuthority(trainId, A<MovementAuthority>.Ignored))
@@ -149,12 +144,6 @@ namespace EtcsServerTests.Tests
             testMap.RailwaySignalStates.SetRailwaySignalState(15, RailwaySignalMessage.GO);
             testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
 
-            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(121, 12)).Returns(211);
-            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(121, 11)).Returns(211);
-            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(122, 13)).Returns(12);
-            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(124, 15)).Returns(14);
-            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(123, 14)).Returns(13);
-
             FakeMessageToDriver messageToDriver = new();
             DateTime originalDateTime = messageToDriver.Timestamp;
             A.CallTo(() => driverAppSender.SendNewMovementAuthority(trainId, A<MovementAuthority>.Ignored))
@@ -228,8 +217,6 @@ namespace EtcsServerTests.Tests
             testMap.SwitchStates.SetSwitchState(131, new SwitchFromTo(15, 17));
             testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
 
-            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(131, 15)).Returns(17);
-
             FakeMessageToDriver messageToDriver = new();
             DateTime originalDateTime = messageToDriver.Timestamp;
             A.CallTo(() => driverAppSender.SendNewMovementAuthority(trainId, A<MovementAuthority>.Ignored))
@@ -302,8 +289,6 @@ namespace EtcsServerTests.Tests
             };
             testMap.SwitchStates.SetSwitchState(13, new SwitchFromTo(15, 17));
             testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
-
-            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(131, 15)).Returns(17);
 
             FakeMessageToDriver messageToDriver = new();
             DateTime originalDateTime = messageToDriver.Timestamp;
@@ -433,9 +418,6 @@ namespace EtcsServerTests.Tests
             testMap.RailwaySignalStates.SetRailwaySignalState(15, RailwaySignalMessage.STOP);
             testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
 
-            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(15)).Returns(RailwaySignalMessage.STOP);
-            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(124, 15)).Returns(11);
-
             FakeMessageToDriver messageToDriver = new();
             DateTime originalDateTime = messageToDriver.Timestamp;
             A.CallTo(() => driverAppSender.SendNewMovementAuthority(trainId, A<MovementAuthority>.Ignored))
@@ -473,6 +455,141 @@ namespace EtcsServerTests.Tests
             Assert.Equal(expected, serviceProvider.GetRequiredService<IMovementAuthorityTracker>().GetActiveMovementAuthority(trainId));
         }
 
+        [Fact]
+        public void IMovementAuthorityProvider_ProvideMovementAuthority_MaOnRailwaySignalStateChangeExtendMa()
+        {
+            //Given
+            string trainId = testMap.Train.TrainId;
+            TrainPosition trainPosition = new TrainPosition()
+            {
+                TrainId = trainId,
+                Kilometer = 1.5,
+                LineNumber = 1,
+                Track = "1",
+                Direction = "N"
+            };
+            testMap.SwitchStates.SetSwitchState(121, new SwitchFromTo(211, 11));
+            testMap.SwitchStates.SetSwitchState(124, new SwitchFromTo(11, 15));
+            testMap.SwitchStates.SetSwitchState(131, new SwitchFromTo(15, 17));
+            testMap.RailwaySignalStates.SetRailwaySignalState(211, RailwaySignalMessage.STOP);
+            testMap.RailwaySignalStates.SetRailwaySignalState(1515, RailwaySignalMessage.STOP);
+            testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
+
+            FakeMessageToDriver messageToDriver = new();
+            DateTime originalDateTime = messageToDriver.Timestamp;
+            A.CallTo(() => driverAppSender.SendNewMovementAuthority(trainId, A<MovementAuthority>.Ignored))
+                .ReturnsLazily((string trainId, MovementAuthority movementAuthority) =>
+                {
+                    messageToDriver.Timestamp = DateTime.Now;
+                    messageToDriver.MovementAuthority = movementAuthority;
+                    return Task.CompletedTask;
+                });
+
+            //When
+            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+
+            //Then
+            MovementAuthority expected = new()
+            {
+                Speeds = [150, 160, 0],
+                SpeedDistances = [0, 800, 1850],
+                Gradients = [0],
+                GradientsDistances = [0, 1850],
+                Lines = [1],
+                LinesDistances = [0, 1850],
+                Messages = [],
+                MessagesDistances = [],
+                ServerPosition = 1.5
+            };
+            Assert.Equal(expected, movementAuthority);
+
+            //When
+            ImitateReceivingRailwaySignalStateFromUnity(211, true);
+
+            //Then
+            MovementAuthority newExpected = new()
+            {
+                Speeds = [150, 160, 0],
+                SpeedDistances = [0, 800, 7446],
+                Gradients = [0],
+                GradientsDistances = [0, 7446],
+                Lines = [1],
+                LinesDistances = [0, 7446],
+                Messages = [],
+                MessagesDistances = [],
+                ServerPosition = 1.5
+            };
+            Assert.True(messageToDriver.Timestamp > originalDateTime);
+            Assert.Equal(newExpected, messageToDriver.MovementAuthority);
+        }
+
+        [Fact]
+        public void IMovementAuthorityProvider_ProvideMovementAuthority_MaOnRailwaySignalStateChangeShortenMa()
+        {
+            //Given
+            string trainId = testMap.Train.TrainId;
+            TrainPosition trainPosition = new TrainPosition()
+            {
+                TrainId = trainId,
+                Kilometer = 1.5,
+                LineNumber = 1,
+                Track = "1",
+                Direction = "N"
+            };
+            testMap.SwitchStates.SetSwitchState(121, new SwitchFromTo(211, 11));
+            testMap.SwitchStates.SetSwitchState(124, new SwitchFromTo(11, 15));
+            testMap.SwitchStates.SetSwitchState(131, new SwitchFromTo(15, 17));
+            testMap.RailwaySignalStates.SetRailwaySignalState(211, RailwaySignalMessage.GO);
+            testMap.RailwaySignalStates.SetRailwaySignalState(1515, RailwaySignalMessage.STOP);
+            testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
+
+            FakeMessageToDriver messageToDriver = new();
+            DateTime originalDateTime = messageToDriver.Timestamp;
+            A.CallTo(() => driverAppSender.SendNewMovementAuthority(trainId, A<MovementAuthority>.Ignored))
+                .ReturnsLazily((string trainId, MovementAuthority movementAuthority) =>
+                {
+                    messageToDriver.Timestamp = DateTime.Now;
+                    messageToDriver.MovementAuthority = movementAuthority;
+                    return Task.CompletedTask;
+                });
+
+            //When
+            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+
+            //Then
+            MovementAuthority expected = new()
+            {
+                Speeds = [150, 160, 0],
+                SpeedDistances = [0, 800, 7446],
+                Gradients = [0],
+                GradientsDistances = [0, 7446],
+                Lines = [1],
+                LinesDistances = [0, 7446],
+                Messages = [],
+                MessagesDistances = [],
+                ServerPosition = 1.5
+            };
+            Assert.Equal(expected, movementAuthority);
+
+            //When
+            ImitateReceivingRailwaySignalStateFromUnity(211, false);
+
+            //Then
+            MovementAuthority newExpected = new() {
+                Speeds = [150, 160, 0],
+                SpeedDistances = [0, 800, 1850],
+                Gradients = [0],
+                GradientsDistances = [0, 1850],
+                Lines = [1],
+                LinesDistances = [0, 1850],
+                Messages = [],
+                MessagesDistances = [],
+                ServerPosition = 1.5
+            };
+            Assert.True(messageToDriver.Timestamp > originalDateTime);
+            Assert.Equal(newExpected, messageToDriver.MovementAuthority);
+        }
+
         private void ImitateReceivingSwitchStateFromUnity(int switchId, int trackFromId, int trackToId)
         {
             ActionResult response = unityAppController.ChangeSwitchState(
@@ -489,6 +606,18 @@ namespace EtcsServerTests.Tests
         {
             ActionResult response = unityAppController.ChangeCrossingState(
                 crossingId, isFunctional,
+                serviceProvider.GetRequiredService<IMovementAuthorityValidator>(),
+                serviceProvider.GetRequiredService<IMovementAuthorityProvider>(),
+                driverAppSender
+            ).Result;
+
+            Assert.True(response is OkResult);
+        }
+
+        private void ImitateReceivingRailwaySignalStateFromUnity(int railwaySignalId, bool isGoMessage)
+        {
+            ActionResult response = unityAppController.ChangeRailwaySignalState(
+                railwaySignalId, isGoMessage,
                 serviceProvider.GetRequiredService<IMovementAuthorityValidator>(),
                 serviceProvider.GetRequiredService<IMovementAuthorityProvider>(),
                 driverAppSender
