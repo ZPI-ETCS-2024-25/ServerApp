@@ -13,6 +13,7 @@ namespace EtcsServerTests.TestMaps
 {
     class UnityMap : MockTestMap
     {
+        private UnityTrackageMap unityTrackageMap;
         public TrainDto Train { get; set; }
 
         public UnityMap()
@@ -24,12 +25,12 @@ namespace EtcsServerTests.TestMaps
                 MaxSpeed = 200,
                 BrakeWeight = 1000
             };
-            InitializeHolders();
+            RegisteredTrainsTracker.Register(Train);
         }
 
         protected override void InitializeHolders()
         {
-            UnityTrackageMap unityTrackageMap = new();
+            unityTrackageMap = new();
 
             Dictionary<int, TrackageElement> trackageElementsLookup = unityTrackageMap.TrackageElementsLookup;
 
@@ -43,21 +44,13 @@ namespace EtcsServerTests.TestMaps
                 .ToList()
                 .ForEach(element => element.Value.LeftSideElement = trackageElementsLookup[element.Value.LeftSideElementId!.Value]);
 
-
-            Dictionary<int, RailwaySignal> railwaySignalLookup = unityTrackageMap.RailwaySignalsLookup;
-            railwaySignalLookup.Add(901, new RailwaySignal() { RailwaySignalId = 901, IsFacedUp = false, TrackId = 211, Track = unityTrackageMap.TracksLookup[211], DistanceFromTrackStart = 1.55 });
-            railwaySignalLookup.Add(9011, new RailwaySignal() { RailwaySignalId = 9011, IsFacedUp = false, TrackId = 213, Track = unityTrackageMap.TracksLookup[213], DistanceFromTrackStart = 1.55 });
-            railwaySignalLookup.Add(902, new RailwaySignal() { RailwaySignalId = 902, IsFacedUp = true, TrackId = 15, Track = unityTrackageMap.TracksLookup[15], DistanceFromTrackStart = 0.1 });
-            railwaySignalLookup.Add(9022, new RailwaySignal() { RailwaySignalId = 9022, IsFacedUp = true, TrackId = 16, Track = unityTrackageMap.TracksLookup[16], DistanceFromTrackStart = 0.15 });
-
             A.CallTo(() => TrackageElementHolder.GetValues()).Returns(unityTrackageMap.TrackageElementsLookup);
             A.CallTo(() => TrackHolder.GetValues()).Returns(unityTrackageMap.TracksLookup);
             A.CallTo(() => CrossingHolder.GetValues()).Returns(unityTrackageMap.CrossingsLookup);
             A.CallTo(() => CrossingTracksHolder.GetValues()).Returns(unityTrackageMap.CrossingTracksLookup);
             A.CallTo(() => RailroadSignHolder.GetValues()).Returns(unityTrackageMap.RailroadSignsLookup);
-            A.CallTo(() => RailwaySignalHolder.GetValues()).Returns(railwaySignalLookup);
+            A.CallTo(() => RailwaySignalHolder.GetValues()).Returns(unityTrackageMap.RailwaySignalsLookup);
             A.CallTo(() => SwitchRouteHolder.GetValues()).Returns(unityTrackageMap.SwitchRoutesLookup);
-            A.CallTo(() => RegisteredTrainsTracker.GetRegisteredTrain(A<string>.Ignored)).Returns(Train);
         }
     }
 }

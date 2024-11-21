@@ -13,7 +13,7 @@ namespace EtcsServer.InMemoryData
         {
             states = [];
             signalTrackHolder.GetValues().Values.ToList()
-                .ForEach(railwaySignalTrack => states.Add(railwaySignalTrack.RailwaySignalId, RailwaySignalMessage.GO));
+                .ForEach(railwaySignalTrack => states.Add(railwaySignalTrack.RailwaySignalId, RailwaySignalMessage.STOP));
         }
 
         public void SetRailwaySignalState(int signalId, RailwaySignalMessage message)

@@ -9,6 +9,7 @@ using EtcsServer.DriverDataCollectors.Contract;
 using EtcsServer.InMemoryData;
 using EtcsServer.InMemoryData.Contract;
 using EtcsServer.InMemoryHolders;
+using EtcsServer.MapLoading;
 using EtcsServer.Security;
 using EtcsServer.Senders;
 using EtcsServer.Senders.Contracts;
@@ -42,15 +43,8 @@ namespace EtcsServerTests.Tests
             securityManager = serviceProvider.GetRequiredService<ISecurityManager>();
             driverAppSender = A.Fake<IDriverAppSender>();
 
-            A.CallTo(() => testMap.TrainPositionTracker.GetMovementDirection(testMap.Train.TrainId)).Returns(MovementDirection.UP);
-            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(A<int>.Ignored)).Returns(RailwaySignalMessage.STOP);
-            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(211)).Returns(RailwaySignalMessage.GO);
-            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(15)).Returns(RailwaySignalMessage.GO);
-            A.CallTo(() => testMap.SwitchStates.SetSwitchState(A<int>.Ignored, A<SwitchFromTo>.Ignored)).Invokes((int switchId, SwitchFromTo newSwitchState) =>
-            {
-                A.CallTo(() => testMap.SwitchStates.GetNextTrackId(switchId, newSwitchState.TrackIdFrom)).Returns(newSwitchState.TrackIdTo);
-            });
-
+            testMap.RailwaySignalStates.SetRailwaySignalState(211, RailwaySignalMessage.GO);
+            testMap.RailwaySignalStates.SetRailwaySignalState(15, RailwaySignalMessage.GO);
         }
 
         [Fact]
@@ -66,7 +60,11 @@ namespace EtcsServerTests.Tests
                 Track = "1",
                 Direction = "N"
             };
-            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
+            testMap.SwitchStates.SetSwitchState(121, new SwitchFromTo(211, 11));
+            testMap.SwitchStates.SetSwitchState(122, new SwitchFromTo(12, 13));
+            testMap.SwitchStates.SetSwitchState(124, new SwitchFromTo(11, 15));
+            testMap.SwitchStates.SetSwitchState(123, new SwitchFromTo(13, 16));
+            testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
 
             A.CallTo(() => testMap.SwitchStates.GetNextTrackId(121, 211)).Returns(11);
             A.CallTo(() => testMap.SwitchStates.GetNextTrackId(122, 12)).Returns(13);
@@ -90,11 +88,11 @@ namespace EtcsServerTests.Tests
             MovementAuthority expected = new()
             {
                 Speeds = [160, 0],
-                SpeedDistances = [0, 1650],
+                SpeedDistances = [0, 6846],
                 Gradients = [0],
-                GradientsDistances = [0, 1650],
+                GradientsDistances = [0, 6846],
                 Lines = [1],
-                LinesDistances = [0, 1650],
+                LinesDistances = [0, 6846],
                 Messages = [],
                 MessagesDistances = [],
                 ServerPosition = 2.1
@@ -110,18 +108,18 @@ namespace EtcsServerTests.Tests
                 Track = "1",
                 Direction = "N"
             };
-            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(newPosition);
+            testMap.TrainPositionTracker.RegisterTrainPosition(newPosition);
             ImitateReceivingSwitchStateFromUnity(121, 211, 12);
 
             //Then
             MovementAuthority expectedAfterSwitchChange = new()
             {
-                Speeds = [160, 60, 0],
-                SpeedDistances = [0, 850, 1170],
+                Speeds = [160, 60, 160, 0],
+                SpeedDistances = [0, 850, 1420, 6366],
                 Gradients = [0],
-                GradientsDistances = [0, 1170],
+                GradientsDistances = [0, 6366],
                 Lines = [1],
-                LinesDistances = [0, 1170],
+                LinesDistances = [0, 6366],
                 Messages = [],
                 MessagesDistances = [],
                 ServerPosition = 2.6
@@ -143,8 +141,13 @@ namespace EtcsServerTests.Tests
                 Track = "1",
                 Direction = "P"
             };
-            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
-            A.CallTo(() => testMap.TrainPositionTracker.GetMovementDirection(trainId)).Returns(MovementDirection.DOWN);
+            testMap.SwitchStates.SetSwitchState(121, new SwitchFromTo(12, 211));
+            testMap.SwitchStates.SetSwitchState(121, new SwitchFromTo(11, 211));
+            testMap.SwitchStates.SetSwitchState(122, new SwitchFromTo(13, 12));
+            testMap.SwitchStates.SetSwitchState(124, new SwitchFromTo(15, 14));
+            testMap.SwitchStates.SetSwitchState(123, new SwitchFromTo(14, 13));
+            testMap.RailwaySignalStates.SetRailwaySignalState(15, RailwaySignalMessage.GO);
+            testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
 
             A.CallTo(() => testMap.SwitchStates.GetNextTrackId(121, 12)).Returns(211);
             A.CallTo(() => testMap.SwitchStates.GetNextTrackId(121, 11)).Returns(211);
@@ -168,12 +171,12 @@ namespace EtcsServerTests.Tests
             //Then
             MovementAuthority expected = new()
             {
-                Speeds = [160, 60, 0],
-                SpeedDistances = [0, 450, 790],
+                Speeds = [160, 60, 160, 150, 0],
+                SpeedDistances = [0, 450, 1190, 2340, 3640],
                 Gradients = [0],
-                GradientsDistances = [0, 790],
+                GradientsDistances = [0, 3640],
                 Lines = [1],
-                LinesDistances = [0, 790],
+                LinesDistances = [0, 3640],
                 Messages = [],
                 MessagesDistances = [],
                 ServerPosition = 4.1
@@ -189,18 +192,18 @@ namespace EtcsServerTests.Tests
                 Track = "1",
                 Direction = "P"
             };
-            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(newPosition);
+            testMap.TrainPositionTracker.RegisterTrainPosition(newPosition);
             ImitateReceivingSwitchStateFromUnity(124, 15, 11);
 
             //Then
             MovementAuthority expectedAfterSwitchChange = new()
             {
-                Speeds = [160, 0],
-                SpeedDistances = [0, 650],
+                Speeds = [160, 150, 0],
+                SpeedDistances = [0, 2200, 3500],
                 Gradients = [0],
-                GradientsDistances = [0, 650],
+                GradientsDistances = [0, 3500],
                 Lines = [1],
-                LinesDistances = [0, 650],
+                LinesDistances = [0, 3500],
                 Messages = [],
                 MessagesDistances = [],
                 ServerPosition = 4.0
@@ -222,7 +225,8 @@ namespace EtcsServerTests.Tests
                 Track = "1",
                 Direction = "N"
             };
-            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
+            testMap.SwitchStates.SetSwitchState(131, new SwitchFromTo(15, 17));
+            testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
 
             A.CallTo(() => testMap.SwitchStates.GetNextTrackId(131, 15)).Returns(17);
 
@@ -263,7 +267,7 @@ namespace EtcsServerTests.Tests
                 Track = "1",
                 Direction = "N"
             };
-            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(newPosition);
+            testMap.TrainPositionTracker.RegisterTrainPosition(newPosition);
             ImitateReceivingCrossingStateFromUnity(1, false);
 
             //Then
@@ -296,7 +300,8 @@ namespace EtcsServerTests.Tests
                 Track = "1",
                 Direction = "N"
             };
-            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
+            testMap.SwitchStates.SetSwitchState(13, new SwitchFromTo(15, 17));
+            testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
 
             A.CallTo(() => testMap.SwitchStates.GetNextTrackId(131, 15)).Returns(17);
 
@@ -350,11 +355,9 @@ namespace EtcsServerTests.Tests
                 Track = "1",
                 Direction = "P"
             };
-            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
-            A.CallTo(() => testMap.TrainPositionTracker.GetMovementDirection(trainId)).Returns(MovementDirection.DOWN);
-
-            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(15)).Returns(RailwaySignalMessage.STOP);
-            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(124, 15)).Returns(11);
+            testMap.SwitchStates.SetSwitchState(124, new SwitchFromTo(15, 11));
+            testMap.RailwaySignalStates.SetRailwaySignalState(15, RailwaySignalMessage.STOP);
+            testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
 
             FakeMessageToDriver messageToDriver = new();
             DateTime originalDateTime = messageToDriver.Timestamp;
@@ -393,7 +396,7 @@ namespace EtcsServerTests.Tests
                 Track = "1",
                 Direction = "P"
             };
-            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(newPosition);
+            testMap.TrainPositionTracker.RegisterTrainPosition(newPosition);
             ImitateReceivingCrossingStateFromUnity(1, false);
 
             //Then
@@ -426,8 +429,9 @@ namespace EtcsServerTests.Tests
                 Track = "1",
                 Direction = "P"
             };
-            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
-            A.CallTo(() => testMap.TrainPositionTracker.GetMovementDirection(trainId)).Returns(MovementDirection.DOWN);
+            testMap.SwitchStates.SetSwitchState(124, new SwitchFromTo(15, 11));
+            testMap.RailwaySignalStates.SetRailwaySignalState(15, RailwaySignalMessage.STOP);
+            testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
 
             A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(15)).Returns(RailwaySignalMessage.STOP);
             A.CallTo(() => testMap.SwitchStates.GetNextTrackId(124, 15)).Returns(11);

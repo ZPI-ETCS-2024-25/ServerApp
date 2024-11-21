@@ -31,6 +31,8 @@ namespace EtcsServerTests.TestMaps
 {
     public abstract class MockTestMap : ITestMap
     {
+        private ServiceProvider _serviceProvider;
+
         public IHolder<Crossing> CrossingHolder { get; set; }
         public IHolder<CrossingTrack> CrossingTracksHolder { get; set; }
         public IHolder<RailroadSign> RailroadSignHolder { get; set; }
@@ -54,13 +56,19 @@ namespace EtcsServerTests.TestMaps
             RailroadSignHolder = A.Fake<IHolder<RailroadSign>>();
             RailwaySignalHolder = A.Fake<IHolder<RailwaySignal>>();
             SwitchRouteHolder = A.Fake<IHolder<SwitchRoute>>();
-            RegisteredTrainsTracker = A.Fake<IRegisteredTrainsTracker>();
-            TrainPositionTracker = A.Fake<ITrainPositionTracker>();
-            RailwaySignalStates = A.Fake<IRailwaySignalStates>();
-            SwitchStates = A.Fake<ISwitchStates>();
+            InitializeHolders();
+
+            InitializeServiceProvider();
+            
+            RegisteredTrainsTracker = _serviceProvider.GetRequiredService<IRegisteredTrainsTracker>();
+            TrainPositionTracker = _serviceProvider.GetRequiredService<ITrainPositionTracker>();
+            RailwaySignalStates = _serviceProvider.GetRequiredService<IRailwaySignalStates>();
+            SwitchStates = _serviceProvider.GetRequiredService<ISwitchStates>();
         }
 
-        public ServiceProvider GetTestMapServiceProvider()
+        public ServiceProvider GetTestMapServiceProvider() => _serviceProvider;
+
+        private void InitializeServiceProvider()
         {
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddLogging(config =>
@@ -79,15 +87,10 @@ namespace EtcsServerTests.TestMaps
             serviceCollection.AddSingleton<IHolder<Track>>(TrackHolder);
             serviceCollection.AddSingleton<IHolder<TrackageElement>>(TrackageElementHolder);
 
-            serviceCollection.AddSingleton<ITrainPositionTracker>(TrainPositionTracker);
-            serviceCollection.AddSingleton<IRailwaySignalStates>(RailwaySignalStates);
-            serviceCollection.AddSingleton<ISwitchStates>(SwitchStates);
-            serviceCollection.AddSingleton<IRegisteredTrainsTracker>(RegisteredTrainsTracker);
-
             serviceCollection.AddScoped<DriverAppController>();
             serviceCollection.AddScoped<UnityAppController>();
 
-            return serviceCollection.BuildServiceProvider();
+            _serviceProvider = serviceCollection.BuildServiceProvider();
         }
     }
 }

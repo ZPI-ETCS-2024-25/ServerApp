@@ -34,12 +34,10 @@ namespace EtcsServerTests.Tests
             driverAppController = serviceProvider.GetRequiredService<DriverAppController>();
             securityManager = serviceProvider.GetRequiredService<ISecurityManager>();
 
-            A.CallTo(() => testMap.TrainPositionTracker.GetMovementDirection(testMap.Train.TrainId)).Returns(MovementDirection.UP);
-            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(A<int>.Ignored)).Returns(RailwaySignalMessage.STOP);
-            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(4, 3)).Returns(6);
-            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(7, 6)).Returns(9);
-            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(10, 9)).Returns(11);
-            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(12, 11)).Returns(15);
+            testMap.SwitchStates.SetSwitchState(4, new SwitchFromTo(3, 6));
+            testMap.SwitchStates.SetSwitchState(7, new SwitchFromTo(6, 9));
+            testMap.SwitchStates.SetSwitchState(10, new SwitchFromTo(9, 11));
+            testMap.SwitchStates.SetSwitchState(12, new SwitchFromTo(11, 15));
         }
 
         [Fact]
@@ -55,7 +53,7 @@ namespace EtcsServerTests.Tests
                 Track = "1",
                 Direction = "N"
             };
-            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
+            testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
 
             //When
             MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
@@ -89,8 +87,8 @@ namespace EtcsServerTests.Tests
                 Track = "1",
                 Direction = "N"
             };
-            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(12)).Returns(RailwaySignalMessage.GO);
-            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
+            testMap.RailwaySignalStates.SetRailwaySignalState(12, RailwaySignalMessage.GO);
+            testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
 
             //When
             MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
@@ -124,9 +122,9 @@ namespace EtcsServerTests.Tests
                 Track = "1",
                 Direction = "N"
             };
-            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(23)).Returns(RailwaySignalMessage.GO);
-            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(3)).Returns(RailwaySignalMessage.GO);
-            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
+            testMap.RailwaySignalStates.SetRailwaySignalState(23, RailwaySignalMessage.GO);
+            testMap.RailwaySignalStates.SetRailwaySignalState(3, RailwaySignalMessage.GO);
+            testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
 
             //When
             MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
@@ -160,10 +158,10 @@ namespace EtcsServerTests.Tests
                 Track = "1",
                 Direction = "N"
             };
-            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(3)).Returns(RailwaySignalMessage.GO);
-            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(33)).Returns(RailwaySignalMessage.GO);
-            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(4)).Returns(RailwaySignalMessage.GO);
-            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
+            testMap.RailwaySignalStates.SetRailwaySignalState(3, RailwaySignalMessage.GO);
+            testMap.RailwaySignalStates.SetRailwaySignalState(33, RailwaySignalMessage.GO);
+            testMap.RailwaySignalStates.SetRailwaySignalState(4, RailwaySignalMessage.GO);
+            testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
 
             //When
             MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
@@ -197,10 +195,9 @@ namespace EtcsServerTests.Tests
                 Track = "1",
                 Direction = "P"
             };
-            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(33)).Returns(RailwaySignalMessage.GO);
-            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(4)).Returns(RailwaySignalMessage.GO);
-            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
-            A.CallTo(() => testMap.TrainPositionTracker.GetMovementDirection(trainId)).Returns(MovementDirection.DOWN);
+            testMap.RailwaySignalStates.SetRailwaySignalState(33, RailwaySignalMessage.GO);
+            testMap.RailwaySignalStates.SetRailwaySignalState(4, RailwaySignalMessage.GO);
+            testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
 
             //When
             MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
@@ -234,10 +231,10 @@ namespace EtcsServerTests.Tests
                 Track = "1",
                 Direction = "N"
             };
-            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(7)).Returns(RailwaySignalMessage.GO);
-            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(1516)).Returns(RailwaySignalMessage.GO);
-            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(1617)).Returns(RailwaySignalMessage.GO);
-            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
+            testMap.RailwaySignalStates.SetRailwaySignalState(7, RailwaySignalMessage.GO);
+            testMap.RailwaySignalStates.SetRailwaySignalState(1516, RailwaySignalMessage.GO);
+            testMap.RailwaySignalStates.SetRailwaySignalState(1617, RailwaySignalMessage.GO);
+            testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
 
             //When
             MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
@@ -271,8 +268,8 @@ namespace EtcsServerTests.Tests
                 Track = "1",
                 Direction = "N"
             };
-            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(7)).Returns(RailwaySignalMessage.GO);
-            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
+            testMap.RailwaySignalStates.SetRailwaySignalState(7, RailwaySignalMessage.GO);
+            testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
 
             //When
             MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
@@ -306,14 +303,13 @@ namespace EtcsServerTests.Tests
                 Track = "1",
                 Direction = "P"
             };
-            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(77)).Returns(RailwaySignalMessage.GO);
-            A.CallTo(() => testMap.RailwaySignalStates.GetSignalMessage(44)).Returns(RailwaySignalMessage.GO);
-            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(4, 3)).Returns(5);
-            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(4, 6)).Returns(3);
-            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(7, 6)).Returns(9);
-            A.CallTo(() => testMap.SwitchStates.GetNextTrackId(7, 8)).Returns(6);
-            A.CallTo(() => testMap.TrainPositionTracker.GetLastKnownTrainPosition(trainId)).Returns(trainPosition);
-            A.CallTo(() => testMap.TrainPositionTracker.GetMovementDirection(trainId)).Returns(MovementDirection.DOWN);
+            testMap.RailwaySignalStates.SetRailwaySignalState(77, RailwaySignalMessage.GO);
+            testMap.RailwaySignalStates.SetRailwaySignalState(44, RailwaySignalMessage.GO);
+            testMap.SwitchStates.SetSwitchState(4, new SwitchFromTo(3, 5));
+            testMap.SwitchStates.SetSwitchState(4, new SwitchFromTo(6, 3));
+            testMap.SwitchStates.SetSwitchState(7, new SwitchFromTo(6, 9));
+            testMap.SwitchStates.SetSwitchState(7, new SwitchFromTo(8, 6));
+            testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
 
             //When
             MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });

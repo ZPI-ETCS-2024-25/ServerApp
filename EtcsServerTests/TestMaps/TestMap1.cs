@@ -23,7 +23,7 @@ namespace EtcsServerTests.TestMaps
                 MaxSpeed = 200,
                 BrakeWeight = 500
             };
-            InitializeHolders();
+            RegisteredTrainsTracker.Register(Train);
         }
 
         protected override void InitializeHolders()
@@ -301,7 +301,6 @@ namespace EtcsServerTests.TestMaps
             A.CallTo(() => RailroadSignHolder.GetValues()).Returns(signsLookup);
             A.CallTo(() => RailwaySignalHolder.GetValues()).Returns(railwaySignalsLookup);
             A.CallTo(() => SwitchRouteHolder.GetValues()).Returns(switchRoutesLookup);
-            A.CallTo(() => RegisteredTrainsTracker.GetRegisteredTrain(A<string>.Ignored)).Returns(Train);
         }
     }
 }
