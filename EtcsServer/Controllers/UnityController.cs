@@ -21,13 +21,15 @@ namespace EtcsServer.Controllers
         private readonly IMovementAuthorityTracker movementAuthorityTracker;
         private readonly ISwitchStates switchStates;
         private readonly ICrossingStates crossingStates;
+        private readonly IRailwaySignalStates railwaySignalStates;
 
-        public UnityAppController(ILogger<TestController> logger, IMovementAuthorityTracker movementAuthorityTracker, ISwitchStates switchStates, ICrossingStates crossingStates)
+        public UnityAppController(ILogger<TestController> logger, IMovementAuthorityTracker movementAuthorityTracker, ISwitchStates switchStates, ICrossingStates crossingStates, IRailwaySignalStates railwaySignalStates)
         {
             _logger = logger;
             this.movementAuthorityTracker = movementAuthorityTracker;
             this.switchStates = switchStates;
             this.crossingStates = crossingStates;
+            this.railwaySignalStates = railwaySignalStates;
         }
 
         [HttpPost("switchState")]
@@ -78,6 +80,39 @@ namespace EtcsServer.Controllers
                 crossingStates.SetCrossingState(crossingId, isFunctional);
 
                 List<(string, MovementAuthority)> impactedMovementAuthorities = movementAuthorityTracker.GetMovementAuthoritiesImpactedByCrossing(crossingId);
+
+                foreach ((string trainId, MovementAuthority _) in impactedMovementAuthorities)
+                {
+                    MovementAuthorityValidationOutcome validationOutcome = movementAuthorityValidator.IsTrainValidForMovementAuthority(trainId);
+                    if (validationOutcome.Result == MovementAuthorityValidationResult.OK)
+                    {
+                        MovementAuthority newMovementAuthority = validationOutcome.NextStopSignal == null ?
+                            movementAuthorityProvider.ProvideMovementAuthorityToEtcsBorder(trainId) :
+                            movementAuthorityProvider.ProvideMovementAuthority(trainId, validationOutcome.NextStopSignal!);
+
+                        driverAppSender.SendNewMovementAuthority(trainId, newMovementAuthority);
+                    }
+                }
+            }
+            return Ok();
+        }
+
+        [HttpPost("semaphoreState")]
+        public async Task<ActionResult> ChangeRailwaySignalState(
+            int signalId,
+            bool isGoMessage,
+            [FromServices] IMovementAuthorityValidator movementAuthorityValidator,
+            [FromServices] IMovementAuthorityProvider movementAuthorityProvider,
+            [FromServices] IDriverAppSender driverAppSender
+            )
+        {
+            RailwaySignalMessage currentMessage = railwaySignalStates.GetSignalMessage(signalId);
+            RailwaySignalMessage newMessage = isGoMessage ? RailwaySignalMessage.GO : RailwaySignalMessage.STOP;
+            if (currentMessage != newMessage)
+            {
+                railwaySignalStates.SetRailwaySignalState(signalId, newMessage);
+
+                List<(string, MovementAuthority)> impactedMovementAuthorities = movementAuthorityTracker.GetMovementAuthoritiesImpactedByRailwaySignal(signalId);
 
                 foreach ((string trainId, MovementAuthority _) in impactedMovementAuthorities)
                 {
