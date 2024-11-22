@@ -1,5 +1,6 @@
 ﻿using EtcsServer.Database;
 using EtcsServer.Database.Entity;
+using EtcsServer.InMemoryData.Contract;
 
 namespace EtcsServer.MapLoading
 {
@@ -12,6 +13,7 @@ namespace EtcsServer.MapLoading
             map.SwitchRoutesLookup.Values.ToList().ForEach(switchRoute => context.TrackSwitches.Add(switchRoute));
             map.CrossingsLookup.Values.ToList().ForEach(crossing => context.Crossings.Add(crossing));
             map.CrossingTracksLookup.Values.ToList().ForEach(crossingTrack => context.CrossingTracks.Add(crossingTrack));
+            map.SwitchDirections.Values.ToList().ForEach(switchDirection => context.SwitchDirections.Add(switchDirection));
 
             context.SaveChanges();
         }

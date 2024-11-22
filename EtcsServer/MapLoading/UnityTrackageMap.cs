@@ -1,6 +1,5 @@
 ﻿using EtcsServer.Database;
 using EtcsServer.Database.Entity;
-using EtcsServer.InMemoryHolders;
 
 namespace EtcsServer.MapLoading
 {
@@ -13,6 +12,7 @@ namespace EtcsServer.MapLoading
         public Dictionary<int, SwitchRoute> SwitchRoutesLookup { get; set; }
         public Dictionary<int, Track> TracksLookup { get; set; }
         public Dictionary<int, TrackageElement> TrackageElementsLookup { get; set; }
+        public Dictionary<int, SwitchDirection> SwitchDirections { get; set; }
 
         public UnityTrackageMap()
         {
@@ -1001,6 +1001,33 @@ namespace EtcsServer.MapLoading
             {
                 {1, new() { CrossingTrackId = 1, CrossingId = 1, TrackId = 15, Track = TracksLookup[15], DistanceFromTrackStart = 2.698 } },
                 {2, new() { CrossingTrackId = 2, CrossingId = 1, TrackId = 16, Track = TracksLookup[16], DistanceFromTrackStart = 2.748 } },
+            };
+
+            SwitchDirections = new()
+            {
+                {111, new() { TrackFromId = 1, TrackToIdGoingStraight = 5, TrackToIdTurning = 6 } },
+                {112, new() { TrackFromId = 4, TrackToIdGoingStraight = 2, TrackToIdTurning = 240 } },
+                {113, new() { TrackFromId = 7, TrackToIdGoingStraight = 4, TrackToIdTurning = 6 } },
+                {114, new() { TrackFromId = 7, TrackToIdGoingStraight = 210, TrackToIdTurning = 8 } },
+                {115, new() { TrackFromId = 209, TrackToIdGoingStraight = 5, TrackToIdTurning = 8 } },
+                {121, new() { TrackFromId = 211, TrackToIdGoingStraight = 11, TrackToIdTurning = 12 } },
+                {122, new() { TrackFromId = 13, TrackToIdGoingStraight = 213, TrackToIdTurning = 12 } },
+                {123, new() { TrackFromId = 13, TrackToIdGoingStraight = 16, TrackToIdTurning = 14 } },
+                {124, new() { TrackFromId = 15, TrackToIdGoingStraight = 11, TrackToIdTurning = 14 } },
+                {131, new() { TrackFromId = 15, TrackToIdGoingStraight = 17, TrackToIdTurning = 18 } },
+                {132, new() { TrackFromId = 19, TrackToIdGoingStraight = 16, TrackToIdTurning = 18 } },
+                {133, new() { TrackFromId = 19, TrackToIdGoingStraight = 222, TrackToIdTurning = 20 } },
+                {134, new() { TrackFromId = 221, TrackToIdGoingStraight = 17, TrackToIdTurning = 20 } },
+                {141, new() { TrackFromId = 230, TrackToIdGoingStraight = 23, TrackToIdTurning = 24 } },
+                {142, new() { TrackFromId = 25, TrackToIdGoingStraight = 229, TrackToIdTurning = 24 } },
+                {143, new() { TrackFromId = 25, TrackToIdGoingStraight = 28, TrackToIdTurning = 26 } },
+                {144, new() { TrackFromId = 27, TrackToIdGoingStraight = 23, TrackToIdTurning = 26 } },
+                {151, new() { TrackFromId = 237, TrackToIdGoingStraight = 29, TrackToIdTurning = 30 } },
+                {152, new() { TrackFromId = 31, TrackToIdGoingStraight = 238, TrackToIdTurning = 30 } },
+                {153, new() { TrackFromId = 31, TrackToIdGoingStraight = 34, TrackToIdTurning = 32 } },
+                {154, new() { TrackFromId = 33, TrackToIdGoingStraight = 29, TrackToIdTurning = 32 } },
+                {155, new() { TrackFromId = 33, TrackToIdGoingStraight = 36, TrackToIdTurning = 241 } },
+                {156, new() { TrackFromId = 34, TrackToIdGoingStraight = 37, TrackToIdTurning = 242 } },
             };
         }
     }

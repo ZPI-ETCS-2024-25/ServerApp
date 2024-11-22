@@ -1,6 +1,5 @@
 ﻿using EtcsServer.Database;
 using EtcsServer.Database.Entity;
-using EtcsServer.InMemoryHolders;
 
 namespace EtcsServer.MapLoading
 {
@@ -13,6 +12,7 @@ namespace EtcsServer.MapLoading
         public Dictionary<int, SwitchRoute> SwitchRoutesLookup { get; set; }
         public Dictionary<int, Track> TracksLookup { get; set; }
         public Dictionary<int, TrackageElement> TrackageElementsLookup { get; set; }
+        public Dictionary<int, SwitchDirection> SwitchDirections { get; set; }
 
     }
 }
