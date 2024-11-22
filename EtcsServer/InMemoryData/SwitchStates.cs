@@ -30,5 +30,10 @@ namespace EtcsServer.InMemoryData
         {
             return states[(switchId, trackIdFrom)].TrackIdTo;
         }
+
+        public void SetSwitchState(int switchId, bool isGoingStraight)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -1,3 +1,4 @@
+using EtcsServer.Database.Entity;
 using EtcsServer.DecisionExecutors.Contract;
 using EtcsServer.DecisionMakers;
 using EtcsServer.DecisionMakers.Contract;
@@ -22,31 +23,35 @@ namespace EtcsServer.Controllers
         private readonly ISwitchStates switchStates;
         private readonly ICrossingStates crossingStates;
         private readonly IRailwaySignalStates railwaySignalStates;
+        private readonly ISwitchDirectionStates switchDirectionStates;
 
-        public UnityAppController(ILogger<TestController> logger, IMovementAuthorityTracker movementAuthorityTracker, ISwitchStates switchStates, ICrossingStates crossingStates, IRailwaySignalStates railwaySignalStates)
+        public UnityAppController(ILogger<TestController> logger, IMovementAuthorityTracker movementAuthorityTracker, ISwitchStates switchStates, ICrossingStates crossingStates, IRailwaySignalStates railwaySignalStates, ISwitchDirectionStates switchDirectionStates)
         {
             _logger = logger;
             this.movementAuthorityTracker = movementAuthorityTracker;
             this.switchStates = switchStates;
             this.crossingStates = crossingStates;
             this.railwaySignalStates = railwaySignalStates;
+            this.switchDirectionStates = switchDirectionStates;
         }
 
         [HttpPost("switchState")]
         public async Task<ActionResult> ChangeSwitchState(
             int switchId,
-            int trackFromId,
-            int trackToId,
+            bool isGoingStraight,
             [FromServices] IMovementAuthorityValidator movementAuthorityValidator,
             [FromServices] IMovementAuthorityProvider movementAuthorityProvider,
             [FromServices] IDriverAppSender driverAppSender
             )
         {
-            SwitchFromTo newState = new(trackFromId, trackToId);
-            int currentNextTrack = switchStates.GetNextTrackId(switchId, newState.TrackIdFrom);
-            if (currentNextTrack != newState.TrackIdTo)
+            SwitchDirection? switchDirection = switchDirectionStates.GetSwitchDirectionInformation(switchId);
+            if (switchDirection == null) return Ok();
+
+            int newTrackToId = isGoingStraight ? switchDirection.TrackToIdGoingStraight : switchDirection.TrackToIdTurning;
+            int currentNextTrack = switchStates.GetNextTrackId(switchId, switchDirection.TrackFromId);
+            if (currentNextTrack != newTrackToId)
             {
-                switchStates.SetSwitchState(switchId, newState);
+                switchStates.SetSwitchState(switchId, new SwitchFromTo(switchDirection.TrackFromId, newTrackToId));
 
                 List<(string, MovementAuthority)> impactedMovementAuthorities = movementAuthorityTracker.GetMovementAuthoritiesImpactedBySwitch(switchId);
 
