@@ -104,7 +104,7 @@ namespace EtcsServerTests.Tests
                 Direction = "N"
             };
             testMap.TrainPositionTracker.RegisterTrainPosition(newPosition);
-            ImitateReceivingSwitchStateFromUnity(121, 211, 12);
+            ImitateReceivingSwitchStateFromUnity(121, false);
 
             //Then
             MovementAuthority expectedAfterSwitchChange = new()
@@ -182,7 +182,7 @@ namespace EtcsServerTests.Tests
                 Direction = "P"
             };
             testMap.TrainPositionTracker.RegisterTrainPosition(newPosition);
-            ImitateReceivingSwitchStateFromUnity(124, 15, 11);
+            ImitateReceivingSwitchStateFromUnity(124, true);
 
             //Then
             MovementAuthority expectedAfterSwitchChange = new()
@@ -590,10 +590,10 @@ namespace EtcsServerTests.Tests
             Assert.Equal(newExpected, messageToDriver.MovementAuthority);
         }
 
-        private void ImitateReceivingSwitchStateFromUnity(int switchId, int trackFromId, int trackToId)
+        private void ImitateReceivingSwitchStateFromUnity(int switchId, bool isGoingStraight)
         {
             ActionResult response = unityAppController.ChangeSwitchState(
-                switchId, trackFromId, trackToId,
+                switchId, isGoingStraight,
                 serviceProvider.GetRequiredService<IMovementAuthorityValidator>(),
                 serviceProvider.GetRequiredService<IMovementAuthorityProvider>(),
                 driverAppSender

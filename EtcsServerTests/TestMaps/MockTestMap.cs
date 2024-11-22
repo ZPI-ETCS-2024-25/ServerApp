@@ -38,6 +38,7 @@ namespace EtcsServerTests.TestMaps
         public IHolder<RailroadSign> RailroadSignHolder { get; set; }
         public IHolder<RailwaySignal> RailwaySignalHolder { get; set; }
         public IHolder<SwitchRoute> SwitchRouteHolder { get; set; }
+        public IHolder<SwitchDirection> SwitchDirectionHolder { get; set; }
         public IHolder<Track> TrackHolder { get; set; }
         public IHolder<TrackageElement> TrackageElementHolder { get; set; }
         public IRegisteredTrainsTracker RegisteredTrainsTracker { get; set; }
@@ -56,6 +57,7 @@ namespace EtcsServerTests.TestMaps
             RailroadSignHolder = A.Fake<IHolder<RailroadSign>>();
             RailwaySignalHolder = A.Fake<IHolder<RailwaySignal>>();
             SwitchRouteHolder = A.Fake<IHolder<SwitchRoute>>();
+            SwitchDirectionHolder = A.Fake<IHolder<SwitchDirection>>();
             InitializeHolders();
 
             InitializeServiceProvider();
@@ -84,6 +86,7 @@ namespace EtcsServerTests.TestMaps
             serviceCollection.AddSingleton<IHolder<RailroadSign>>(RailroadSignHolder);
             serviceCollection.AddSingleton<IHolder<RailwaySignal>>(RailwaySignalHolder);
             serviceCollection.AddSingleton<IHolder<SwitchRoute>>(SwitchRouteHolder);
+            serviceCollection.AddSingleton<IHolder<SwitchDirection>>(SwitchDirectionHolder);
             serviceCollection.AddSingleton<IHolder<Track>>(TrackHolder);
             serviceCollection.AddSingleton<IHolder<TrackageElement>>(TrackageElementHolder);
 

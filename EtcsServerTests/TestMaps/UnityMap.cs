@@ -51,6 +51,7 @@ namespace EtcsServerTests.TestMaps
             A.CallTo(() => RailroadSignHolder.GetValues()).Returns(unityTrackageMap.RailroadSignsLookup);
             A.CallTo(() => RailwaySignalHolder.GetValues()).Returns(unityTrackageMap.RailwaySignalsLookup);
             A.CallTo(() => SwitchRouteHolder.GetValues()).Returns(unityTrackageMap.SwitchRoutesLookup);
+            A.CallTo(() => SwitchDirectionHolder.GetValues()).Returns(unityTrackageMap.SwitchDirections);
         }
     }
 }
