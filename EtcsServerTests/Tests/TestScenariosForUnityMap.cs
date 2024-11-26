@@ -665,6 +665,42 @@ namespace EtcsServerTests.Tests
             Assert.Equal(expectedAfterSwitchChange, messageToDriver.MovementAuthority);
         }
 
+        [Fact]
+        public void IMovementAuthorityProvider_ProvideMovementAuthority_MaOnLeavingEtcsZone()
+        {
+            //Given
+            string trainId = testMap.Train.TrainId;
+            TrainPosition trainPosition = new TrainPosition()
+            {
+                TrainId = trainId,
+                Kilometer = 10.466,
+                LineNumber = 1,
+                Track = "2",
+                Direction = "N"
+            };
+            testMap.RailwaySignalStates.SetRailwaySignalState(227229, RailwaySignalMessage.GO);
+            testMap.SwitchStates.SetSwitchState(142, new SwitchFromTo(229, 25));
+            testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
+
+            //When
+            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+
+            //Then
+            MovementAuthority expected = new()
+            {
+                Speeds = [60, 120, 80],
+                SpeedDistances = [0, 520, 1130],
+                Gradients = [0],
+                GradientsDistances = [0, 1130],
+                Lines = [1],
+                LinesDistances = [0, 1130],
+                Messages = [],
+                MessagesDistances = [],
+                ServerPosition = 10.466
+            };
+            Assert.Equal(expected, movementAuthority);
+        }
+
         private void ImitateReceivingSwitchStateFromUnity(int switchId, bool isGoingStraight)
         {
             ActionResult response = unityAppController.ChangeSwitchState(
