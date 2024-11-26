@@ -95,6 +95,9 @@ namespace EtcsServer.Controllers
             return Ok();
         }
 
+        [HttpPost("alive")]
+        public ActionResult GetHeartbeat() => Ok(GetEncryptedResponse(IsAliveResponse.GetAliveResponse()));
+
         private string GetEncryptedResponse(object response) => securityManager.Encrypt(response);
     }
 }
