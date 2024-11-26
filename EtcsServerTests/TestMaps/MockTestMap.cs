@@ -45,6 +45,7 @@ namespace EtcsServerTests.TestMaps
         public ITrainPositionTracker TrainPositionTracker { get; set; }
         public IRailwaySignalStates RailwaySignalStates { get; set; }
         public ISwitchStates SwitchStates { get; set; }
+        public ICrossingStates CrossingStates { get; set; }
 
         protected abstract void InitializeHolders();
 
@@ -66,6 +67,7 @@ namespace EtcsServerTests.TestMaps
             TrainPositionTracker = _serviceProvider.GetRequiredService<ITrainPositionTracker>();
             RailwaySignalStates = _serviceProvider.GetRequiredService<IRailwaySignalStates>();
             SwitchStates = _serviceProvider.GetRequiredService<ISwitchStates>();
+            CrossingStates = _serviceProvider.GetRequiredService<ICrossingStates>();
         }
 
         public ServiceProvider GetTestMapServiceProvider() => _serviceProvider;

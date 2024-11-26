@@ -590,6 +590,81 @@ namespace EtcsServerTests.Tests
             Assert.Equal(newExpected, messageToDriver.MovementAuthority);
         }
 
+        [Fact]
+        public void IMovementAuthorityProvider_ProvideMovementAuthority_MaOnCrossingFixedTrainBeforeCrossingMovingDown()
+        {
+            //Given
+            string trainId = testMap.Train.TrainId;
+            TrainPosition trainPosition = new TrainPosition()
+            {
+                TrainId = trainId,
+                Kilometer = 6.8,
+                LineNumber = 1,
+                Track = "1",
+                Direction = "P"
+            };
+            testMap.SwitchStates.SetSwitchState(124, new SwitchFromTo(15, 11));
+            testMap.CrossingStates.SetCrossingState(1, false);
+            testMap.RailwaySignalStates.SetRailwaySignalState(15, RailwaySignalMessage.STOP);
+            testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
+
+            FakeMessageToDriver messageToDriver = new();
+            DateTime originalDateTime = messageToDriver.Timestamp;
+            A.CallTo(() => driverAppSender.SendNewMovementAuthority(trainId, A<MovementAuthority>.Ignored))
+                .ReturnsLazily((string trainId, MovementAuthority movementAuthority) =>
+                {
+                    messageToDriver.Timestamp = DateTime.Now;
+                    messageToDriver.MovementAuthority = movementAuthority;
+                    return Task.CompletedTask;
+                });
+
+            //When
+            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+
+            //Then
+            MovementAuthority expected = new()
+            {
+                Speeds = [160, 20, 160, 0],
+                SpeedDistances = [0, 442, 962, 3050],
+                Gradients = [0],
+                GradientsDistances = [0, 3050],
+                Lines = [1],
+                LinesDistances = [0, 3050],
+                Messages = [],
+                MessagesDistances = [],
+                ServerPosition = 6.8
+            };
+            Assert.Equal(expected, movementAuthority);
+
+            //When
+            TrainPosition newPosition = new TrainPosition()
+            {
+                TrainId = trainId,
+                Kilometer = 6.7,
+                LineNumber = 1,
+                Track = "1",
+                Direction = "P"
+            };
+            testMap.TrainPositionTracker.RegisterTrainPosition(newPosition);
+            ImitateReceivingCrossingStateFromUnity(1, true);
+
+            //Then
+            MovementAuthority expectedAfterSwitchChange = new()
+            {
+                Speeds = [160, 0],
+                SpeedDistances = [0, 2950],
+                Gradients = [0],
+                GradientsDistances = [0, 2950],
+                Lines = [1],
+                LinesDistances = [0, 2950],
+                Messages = [],
+                MessagesDistances = [],
+                ServerPosition = 6.7
+            };
+            Assert.True(messageToDriver.Timestamp > originalDateTime);
+            Assert.Equal(expectedAfterSwitchChange, messageToDriver.MovementAuthority);
+        }
+
         private void ImitateReceivingSwitchStateFromUnity(int switchId, bool isGoingStraight)
         {
             ActionResult response = unityAppController.ChangeSwitchState(
