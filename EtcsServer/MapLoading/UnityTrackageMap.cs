@@ -531,7 +531,7 @@ namespace EtcsServer.MapLoading
                     MaxUpSpeed = 80,
                     MaxDownSpeed = 80,
                     Gradient = 0,
-                    TrackPosition = TrackPosition.INSIDE_ZONE
+                    TrackPosition = TrackPosition.INCOMING_ZONE
                 },
                 new Track() {
                     TrackageElementId = 222,
@@ -609,7 +609,7 @@ namespace EtcsServer.MapLoading
                     MaxUpSpeed = 80,
                     MaxDownSpeed = 80,
                     Gradient = 0,
-                    TrackPosition = TrackPosition.INSIDE_ZONE
+                    TrackPosition = TrackPosition.INCOMING_ZONE
                 },
                 new Track() {
                     TrackageElementId = 23,
@@ -622,7 +622,7 @@ namespace EtcsServer.MapLoading
                     MaxUpSpeed = 80,
                     MaxDownSpeed = 80,
                     Gradient = 0,
-                    TrackPosition = TrackPosition.INSIDE_ZONE
+                    TrackPosition = TrackPosition.INCOMING_ZONE
                 },
                 new SwitchingTrack() {
                     TrackageElementId = 24,
@@ -631,7 +631,7 @@ namespace EtcsServer.MapLoading
                     Length = switchingTrackLength,
                     MaxSpeed = lowSwitchingSpeed,
                     Gradient = 0,
-                    TrackPosition = TrackPosition.INSIDE_ZONE
+                    TrackPosition = TrackPosition.INCOMING_ZONE
                 },
                 new Track() {
                     TrackageElementId = 25,
@@ -644,7 +644,7 @@ namespace EtcsServer.MapLoading
                     MaxUpSpeed = 80,
                     MaxDownSpeed = 80,
                     Gradient = 0,
-                    TrackPosition = TrackPosition.INSIDE_ZONE
+                    TrackPosition = TrackPosition.INCOMING_ZONE
                 },
                 new SwitchingTrack() {
                     TrackageElementId = 26,
@@ -653,20 +653,33 @@ namespace EtcsServer.MapLoading
                     Length = switchingTrackLength,
                     MaxSpeed = lowSwitchingSpeed,
                     Gradient = 0,
-                    TrackPosition = TrackPosition.INSIDE_ZONE
+                    TrackPosition = TrackPosition.INCOMING_ZONE
                 },
                 new Track() {
-                    TrackageElementId = 27,
+                    TrackageElementId = 243,
                     LeftSideElementId = 144,
-                    RightSideElementId = 237,
+                    RightSideElementId = 27,
                     LineNumber = 1,
                     TrackNumber = "1",
                     Kilometer = 11.896,
-                    Length = 1.75,
+                    Length = 0.1,
                     MaxUpSpeed = 80,
                     MaxDownSpeed = 80,
                     Gradient = 0,
-                    TrackPosition = TrackPosition.INSIDE_ZONE
+                    TrackPosition = TrackPosition.INCOMING_ZONE
+                },
+                new Track() {
+                    TrackageElementId = 27,
+                    LeftSideElementId = 243,
+                    RightSideElementId = 237,
+                    LineNumber = 1,
+                    TrackNumber = "1",
+                    Kilometer = 11.996,
+                    Length = 1.65,
+                    MaxUpSpeed = 80,
+                    MaxDownSpeed = 80,
+                    Gradient = 0,
+                    TrackPosition = TrackPosition.OUTSIDE_ZONE
                 },
 
                 new Track() {
@@ -680,20 +693,33 @@ namespace EtcsServer.MapLoading
                     MaxUpSpeed = 40,
                     MaxDownSpeed = 80,
                     Gradient = 0,
-                    TrackPosition = TrackPosition.INSIDE_ZONE
+                    TrackPosition = TrackPosition.OUTSIDE_ZONE
+                },
+                new Track() {
+                    TrackageElementId = 244,
+                    LeftSideElementId = 143,
+                    RightSideElementId = 28,
+                    LineNumber = 1,
+                    TrackNumber = "2",
+                    Kilometer = 11.846,
+                    Length = 0.15,
+                    MaxUpSpeed = 80,
+                    MaxDownSpeed = 80,
+                    Gradient = 0,
+                    TrackPosition = TrackPosition.INCOMING_ZONE
                 },
                 new Track() {
                     TrackageElementId = 28,
                     LeftSideElementId = 143,
-                    RightSideElementId = 228,
+                    RightSideElementId = 238,
                     LineNumber = 1,
                     TrackNumber = "2",
-                    Kilometer = 11.846,
-                    Length = 1.8,
+                    Kilometer = 11.996,
+                    Length = 1.65,
                     MaxUpSpeed = 80,
                     MaxDownSpeed = 80,
                     Gradient = 0,
-                    TrackPosition = TrackPosition.INSIDE_ZONE
+                    TrackPosition = TrackPosition.OUTSIDE_ZONE
                 },
                 new Track() {
                     TrackageElementId = 238,
@@ -706,7 +732,7 @@ namespace EtcsServer.MapLoading
                     MaxUpSpeed = 40,
                     MaxDownSpeed = 80,
                     Gradient = 0,
-                    TrackPosition = TrackPosition.INSIDE_ZONE
+                    TrackPosition = TrackPosition.OUTSIDE_ZONE
                 },
                 new Track() {
                     TrackageElementId = 29,
@@ -719,7 +745,7 @@ namespace EtcsServer.MapLoading
                     MaxUpSpeed = 40,
                     MaxDownSpeed = 80,
                     Gradient = 0,
-                    TrackPosition = TrackPosition.INSIDE_ZONE
+                    TrackPosition = TrackPosition.OUTSIDE_ZONE
                 },
                 new SwitchingTrack() {
                     TrackageElementId = 30,
@@ -728,7 +754,7 @@ namespace EtcsServer.MapLoading
                     Length = switchingTrackLength,
                     MaxSpeed = lowSwitchingSpeed,
                     Gradient = 0,
-                    TrackPosition = TrackPosition.INSIDE_ZONE
+                    TrackPosition = TrackPosition.OUTSIDE_ZONE
                 },
                 new Track() {
                     TrackageElementId = 31,
@@ -741,7 +767,7 @@ namespace EtcsServer.MapLoading
                     MaxUpSpeed = 40,
                     MaxDownSpeed = 80,
                     Gradient = 0,
-                    TrackPosition = TrackPosition.INSIDE_ZONE
+                    TrackPosition = TrackPosition.OUTSIDE_ZONE
                 },
                 new SwitchingTrack() {
                     TrackageElementId = 32,
@@ -750,7 +776,7 @@ namespace EtcsServer.MapLoading
                     Length = switchingTrackLength,
                     MaxSpeed = lowSwitchingSpeed,
                     Gradient = 0,
-                    TrackPosition = TrackPosition.INSIDE_ZONE
+                    TrackPosition = TrackPosition.OUTSIDE_ZONE
                 },
                 new Track() {
                     TrackageElementId = 33,
@@ -763,7 +789,7 @@ namespace EtcsServer.MapLoading
                     MaxUpSpeed = 40,
                     MaxDownSpeed = 80,
                     Gradient = 0,
-                    TrackPosition = TrackPosition.INSIDE_ZONE
+                    TrackPosition = TrackPosition.OUTSIDE_ZONE
                 },
                 new Track() {
                     TrackageElementId = 34,
@@ -776,7 +802,7 @@ namespace EtcsServer.MapLoading
                     MaxUpSpeed = 40,
                     MaxDownSpeed = 80,
                     Gradient = 0,
-                    TrackPosition = TrackPosition.INSIDE_ZONE
+                    TrackPosition = TrackPosition.OUTSIDE_ZONE
                 },
                 new SwitchingTrack() {
                     TrackageElementId = 241,
@@ -785,7 +811,7 @@ namespace EtcsServer.MapLoading
                     Length = switchingTrackLength,
                     MaxSpeed = lowSwitchingSpeed,
                     Gradient = 0,
-                    TrackPosition = TrackPosition.INSIDE_ZONE
+                    TrackPosition = TrackPosition.OUTSIDE_ZONE
                 },
                 new SwitchingTrack() {
                     TrackageElementId = 242,
@@ -794,7 +820,7 @@ namespace EtcsServer.MapLoading
                     Length = switchingTrackLength,
                     MaxSpeed = lowSwitchingSpeed,
                     Gradient = 0,
-                    TrackPosition = TrackPosition.INSIDE_ZONE
+                    TrackPosition = TrackPosition.OUTSIDE_ZONE
                 },
                 new Track() {
                     TrackageElementId = 35,
@@ -807,7 +833,7 @@ namespace EtcsServer.MapLoading
                     MaxUpSpeed = 40,
                     MaxDownSpeed = 80,
                     Gradient = 0,
-                    TrackPosition = TrackPosition.INSIDE_ZONE
+                    TrackPosition = TrackPosition.OUTSIDE_ZONE
                 },
                 new Track() {
                     TrackageElementId = 36,
@@ -820,7 +846,7 @@ namespace EtcsServer.MapLoading
                     MaxUpSpeed = 40,
                     MaxDownSpeed = 80,
                     Gradient = 0,
-                    TrackPosition = TrackPosition.INSIDE_ZONE
+                    TrackPosition = TrackPosition.OUTSIDE_ZONE
                 },
                 new Track() {
                     TrackageElementId = 37,
@@ -833,7 +859,7 @@ namespace EtcsServer.MapLoading
                     MaxUpSpeed = 40,
                     MaxDownSpeed = 80,
                     Gradient = 0,
-                    TrackPosition = TrackPosition.INSIDE_ZONE
+                    TrackPosition = TrackPosition.OUTSIDE_ZONE
                 },
                 new Track() {
                     TrackageElementId = 38,
@@ -846,7 +872,7 @@ namespace EtcsServer.MapLoading
                     MaxUpSpeed = 40,
                     MaxDownSpeed = 80,
                     Gradient = 0,
-                    TrackPosition = TrackPosition.INSIDE_ZONE
+                    TrackPosition = TrackPosition.OUTSIDE_ZONE
                 },
             ];
 
@@ -875,8 +901,8 @@ namespace EtcsServer.MapLoading
                 { 21221, new() { RailwaySignalId = 21221, TrackId = 21, Track = TracksLookup[21], DistanceFromTrackStart = 0, IsFacedUp = false } },
                 { 227229, new() { RailwaySignalId = 227229, TrackId = 227, Track = TracksLookup[227], DistanceFromTrackStart = TracksLookup[227].Length, IsFacedUp = true } },
                 { 228230, new() { RailwaySignalId = 228230, TrackId = 228, Track = TracksLookup[228], DistanceFromTrackStart = TracksLookup[228].Length, IsFacedUp = true } },
-                { 28, new() { RailwaySignalId = 28, TrackId = 28, Track = TracksLookup[28], DistanceFromTrackStart = 0.15, IsFacedUp = false } },
-                { 27, new() { RailwaySignalId = 27, TrackId = 27, Track = TracksLookup[27], DistanceFromTrackStart = 0.1, IsFacedUp = false } },
+                { 28, new() { RailwaySignalId = 28, TrackId = 28, Track = TracksLookup[28], DistanceFromTrackStart = 0, IsFacedUp = false } },
+                { 27, new() { RailwaySignalId = 27, TrackId = 27, Track = TracksLookup[27], DistanceFromTrackStart = 0, IsFacedUp = false } },
                 { 28238, new() { RailwaySignalId = 28238, TrackId = 28, Track = TracksLookup[28], DistanceFromTrackStart = TracksLookup[28].Length, IsFacedUp = false } },
                 { 27237, new() { RailwaySignalId = 27237, TrackId = 27, Track = TracksLookup[27], DistanceFromTrackStart = TracksLookup[27].Length, IsFacedUp = false } },
                 { 3838, new() { RailwaySignalId = 3838, TrackId = 38, Track = TracksLookup[38], DistanceFromTrackStart = 0, IsFacedUp = false } },
@@ -954,13 +980,13 @@ namespace EtcsServer.MapLoading
                 {57, new() { SwitchRouteId = 57, SwitchId = 142, Switch = (Switch)TrackageElementsLookup[142], TrackFromId = 24, TrackFrom = TrackageElementsLookup[24], TrackToId = 25, TrackTo = TrackageElementsLookup[25] } },
                 {58, new() { SwitchRouteId = 58, SwitchId = 142, Switch = (Switch)TrackageElementsLookup[142], TrackFromId = 229, TrackFrom = TrackageElementsLookup[229], TrackToId = 25, TrackTo = TrackageElementsLookup[25] } },
                 {59, new() { SwitchRouteId = 59, SwitchId = 143, Switch = (Switch)TrackageElementsLookup[143], TrackFromId = 25, TrackFrom = TrackageElementsLookup[25], TrackToId = 26, TrackTo = TrackageElementsLookup[26] } },
-                {60, new() { SwitchRouteId = 60, SwitchId = 143, Switch = (Switch)TrackageElementsLookup[143], TrackFromId = 25, TrackFrom = TrackageElementsLookup[25], TrackToId = 28, TrackTo = TrackageElementsLookup[28] } },
+                {60, new() { SwitchRouteId = 60, SwitchId = 143, Switch = (Switch)TrackageElementsLookup[143], TrackFromId = 25, TrackFrom = TrackageElementsLookup[25], TrackToId = 244, TrackTo = TrackageElementsLookup[244] } },
                 {61, new() { SwitchRouteId = 61, SwitchId = 143, Switch = (Switch)TrackageElementsLookup[143], TrackFromId = 26, TrackFrom = TrackageElementsLookup[26], TrackToId = 25, TrackTo = TrackageElementsLookup[25] } },
-                {62, new() { SwitchRouteId = 62, SwitchId = 143, Switch = (Switch)TrackageElementsLookup[143], TrackFromId = 28, TrackFrom = TrackageElementsLookup[28], TrackToId = 25, TrackTo = TrackageElementsLookup[25] } },
-                {63, new() { SwitchRouteId = 63, SwitchId = 144, Switch = (Switch)TrackageElementsLookup[144], TrackFromId = 27, TrackFrom = TrackageElementsLookup[27], TrackToId = 23, TrackTo = TrackageElementsLookup[23] } },
-                {64, new() { SwitchRouteId = 64, SwitchId = 144, Switch = (Switch)TrackageElementsLookup[144], TrackFromId = 27, TrackFrom = TrackageElementsLookup[27], TrackToId = 26, TrackTo = TrackageElementsLookup[26] } },
-                {65, new() { SwitchRouteId = 65, SwitchId = 144, Switch = (Switch)TrackageElementsLookup[144], TrackFromId = 23, TrackFrom = TrackageElementsLookup[23], TrackToId = 27, TrackTo = TrackageElementsLookup[27] } },
-                {66, new() { SwitchRouteId = 66, SwitchId = 144, Switch = (Switch)TrackageElementsLookup[144], TrackFromId = 26, TrackFrom = TrackageElementsLookup[26], TrackToId = 27, TrackTo = TrackageElementsLookup[27] } },
+                {62, new() { SwitchRouteId = 62, SwitchId = 143, Switch = (Switch)TrackageElementsLookup[143], TrackFromId = 244, TrackFrom = TrackageElementsLookup[244], TrackToId = 25, TrackTo = TrackageElementsLookup[25] } },
+                {63, new() { SwitchRouteId = 63, SwitchId = 144, Switch = (Switch)TrackageElementsLookup[144], TrackFromId = 243, TrackFrom = TrackageElementsLookup[243], TrackToId = 23, TrackTo = TrackageElementsLookup[23] } },
+                {64, new() { SwitchRouteId = 64, SwitchId = 144, Switch = (Switch)TrackageElementsLookup[144], TrackFromId = 243, TrackFrom = TrackageElementsLookup[243], TrackToId = 26, TrackTo = TrackageElementsLookup[26] } },
+                {65, new() { SwitchRouteId = 65, SwitchId = 144, Switch = (Switch)TrackageElementsLookup[144], TrackFromId = 23, TrackFrom = TrackageElementsLookup[23], TrackToId = 243, TrackTo = TrackageElementsLookup[243] } },
+                {66, new() { SwitchRouteId = 66, SwitchId = 144, Switch = (Switch)TrackageElementsLookup[144], TrackFromId = 26, TrackFrom = TrackageElementsLookup[26], TrackToId = 243, TrackTo = TrackageElementsLookup[243] } },
                 {67, new() { SwitchRouteId = 67, SwitchId = 151, Switch = (Switch)TrackageElementsLookup[151], TrackFromId = 237, TrackFrom = TrackageElementsLookup[237], TrackToId = 29, TrackTo = TrackageElementsLookup[29] } },
                 {68, new() { SwitchRouteId = 68, SwitchId = 151, Switch = (Switch)TrackageElementsLookup[151], TrackFromId = 237, TrackFrom = TrackageElementsLookup[237], TrackToId = 30, TrackTo = TrackageElementsLookup[30] } },
                 {69, new() { SwitchRouteId = 69, SwitchId = 151, Switch = (Switch)TrackageElementsLookup[151], TrackFromId = 29, TrackFrom = TrackageElementsLookup[29], TrackToId = 237, TrackTo = TrackageElementsLookup[237] } },
@@ -1020,8 +1046,8 @@ namespace EtcsServer.MapLoading
                 {134, new() { TrackFromId = 221, TrackToIdGoingStraight = 17, TrackToIdTurning = 20 } },
                 {141, new() { TrackFromId = 230, TrackToIdGoingStraight = 23, TrackToIdTurning = 24 } },
                 {142, new() { TrackFromId = 25, TrackToIdGoingStraight = 229, TrackToIdTurning = 24 } },
-                {143, new() { TrackFromId = 25, TrackToIdGoingStraight = 28, TrackToIdTurning = 26 } },
-                {144, new() { TrackFromId = 27, TrackToIdGoingStraight = 23, TrackToIdTurning = 26 } },
+                {143, new() { TrackFromId = 25, TrackToIdGoingStraight = 244, TrackToIdTurning = 26 } },
+                {144, new() { TrackFromId = 243, TrackToIdGoingStraight = 23, TrackToIdTurning = 26 } },
                 {151, new() { TrackFromId = 237, TrackToIdGoingStraight = 29, TrackToIdTurning = 30 } },
                 {152, new() { TrackFromId = 31, TrackToIdGoingStraight = 238, TrackToIdTurning = 30 } },
                 {153, new() { TrackFromId = 31, TrackToIdGoingStraight = 34, TrackToIdTurning = 32 } },
