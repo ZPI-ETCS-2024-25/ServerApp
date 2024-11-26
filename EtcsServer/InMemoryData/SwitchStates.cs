@@ -9,16 +9,21 @@ namespace EtcsServer.InMemoryData
     {
         private readonly Dictionary<(int, int), SwitchFromTo> states;
         private readonly IHolder<SwitchRoute> switchRoutesHolder;
+        private readonly IHolder<SwitchDirection> switchDirections;
 
-        public SwitchStates([FromServices] IHolder<SwitchRoute> switchRoutesHolder)
+        public SwitchStates(IHolder<SwitchRoute> switchRoutesHolder, IHolder<SwitchDirection> switchDirections)
         {
             states = [];
             switchRoutesHolder.GetValues().Values.ToList()
                 .GroupBy(sr => new { sr.SwitchId, sr.TrackFromId })
-                .Select(group => group.First())
+                .Select(group => (switchDirections.GetValues().TryGetValue(group.Key.SwitchId, out SwitchDirection? switchDirection) && switchDirection.TrackFromId == group.Key.TrackFromId) ?
+                    new { group.Key.SwitchId, group.Key.TrackFromId, TrackToId = switchDirections.GetValues()[group.Key.SwitchId].TrackToIdGoingStraight } :
+                    new { group.Key.SwitchId, group.Key.TrackFromId, TrackToId = group.First().TrackToId }
+                )
                 .ToList()
                 .ForEach(switchRoute => states.Add((switchRoute.SwitchId, switchRoute.TrackFromId), new SwitchFromTo(switchRoute.TrackFromId, switchRoute.TrackToId)));
             this.switchRoutesHolder = switchRoutesHolder;
+            this.switchDirections = switchDirections;
         }
 
         public void SetSwitchState(int switchId, SwitchFromTo switchFromTo)

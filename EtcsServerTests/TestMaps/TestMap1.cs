@@ -260,20 +260,20 @@ namespace EtcsServerTests.TestMaps
 
             Dictionary<int, RailwaySignal> railwaySignalsLookup = new()
             {
-                { 12, new() { RailwaySignalId = 12, TrackId = 2, Track = tracksLookup[2], DistanceFromTrackStart = 0, IsFacedUp = true } },
-                { 21, new() { RailwaySignalId = 21, TrackId = 1, Track = tracksLookup[1], DistanceFromTrackStart = tracksLookup[1].Length, IsFacedUp = false } },
-                { 23, new() { RailwaySignalId = 23, TrackId = 3, Track = tracksLookup[3], DistanceFromTrackStart = 0, IsFacedUp = true } },
-                { 32, new() { RailwaySignalId = 32, TrackId = 2, Track = tracksLookup[2], DistanceFromTrackStart = tracksLookup[2].Length, IsFacedUp = false } },
+                { 12, new() { RailwaySignalId = 12, TrackId = 1, Track = tracksLookup[1], DistanceFromTrackStart = tracksLookup[1].Length, IsFacedUp = true } },
+                { 21, new() { RailwaySignalId = 21, TrackId = 2, Track = tracksLookup[2], DistanceFromTrackStart = 0, IsFacedUp = false } },
+                { 23, new() { RailwaySignalId = 23, TrackId = 2, Track = tracksLookup[2], DistanceFromTrackStart = tracksLookup[2].Length, IsFacedUp = true } },
+                { 32, new() { RailwaySignalId = 32, TrackId = 3, Track = tracksLookup[3], DistanceFromTrackStart = 0, IsFacedUp = false } },
                 { 3, new() { RailwaySignalId = 3, TrackId = 3, Track = tracksLookup[3], DistanceFromTrackStart = 2.5, IsFacedUp = true } },
                 { 33, new() { RailwaySignalId = 33, TrackId = 3, Track = tracksLookup[3], DistanceFromTrackStart = 2.5, IsFacedUp = false } },
                 { 4, new() { RailwaySignalId = 4, TrackId = 3, Track = tracksLookup[3], DistanceFromTrackStart = tracksLookup[3].Length, IsFacedUp = true } },
                 { 44, new() { RailwaySignalId = 44, TrackId = 3, Track = tracksLookup[3], DistanceFromTrackStart = tracksLookup[3].Length, IsFacedUp = false } },
                 { 7, new() { RailwaySignalId = 7, TrackId = 6, Track = tracksLookup[6], DistanceFromTrackStart = tracksLookup[6].Length, IsFacedUp = true } },
                 { 77, new() { RailwaySignalId = 77, TrackId = 6, Track = tracksLookup[6], DistanceFromTrackStart = tracksLookup[6].Length, IsFacedUp = false } },
-                { 1516, new() { RailwaySignalId = 1516, TrackId = 16, Track = tracksLookup[16], DistanceFromTrackStart = 0, IsFacedUp = true } },
-                { 1615, new() { RailwaySignalId = 1615, TrackId = 15, Track = tracksLookup[15], DistanceFromTrackStart = tracksLookup[15].Length, IsFacedUp = false } },
-                { 1617, new() { RailwaySignalId = 1617, TrackId = 17, Track = tracksLookup[17], DistanceFromTrackStart = 0, IsFacedUp = true } },
-                { 1716, new() { RailwaySignalId = 1716, TrackId = 16, Track = tracksLookup[16], DistanceFromTrackStart = tracksLookup[16].Length, IsFacedUp = false } },
+                { 1516, new() { RailwaySignalId = 1516, TrackId = 15, Track = tracksLookup[15], DistanceFromTrackStart = tracksLookup[15].Length, IsFacedUp = true } },
+                { 1615, new() { RailwaySignalId = 1615, TrackId = 16, Track = tracksLookup[16], DistanceFromTrackStart = 0, IsFacedUp = false } },
+                { 1617, new() { RailwaySignalId = 1617, TrackId = 16, Track = tracksLookup[16], DistanceFromTrackStart = tracksLookup[16].Length, IsFacedUp = true } },
+                { 1716, new() { RailwaySignalId = 1716, TrackId = 17, Track = tracksLookup[17], DistanceFromTrackStart = 0, IsFacedUp = false } },
             };
 
             Dictionary<int, SwitchRoute> switchRoutesLookup = new()

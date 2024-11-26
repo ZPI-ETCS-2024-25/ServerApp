@@ -48,6 +48,8 @@ namespace EtcsServer.DecisionMakers
                 return MovementAuthorityValidationOutcome.GetFailedOutcome(MovementAuthorityValidationResult.TRAIN_OUTSIDE_OF_ETCS_BORDER);
 
             RailwaySignal? firstStopSignal = railwaySignalHelper.GetFirstStopSignal(trainPosition, movementDirection);
+            if (firstStopSignal != null && currentTrack.TrackPosition == TrackPosition.INSIDE_ZONE && trackHelper.GetTrackById(firstStopSignal.TrackId)!.TrackPosition != TrackPosition.INSIDE_ZONE)
+                firstStopSignal = null;
 
             return new MovementAuthorityValidationOutcome()
             {
