@@ -33,6 +33,7 @@ namespace EtcsServerTests.Tests
         private UnityAppController unityAppController;
         private ISecurityManager securityManager;
         private IDriverAppSender driverAppSender;
+        private TrainDto Train { get; set; }
 
         public TestScenariosForUnityMap()
         {
@@ -45,13 +46,22 @@ namespace EtcsServerTests.Tests
 
             testMap.RailwaySignalStates.SetRailwaySignalState(211, RailwaySignalMessage.GO);
             testMap.RailwaySignalStates.SetRailwaySignalState(15, RailwaySignalMessage.GO);
+
+            this.Train = new()
+            {
+                TrainId = "97888",
+                LengthMeters = 500,
+                MaxSpeed = 200,
+                BrakeWeight = 1000
+            };
+            testMap.RegisteredTrainsTracker.Register(Train);
         }
 
         [Fact]
         public void IMovementAuthorityProvider_ProvideMovementAuthority_MaOnSwitchStateChangeMovingUp()
         {
             //Given
-            string trainId = testMap.Train.TrainId;
+            string trainId = Train.TrainId;
             TrainPosition trainPosition = new TrainPosition()
             {
                 TrainId = trainId,
@@ -127,7 +137,7 @@ namespace EtcsServerTests.Tests
         public void IMovementAuthorityProvider_ProvideMovementAuthority_MaOnSwitchStateChangeMovingDown()
         {
             //Given
-            string trainId = testMap.Train.TrainId;
+            string trainId = Train.TrainId;
             TrainPosition trainPosition = new TrainPosition()
             {
                 TrainId = trainId,
@@ -205,7 +215,7 @@ namespace EtcsServerTests.Tests
         public void IMovementAuthorityProvider_ProvideMovementAuthority_MaOnCrossingStateChangeTrainBeforeCrossing()
         {
             //Given
-            string trainId = testMap.Train.TrainId;
+            string trainId = Train.TrainId;
             TrainPosition trainPosition = new TrainPosition()
             {
                 TrainId = trainId,
@@ -278,7 +288,7 @@ namespace EtcsServerTests.Tests
         public void IMovementAuthorityProvider_ProvideMovementAuthority_MaOnCrossingStateChangeTrainAfterCrossing()
         {
             //Given
-            string trainId = testMap.Train.TrainId;
+            string trainId = Train.TrainId;
             TrainPosition trainPosition = new TrainPosition()
             {
                 TrainId = trainId,
@@ -331,7 +341,7 @@ namespace EtcsServerTests.Tests
         public void IMovementAuthorityProvider_ProvideMovementAuthority_MaOnCrossingStateChangeTrainBeforeCrossingMovingDown()
         {
             //Given
-            string trainId = testMap.Train.TrainId;
+            string trainId = Train.TrainId;
             TrainPosition trainPosition = new TrainPosition()
             {
                 TrainId = trainId,
@@ -405,7 +415,7 @@ namespace EtcsServerTests.Tests
         public void IMovementAuthorityProvider_ProvideMovementAuthority_MaOnCrossingStateChangeTrainAfterCrossingMovingDown()
         {
             //Given
-            string trainId = testMap.Train.TrainId;
+            string trainId = Train.TrainId;
             TrainPosition trainPosition = new TrainPosition()
             {
                 TrainId = trainId,
@@ -459,7 +469,7 @@ namespace EtcsServerTests.Tests
         public void IMovementAuthorityProvider_ProvideMovementAuthority_MaOnRailwaySignalStateChangeExtendMa()
         {
             //Given
-            string trainId = testMap.Train.TrainId;
+            string trainId = Train.TrainId;
             TrainPosition trainPosition = new TrainPosition()
             {
                 TrainId = trainId,
@@ -527,7 +537,7 @@ namespace EtcsServerTests.Tests
         public void IMovementAuthorityProvider_ProvideMovementAuthority_MaOnRailwaySignalStateChangeShortenMa()
         {
             //Given
-            string trainId = testMap.Train.TrainId;
+            string trainId = Train.TrainId;
             TrainPosition trainPosition = new TrainPosition()
             {
                 TrainId = trainId,
@@ -594,7 +604,7 @@ namespace EtcsServerTests.Tests
         public void IMovementAuthorityProvider_ProvideMovementAuthority_MaOnCrossingFixedTrainBeforeCrossingMovingDown()
         {
             //Given
-            string trainId = testMap.Train.TrainId;
+            string trainId = Train.TrainId;
             TrainPosition trainPosition = new TrainPosition()
             {
                 TrainId = trainId,
@@ -669,7 +679,7 @@ namespace EtcsServerTests.Tests
         public void IMovementAuthorityProvider_ProvideMovementAuthority_MaOnLeavingEtcsZone()
         {
             //Given
-            string trainId = testMap.Train.TrainId;
+            string trainId = Train.TrainId;
             TrainPosition trainPosition = new TrainPosition()
             {
                 TrainId = trainId,
@@ -705,7 +715,7 @@ namespace EtcsServerTests.Tests
         public void IMovementAuthorityProvider_ProvideMovementAuthority_MaOnEnteringEtcsZone()
         {
             //Given
-            string trainId = testMap.Train.TrainId;
+            string trainId = Train.TrainId;
             TrainPosition trainPosition = new TrainPosition()
             {
                 TrainId = trainId,

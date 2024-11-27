@@ -14,19 +14,6 @@ namespace EtcsServerTests.TestMaps
     class UnityMap : MockTestMap
     {
         private UnityTrackageMap unityTrackageMap;
-        public TrainDto Train { get; set; }
-
-        public UnityMap()
-        {
-            this.Train = new()
-            {
-                TrainId = "97888",
-                LengthMeters = 500,
-                MaxSpeed = 200,
-                BrakeWeight = 1000
-            };
-            RegisteredTrainsTracker.Register(Train);
-        }
 
         protected override void InitializeHolders()
         {
