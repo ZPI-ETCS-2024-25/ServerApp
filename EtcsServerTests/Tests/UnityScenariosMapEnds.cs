@@ -51,9 +51,6 @@ namespace EtcsServerTests.Tests
             securityManager = serviceProvider.GetRequiredService<ISecurityManager>();
             driverAppSender = A.Fake<IDriverAppSender>();
 
-            testMap.RailwaySignalStates.SetRailwaySignalState(11, RailwaySignalMessage.GO);
-            testMap.RailwaySignalStates.SetRailwaySignalState(22, RailwaySignalMessage.GO);
-            testMap.RailwaySignalStates.SetRailwaySignalState(44, RailwaySignalMessage.GO);
             testMap.RegisteredTrainsTracker.Register(Train);
         }
 
@@ -71,6 +68,9 @@ namespace EtcsServerTests.Tests
                 Direction = "N"
             };
             testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
+            testMap.RailwaySignalStates.SetRailwaySignalState(11, RailwaySignalMessage.GO);
+            testMap.RailwaySignalStates.SetRailwaySignalState(22, RailwaySignalMessage.GO);
+            testMap.RailwaySignalStates.SetRailwaySignalState(44, RailwaySignalMessage.GO);
 
             //When
             MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
@@ -116,6 +116,33 @@ namespace EtcsServerTests.Tests
                 Direction = "N"
             };
             testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
+
+            //When
+            prepareSwitches.Invoke();
+            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+
+            //Then
+            Assert.Equal(expectedMovementAuthority, movementAuthority);
+        }
+
+        [Theory, MemberData(nameof(SwitchStatesToExpectedMovementAuthorityOnStartingFromFinish))]
+        public void IMovementAuthorityProvider_ProvideMovementAuthority_LeavingFromTrackageEnd(string trackNumber, Action prepareSwitches, MovementAuthority expectedMovementAuthority)
+        {
+            //Given
+            string trainId = Train.TrainId;
+            TrainPosition trainPosition = new TrainPosition()
+            {
+                TrainId = trainId,
+                Kilometer = 14.296,
+                LineNumber = 1,
+                Track = trackNumber,
+                Direction = "P"
+            };
+            testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
+            testMap.RailwaySignalStates.SetRailwaySignalState(3535, RailwaySignalMessage.GO);
+            testMap.RailwaySignalStates.SetRailwaySignalState(3636, RailwaySignalMessage.GO);
+            testMap.RailwaySignalStates.SetRailwaySignalState(3737, RailwaySignalMessage.GO);
+            testMap.RailwaySignalStates.SetRailwaySignalState(3838, RailwaySignalMessage.GO);
 
             //When
             prepareSwitches.Invoke();
@@ -298,6 +325,71 @@ namespace EtcsServerTests.Tests
                     Messages = [],
                     MessagesDistances = [],
                     ServerPosition = 13.65
+                }
+            }
+        };
+
+        public static IEnumerable<object[]> SwitchStatesToExpectedMovementAuthorityOnStartingFromFinish =>
+        new List<object[]>
+        {
+            new object[] { "1", () => { }, new MovementAuthority()
+            {
+                Speeds = [80, 0],
+                SpeedDistances = [0, 2300],
+                Gradients = [0],
+                GradientsDistances = [0, 2300],
+                Lines = [1],
+                LinesDistances = [0, 2300],
+                Messages = [],
+                MessagesDistances = [],
+                ServerPosition = 14.296
+            } },
+            new object[] {
+                "2", () => {
+                    testMap.SwitchStates.SetSwitchState(152, false);
+                }, new MovementAuthority()
+                {
+                    Speeds = [80, 40, 80, 0],
+                    SpeedDistances = [0, 450, 570, 2320],
+                    Gradients = [0],
+                    GradientsDistances = [0, 2320],
+                    Lines = [1],
+                    LinesDistances = [0, 2320],
+                    Messages = [],
+                    MessagesDistances = [],
+                    ServerPosition = 14.296
+                }
+            },
+            new object[] {
+                "3", () => {
+                    testMap.SwitchStates.SetSwitchState(154, false);
+                },
+                new MovementAuthority()
+                {
+                    Speeds = [80, 40, 80, 40, 80, 0],
+                    SpeedDistances = [0, 150, 270, 320, 440, 2340],
+                    Gradients = [0],
+                    GradientsDistances = [0, 2340],
+                    Lines = [1],
+                    LinesDistances = [0, 2340],
+                    Messages = [],
+                    MessagesDistances = [],
+                    ServerPosition = 14.296
+                }
+            },
+            new object[] {
+                "4", () => { },
+                new MovementAuthority()
+                {
+                    Speeds = [80, 40, 80, 0],
+                    SpeedDistances = [0, 150, 270, 2320],
+                    Gradients = [0],
+                    GradientsDistances = [0, 2320],
+                    Lines = [1],
+                    LinesDistances = [0, 2320],
+                    Messages = [],
+                    MessagesDistances = [],
+                    ServerPosition = 14.296
                 }
             }
         };
