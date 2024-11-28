@@ -102,6 +102,29 @@ namespace EtcsServerTests.Tests
             Assert.Equal(expectedMovementAuthority, movementAuthority);
         }
 
+        [Theory, MemberData(nameof(SwitchStatesToExpectedMovementAuthorityOnFinishing))]
+        public void IMovementAuthorityProvider_ProvideMovementAuthority_ReachingTrackageEnd(string trackNumber, Action prepareSwitches, MovementAuthority expectedMovementAuthority)
+        {
+            //Given
+            string trainId = Train.TrainId;
+            TrainPosition trainPosition = new TrainPosition()
+            {
+                TrainId = trainId,
+                Kilometer = 13.65,
+                LineNumber = 1,
+                Track = trackNumber,
+                Direction = "N"
+            };
+            testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
+
+            //When
+            prepareSwitches.Invoke();
+            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+
+            //Then
+            Assert.Equal(expectedMovementAuthority, movementAuthority);
+        }
+
         private MovementAuthority? PostValidMovementAuthorityRequest(MovementAuthorityRequest request)
         {
             ActionResult response = driverAppController.PostMovementAuthorityRequest(
@@ -207,6 +230,74 @@ namespace EtcsServerTests.Tests
                     Messages = [],
                     MessagesDistances = [],
                     ServerPosition = 0.499
+                }
+            }
+        };
+
+        public static IEnumerable<object[]> SwitchStatesToExpectedMovementAuthorityOnFinishing =>
+        new List<object[]>
+        {
+            new object[] { "2", () => {
+                    testMap.SwitchStates.SetSwitchState(153, false);
+            }, new MovementAuthority()
+            {
+                Speeds = [40, 0],
+                SpeedDistances = [0, 716],
+                Gradients = [0],
+                GradientsDistances = [0, 716],
+                Lines = [1],
+                LinesDistances = [0, 716],
+                Messages = [],
+                MessagesDistances = [],
+                ServerPosition = 13.65
+            } },
+            new object[] {
+                "2", () => { }, new MovementAuthority()
+                {
+                    Speeds = [40, 0],
+                    SpeedDistances = [0, 696],
+                    Gradients = [0],
+                    GradientsDistances = [0, 696],
+                    Lines = [1],
+                    LinesDistances = [0, 696],
+                    Messages = [],
+                    MessagesDistances = [],
+                    ServerPosition = 13.65
+                }
+            },
+            new object[] {
+                "1", () => {
+                    testMap.SwitchStates.SetSwitchState(155, false);
+                },
+                new MovementAuthority()
+                {
+                    Speeds = [40, 0],
+                    SpeedDistances = [0, 716],
+                    Gradients = [0],
+                    GradientsDistances = [0, 716],
+                    Lines = [1],
+                    LinesDistances = [0, 716],
+                    Messages = [],
+                    MessagesDistances = [],
+                    ServerPosition = 13.65
+                }
+            },
+            new object[] {
+                "1", () => {
+                    testMap.SwitchStates.SetSwitchState(151, false);
+                    testMap.SwitchStates.SetSwitchState(156, false);
+                },
+                new MovementAuthority()
+                {
+                    Speeds = [40, 0],
+                    SpeedDistances = [0, 736],
+                    Gradients = [0],
+                    GradientsDistances = [0, 736],
+                    Lines = [1],
+                    LinesDistances = [0, 736],
+                    Messages = [],
+                    MessagesDistances = [],
+                    ServerPosition = 13.65
                 }
             }
         };
