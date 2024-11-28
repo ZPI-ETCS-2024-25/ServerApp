@@ -885,10 +885,10 @@ namespace EtcsServer.MapLoading
             {
                 { 1, new() { RailwaySignalId = 1, TrackId = 1, Track = TracksLookup[1], DistanceFromTrackStart = 0, IsFacedUp = false } },
                 { 2, new() { RailwaySignalId = 2, TrackId = 2, Track = TracksLookup[2], DistanceFromTrackStart = 0, IsFacedUp = false } },
-                { 4, new() { RailwaySignalId = 4, TrackId = 4, Track = TracksLookup[4], DistanceFromTrackStart = 0, IsFacedUp = false } },
+                { 4, new() { RailwaySignalId = 4, TrackId = 3, Track = TracksLookup[3], DistanceFromTrackStart = 0, IsFacedUp = false } },
                 { 11, new() { RailwaySignalId = 11, TrackId = 1, Track = TracksLookup[1], DistanceFromTrackStart = 0.15, IsFacedUp = true } },
                 { 22, new() { RailwaySignalId = 22, TrackId = 2, Track = TracksLookup[2], DistanceFromTrackStart = 0.15, IsFacedUp = true } },
-                { 44, new() { RailwaySignalId = 44, TrackId = 4, Track = TracksLookup[4], DistanceFromTrackStart = 0.15, IsFacedUp = true } },
+                { 44, new() { RailwaySignalId = 44, TrackId = 3, Track = TracksLookup[3], DistanceFromTrackStart = 0.15, IsFacedUp = true } },
                 { 9209, new() { RailwaySignalId = 9209, TrackId = 9, Track = TracksLookup[9], DistanceFromTrackStart = 0, IsFacedUp = false } },
                 { 10210, new() { RailwaySignalId = 10210, TrackId = 10, Track = TracksLookup[10], DistanceFromTrackStart = 0, IsFacedUp = false } },
                 { 213, new() { RailwaySignalId = 213, TrackId = 213, Track = TracksLookup[213], DistanceFromTrackStart = 1.55, IsFacedUp = true } },
