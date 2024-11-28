@@ -80,7 +80,7 @@ namespace EtcsServerTests.Tests
         }
 
         [Theory, MemberData(nameof(SwitchStatesToExpectedMovementAuthorityOnReturning))]
-        public void IMovementAuthorityProvider_ProvideMovementAuthority_ReturningToTrackageStart(Action prepareSwitches, MovementAuthority expectedMovementAuthority)
+        public void IMovementAuthorityProvider_ProvideMovementAuthority_ReturningToTrackageStart(string trackNumber, Action prepareSwitches, MovementAuthority expectedMovementAuthority)
         {
             //Given
             string trainId = Train.TrainId;
@@ -89,7 +89,7 @@ namespace EtcsServerTests.Tests
                 TrainId = trainId,
                 Kilometer = 0.499,
                 LineNumber = 1,
-                Track = "1",
+                Track = trackNumber,
                 Direction = "P"
             };
             testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
@@ -164,7 +164,7 @@ namespace EtcsServerTests.Tests
         public static IEnumerable<object[]> SwitchStatesToExpectedMovementAuthorityOnReturning =>
         new List<object[]>
         {
-            new object[] { () => { }, new MovementAuthority()
+            new object[] { "1", () => { }, new MovementAuthority()
             {
                 Speeds = [40, 0],
                 SpeedDistances = [0, 499],
@@ -177,7 +177,7 @@ namespace EtcsServerTests.Tests
                 ServerPosition = 0.499
             } },
             new object[] {
-                () => {
+                "1", () => {
                     testMap.SwitchStates.SetSwitchState(115, false);
                 }, new MovementAuthority()
                 {
@@ -193,18 +193,17 @@ namespace EtcsServerTests.Tests
                 }
             },
             new object[] {
-                () => {
-                    testMap.SwitchStates.SetSwitchState(115, false);
+                "2", () => {
                     testMap.SwitchStates.SetSwitchState(112, false);
                 },
                 new MovementAuthority()
                 {
                     Speeds = [40, 0],
-                    SpeedDistances = [0, 559],
+                    SpeedDistances = [0, 539],
                     Gradients = [0],
-                    GradientsDistances = [0, 559],
+                    GradientsDistances = [0, 539],
                     Lines = [1],
-                    LinesDistances = [0, 559],
+                    LinesDistances = [0, 539],
                     Messages = [],
                     MessagesDistances = [],
                     ServerPosition = 0.499
