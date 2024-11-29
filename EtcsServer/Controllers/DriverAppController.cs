@@ -98,6 +98,6 @@ namespace EtcsServer.Controllers
         [HttpPost("alive")]
         public ActionResult GetHeartbeat() => Ok(GetEncryptedResponse(IsAliveResponse.GetAliveResponse()));
 
-        private string GetEncryptedResponse(object response) => securityManager.Encrypt(response);
+        private string GetEncryptedResponse(object response) => JsonSerializer.Serialize(new { Content = securityManager.Encrypt(response) });
     }
 }

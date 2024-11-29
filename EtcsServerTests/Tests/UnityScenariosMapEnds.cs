@@ -13,6 +13,7 @@ using EtcsServer.MapLoading;
 using EtcsServer.Security;
 using EtcsServer.Senders;
 using EtcsServer.Senders.Contracts;
+using EtcsServerTests.Helpers;
 using EtcsServerTests.TestMaps;
 using FakeItEasy;
 using Microsoft.AspNetCore.Mvc;
@@ -29,10 +30,7 @@ namespace EtcsServerTests.Tests
     {
         private static UnityMap testMap;
         private ServiceProvider serviceProvider;
-        private DriverAppController driverAppController;
-        private UnityAppController unityAppController;
-        private ISecurityManager securityManager;
-        private IDriverAppSender driverAppSender;
+        private TestRequestSender testRequestSender;
         private TrainDto Train { get; set; }
 
         public UnityScenariosMapEnds()
@@ -46,10 +44,7 @@ namespace EtcsServerTests.Tests
                 BrakeWeight = 750
             };
             serviceProvider = testMap.GetTestMapServiceProvider();
-            driverAppController = serviceProvider.GetRequiredService<DriverAppController>();
-            unityAppController = serviceProvider.GetRequiredService<UnityAppController>();
-            securityManager = serviceProvider.GetRequiredService<ISecurityManager>();
-            driverAppSender = A.Fake<IDriverAppSender>();
+            testRequestSender = new(serviceProvider);
 
             testMap.RegisteredTrainsTracker.Register(Train);
         }
@@ -73,7 +68,7 @@ namespace EtcsServerTests.Tests
             testMap.RailwaySignalStates.SetRailwaySignalState(44, RailwaySignalMessage.GO);
 
             //When
-            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+            MovementAuthority? movementAuthority = testRequestSender.PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
 
             //Then
             Assert.Equal(expectedMovementAuthority, movementAuthority);
@@ -96,7 +91,7 @@ namespace EtcsServerTests.Tests
 
             //When
             prepareSwitches.Invoke();
-            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+            MovementAuthority? movementAuthority = testRequestSender.PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
 
             //Then
             Assert.Equal(expectedMovementAuthority, movementAuthority);
@@ -119,7 +114,7 @@ namespace EtcsServerTests.Tests
 
             //When
             prepareSwitches.Invoke();
-            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+            MovementAuthority? movementAuthority = testRequestSender.PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
 
             //Then
             Assert.Equal(expectedMovementAuthority, movementAuthority);
@@ -146,28 +141,10 @@ namespace EtcsServerTests.Tests
 
             //When
             prepareSwitches.Invoke();
-            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+            MovementAuthority? movementAuthority = testRequestSender.PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
 
             //Then
             Assert.Equal(expectedMovementAuthority, movementAuthority);
-        }
-
-        private MovementAuthority? PostValidMovementAuthorityRequest(MovementAuthorityRequest request)
-        {
-            ActionResult response = driverAppController.PostMovementAuthorityRequest(
-                new EncryptedMessage() { Content = securityManager.Encrypt(request) },
-                serviceProvider.GetRequiredService<IMovementAuthorityValidator>(),
-                serviceProvider.GetRequiredService<IMovementAuthorityProvider>(),
-                serviceProvider.GetRequiredService<IMovementAuthorityTracker>()
-            ).Result;
-
-            if (response is ObjectResult objectResult && objectResult.Value is string encryptedResponse)
-            {
-                if (encryptedResponse != null)
-                    return securityManager.Decrypt<MovementAuthority>(encryptedResponse);
-                return null;
-            }
-            return null;
         }
 
         public static IEnumerable<object[]> StartingTrackToExpectedMovementAuthority =>

@@ -13,6 +13,7 @@ using EtcsServer.MapLoading;
 using EtcsServer.Security;
 using EtcsServer.Senders;
 using EtcsServer.Senders.Contracts;
+using EtcsServerTests.Helpers;
 using EtcsServerTests.TestMaps;
 using FakeItEasy;
 using Microsoft.AspNetCore.Mvc;
@@ -22,6 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static EtcsServer.Controllers.UnityAppController;
 
 namespace EtcsServerTests.Tests
 {
@@ -29,20 +31,14 @@ namespace EtcsServerTests.Tests
     {
         private UnityMap testMap;
         private ServiceProvider serviceProvider;
-        private DriverAppController driverAppController;
-        private UnityAppController unityAppController;
-        private ISecurityManager securityManager;
-        private IDriverAppSender driverAppSender;
+        private TestRequestSender testRequestSender;
         private TrainDto Train { get; set; }
 
         public TestScenariosForUnityMap()
         {
             testMap = new UnityMap();
             serviceProvider = testMap.GetTestMapServiceProvider();
-            driverAppController = serviceProvider.GetRequiredService<DriverAppController>();
-            unityAppController = serviceProvider.GetRequiredService<UnityAppController>();
-            securityManager = serviceProvider.GetRequiredService<ISecurityManager>();
-            driverAppSender = A.Fake<IDriverAppSender>();
+            testRequestSender = new(serviceProvider);
 
             testMap.RailwaySignalStates.SetRailwaySignalState(211, RailwaySignalMessage.GO);
             testMap.RailwaySignalStates.SetRailwaySignalState(15, RailwaySignalMessage.GO);
@@ -78,16 +74,10 @@ namespace EtcsServerTests.Tests
 
             FakeMessageToDriver messageToDriver = new();
             DateTime originalDateTime = messageToDriver.Timestamp;
-            A.CallTo(() => driverAppSender.SendNewMovementAuthority(trainId, A<MovementAuthority>.Ignored))
-                .ReturnsLazily((string trainId, MovementAuthority movementAuthority) =>
-                {
-                    messageToDriver.Timestamp = DateTime.Now;
-                    messageToDriver.MovementAuthority = movementAuthority;
-                    return Task.CompletedTask;
-                });
+            PrepareFakeMessageSender(messageToDriver);
 
             //When
-            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+            MovementAuthority? movementAuthority = testRequestSender.PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
 
             //Then
             MovementAuthority expected = new()
@@ -114,7 +104,7 @@ namespace EtcsServerTests.Tests
                 Direction = "N"
             };
             testMap.TrainPositionTracker.RegisterTrainPosition(newPosition);
-            ImitateReceivingSwitchStateFromUnity(121, false);
+            testRequestSender.ImitateReceivingSwitchStateFromUnity(121, false);
 
             //Then
             MovementAuthority expectedAfterSwitchChange = new()
@@ -156,16 +146,10 @@ namespace EtcsServerTests.Tests
 
             FakeMessageToDriver messageToDriver = new();
             DateTime originalDateTime = messageToDriver.Timestamp;
-            A.CallTo(() => driverAppSender.SendNewMovementAuthority(trainId, A<MovementAuthority>.Ignored))
-                .ReturnsLazily((string trainId, MovementAuthority movementAuthority) =>
-                {
-                    messageToDriver.Timestamp = DateTime.Now;
-                    messageToDriver.MovementAuthority = movementAuthority;
-                    return Task.CompletedTask;
-                });
+            PrepareFakeMessageSender(messageToDriver);
 
             //When
-            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+            MovementAuthority? movementAuthority = testRequestSender.PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
 
             //Then
             MovementAuthority expected = new()
@@ -192,7 +176,7 @@ namespace EtcsServerTests.Tests
                 Direction = "P"
             };
             testMap.TrainPositionTracker.RegisterTrainPosition(newPosition);
-            ImitateReceivingSwitchStateFromUnity(124, true);
+            testRequestSender.ImitateReceivingSwitchStateFromUnity(124, true);
 
             //Then
             MovementAuthority expectedAfterSwitchChange = new()
@@ -229,16 +213,10 @@ namespace EtcsServerTests.Tests
 
             FakeMessageToDriver messageToDriver = new();
             DateTime originalDateTime = messageToDriver.Timestamp;
-            A.CallTo(() => driverAppSender.SendNewMovementAuthority(trainId, A<MovementAuthority>.Ignored))
-                .ReturnsLazily((string trainId, MovementAuthority movementAuthority) =>
-                {
-                    messageToDriver.Timestamp = DateTime.Now;
-                    messageToDriver.MovementAuthority = movementAuthority;
-                    return Task.CompletedTask;
-                });
+            PrepareFakeMessageSender(messageToDriver);
 
             //When
-            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+            MovementAuthority? movementAuthority = testRequestSender.PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
 
             //Then
             MovementAuthority expected = new()
@@ -265,7 +243,7 @@ namespace EtcsServerTests.Tests
                 Direction = "N"
             };
             testMap.TrainPositionTracker.RegisterTrainPosition(newPosition);
-            ImitateReceivingCrossingStateFromUnity(1, false);
+            testRequestSender.ImitateReceivingCrossingStateFromUnity(1, false);
 
             //Then
             MovementAuthority expectedAfterSwitchChange = new()
@@ -302,16 +280,10 @@ namespace EtcsServerTests.Tests
 
             FakeMessageToDriver messageToDriver = new();
             DateTime originalDateTime = messageToDriver.Timestamp;
-            A.CallTo(() => driverAppSender.SendNewMovementAuthority(trainId, A<MovementAuthority>.Ignored))
-                .ReturnsLazily((string trainId, MovementAuthority movementAuthority) =>
-                {
-                    messageToDriver.Timestamp = DateTime.Now;
-                    messageToDriver.MovementAuthority = movementAuthority;
-                    return Task.CompletedTask;
-                });
+            PrepareFakeMessageSender(messageToDriver);
 
             //When
-            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+            MovementAuthority? movementAuthority = testRequestSender.PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
 
             //Then
             MovementAuthority expected = new()
@@ -329,7 +301,7 @@ namespace EtcsServerTests.Tests
             Assert.Equal(expected, movementAuthority);
 
             //When
-            ImitateReceivingCrossingStateFromUnity(1, false);
+            testRequestSender.ImitateReceivingCrossingStateFromUnity(1, false);
 
             //Then
             Assert.True(messageToDriver.Timestamp == originalDateTime);
@@ -356,16 +328,10 @@ namespace EtcsServerTests.Tests
 
             FakeMessageToDriver messageToDriver = new();
             DateTime originalDateTime = messageToDriver.Timestamp;
-            A.CallTo(() => driverAppSender.SendNewMovementAuthority(trainId, A<MovementAuthority>.Ignored))
-                .ReturnsLazily((string trainId, MovementAuthority movementAuthority) =>
-                {
-                    messageToDriver.Timestamp = DateTime.Now;
-                    messageToDriver.MovementAuthority = movementAuthority;
-                    return Task.CompletedTask;
-                });
+            PrepareFakeMessageSender(messageToDriver);
 
             //When
-            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+            MovementAuthority? movementAuthority = testRequestSender.PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
 
             //Then
             MovementAuthority expected = new()
@@ -392,7 +358,7 @@ namespace EtcsServerTests.Tests
                 Direction = "P"
             };
             testMap.TrainPositionTracker.RegisterTrainPosition(newPosition);
-            ImitateReceivingCrossingStateFromUnity(1, false);
+            testRequestSender.ImitateReceivingCrossingStateFromUnity(1, false);
 
             //Then
             MovementAuthority expectedAfterSwitchChange = new()
@@ -430,16 +396,10 @@ namespace EtcsServerTests.Tests
 
             FakeMessageToDriver messageToDriver = new();
             DateTime originalDateTime = messageToDriver.Timestamp;
-            A.CallTo(() => driverAppSender.SendNewMovementAuthority(trainId, A<MovementAuthority>.Ignored))
-                .ReturnsLazily((string trainId, MovementAuthority movementAuthority) =>
-                {
-                    messageToDriver.Timestamp = DateTime.Now;
-                    messageToDriver.MovementAuthority = movementAuthority;
-                    return Task.CompletedTask;
-                });
+            PrepareFakeMessageSender(messageToDriver);
 
             //When
-            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+            MovementAuthority? movementAuthority = testRequestSender.PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
 
             //Then
             MovementAuthority expected = new()
@@ -457,7 +417,7 @@ namespace EtcsServerTests.Tests
             Assert.Equal(expected, movementAuthority);
 
             //When
-            ImitateReceivingCrossingStateFromUnity(1, false);
+            testRequestSender.ImitateReceivingCrossingStateFromUnity(1, false);
 
             //Then
             Assert.True(messageToDriver.Timestamp == originalDateTime);
@@ -487,16 +447,10 @@ namespace EtcsServerTests.Tests
 
             FakeMessageToDriver messageToDriver = new();
             DateTime originalDateTime = messageToDriver.Timestamp;
-            A.CallTo(() => driverAppSender.SendNewMovementAuthority(trainId, A<MovementAuthority>.Ignored))
-                .ReturnsLazily((string trainId, MovementAuthority movementAuthority) =>
-                {
-                    messageToDriver.Timestamp = DateTime.Now;
-                    messageToDriver.MovementAuthority = movementAuthority;
-                    return Task.CompletedTask;
-                });
+            PrepareFakeMessageSender(messageToDriver);
 
             //When
-            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+            MovementAuthority? movementAuthority = testRequestSender.PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
 
             //Then
             MovementAuthority expected = new()
@@ -514,7 +468,7 @@ namespace EtcsServerTests.Tests
             Assert.Equal(expected, movementAuthority);
 
             //When
-            ImitateReceivingRailwaySignalStateFromUnity(211, true);
+            testRequestSender.ImitateReceivingRailwaySignalStateFromUnity(211, true);
 
             //Then
             MovementAuthority newExpected = new()
@@ -555,16 +509,10 @@ namespace EtcsServerTests.Tests
 
             FakeMessageToDriver messageToDriver = new();
             DateTime originalDateTime = messageToDriver.Timestamp;
-            A.CallTo(() => driverAppSender.SendNewMovementAuthority(trainId, A<MovementAuthority>.Ignored))
-                .ReturnsLazily((string trainId, MovementAuthority movementAuthority) =>
-                {
-                    messageToDriver.Timestamp = DateTime.Now;
-                    messageToDriver.MovementAuthority = movementAuthority;
-                    return Task.CompletedTask;
-                });
+            PrepareFakeMessageSender(messageToDriver);
 
             //When
-            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+            MovementAuthority? movementAuthority = testRequestSender.PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
 
             //Then
             MovementAuthority expected = new()
@@ -582,7 +530,7 @@ namespace EtcsServerTests.Tests
             Assert.Equal(expected, movementAuthority);
 
             //When
-            ImitateReceivingRailwaySignalStateFromUnity(211, false);
+            testRequestSender.ImitateReceivingRailwaySignalStateFromUnity(211, false);
 
             //Then
             MovementAuthority newExpected = new() {
@@ -620,16 +568,10 @@ namespace EtcsServerTests.Tests
 
             FakeMessageToDriver messageToDriver = new();
             DateTime originalDateTime = messageToDriver.Timestamp;
-            A.CallTo(() => driverAppSender.SendNewMovementAuthority(trainId, A<MovementAuthority>.Ignored))
-                .ReturnsLazily((string trainId, MovementAuthority movementAuthority) =>
-                {
-                    messageToDriver.Timestamp = DateTime.Now;
-                    messageToDriver.MovementAuthority = movementAuthority;
-                    return Task.CompletedTask;
-                });
+            PrepareFakeMessageSender(messageToDriver);
 
             //When
-            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+            MovementAuthority? movementAuthority = testRequestSender.PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
 
             //Then
             MovementAuthority expected = new()
@@ -656,7 +598,7 @@ namespace EtcsServerTests.Tests
                 Direction = "P"
             };
             testMap.TrainPositionTracker.RegisterTrainPosition(newPosition);
-            ImitateReceivingCrossingStateFromUnity(1, true);
+            testRequestSender.ImitateReceivingCrossingStateFromUnity(1, true);
 
             //Then
             MovementAuthority expectedAfterSwitchChange = new()
@@ -693,7 +635,7 @@ namespace EtcsServerTests.Tests
             testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
 
             //When
-            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+            MovementAuthority? movementAuthority = testRequestSender.PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
 
             //Then
             MovementAuthority expected = new()
@@ -731,7 +673,7 @@ namespace EtcsServerTests.Tests
             testMap.TrainPositionTracker.RegisterTrainPosition(trainPosition);
 
             //When
-            MovementAuthority? movementAuthority = PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
+            MovementAuthority? movementAuthority = testRequestSender.PostValidMovementAuthorityRequest(new MovementAuthorityRequest() { TrainId = trainId });
 
             //Then
             MovementAuthority expected = new()
@@ -749,64 +691,15 @@ namespace EtcsServerTests.Tests
             Assert.Equal(expected, movementAuthority);
         }
 
-        private void ImitateReceivingSwitchStateFromUnity(int switchId, bool isGoingStraight)
+        private void PrepareFakeMessageSender(FakeMessageToDriver messageToDriver)
         {
-            ActionResult response = unityAppController.ChangeSwitchState(
-                switchId, isGoingStraight,
-                serviceProvider.GetRequiredService<IMovementAuthorityValidator>(),
-                serviceProvider.GetRequiredService<IMovementAuthorityProvider>(),
-                driverAppSender
-            ).Result;
-
-            Assert.True(response is OkResult);
-        }
-
-        private void ImitateReceivingCrossingStateFromUnity(int crossingId, bool isFunctional)
-        {
-            ActionResult response = unityAppController.ChangeCrossingState(
-                crossingId, isFunctional,
-                serviceProvider.GetRequiredService<IMovementAuthorityValidator>(),
-                serviceProvider.GetRequiredService<IMovementAuthorityProvider>(),
-                driverAppSender
-            ).Result;
-
-            Assert.True(response is OkResult);
-        }
-
-        private void ImitateReceivingRailwaySignalStateFromUnity(int railwaySignalId, bool isGoMessage)
-        {
-            ActionResult response = unityAppController.ChangeRailwaySignalState(
-                railwaySignalId, isGoMessage,
-                serviceProvider.GetRequiredService<IMovementAuthorityValidator>(),
-                serviceProvider.GetRequiredService<IMovementAuthorityProvider>(),
-                driverAppSender
-            ).Result;
-
-            Assert.True(response is OkResult);
-        }
-
-        private MovementAuthority? PostValidMovementAuthorityRequest(MovementAuthorityRequest request)
-        {
-            ActionResult response = driverAppController.PostMovementAuthorityRequest(
-                new EncryptedMessage() { Content = securityManager.Encrypt(request) },
-                serviceProvider.GetRequiredService<IMovementAuthorityValidator>(),
-                serviceProvider.GetRequiredService<IMovementAuthorityProvider>(),
-                serviceProvider.GetRequiredService<IMovementAuthorityTracker>()
-            ).Result;
-
-            if (response is ObjectResult objectResult && objectResult.Value is string encryptedResponse)
-            {
-                if (encryptedResponse != null)
-                    return securityManager.Decrypt<MovementAuthority>(encryptedResponse);
-                return null;
-            }
-            return null;
-        }
-
-        class FakeMessageToDriver
-        {
-            public DateTime Timestamp { get; set; } = DateTime.Now;
-            public MovementAuthority? MovementAuthority { get; set; }
+            A.CallTo(() => testRequestSender.DriverAppSender.SendNewMovementAuthority(Train.TrainId, A<MovementAuthority>.Ignored))
+                .ReturnsLazily((string trainId, MovementAuthority movementAuthority) =>
+                {
+                    messageToDriver.Timestamp = DateTime.Now;
+                    messageToDriver.MovementAuthority = movementAuthority;
+                    return Task.CompletedTask;
+                });
         }
     }
 }
