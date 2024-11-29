@@ -7,6 +7,7 @@ using EtcsServer.DriverDataCollectors.Contract;
 using EtcsServer.InMemoryData.Contract;
 using EtcsServer.Security;
 using EtcsServer.Senders.Contracts;
+using EtcsServer.UnityDto;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using static EtcsServer.Controllers.TestController;
@@ -35,25 +36,26 @@ namespace EtcsServer.Controllers
             this.switchDirectionStates = switchDirectionStates;
         }
 
-        [HttpPost("switchState")]
+        [HttpPost("JunctionState")]
         public async Task<ActionResult> ChangeSwitchState(
-            int switchId,
-            bool isGoingStraight,
+            JunctionStateChange junctionStateChange,
             [FromServices] IMovementAuthorityValidator movementAuthorityValidator,
             [FromServices] IMovementAuthorityProvider movementAuthorityProvider,
             [FromServices] IDriverAppSender driverAppSender
             )
         {
-            SwitchDirection? switchDirection = switchDirectionStates.GetSwitchDirectionInformation(switchId);
+            int junctionId = junctionStateChange.JunctionId;
+            bool straight = junctionStateChange.Straight;
+            SwitchDirection? switchDirection = switchDirectionStates.GetSwitchDirectionInformation(junctionId);
             if (switchDirection == null) return Ok();
 
-            int newTrackToId = isGoingStraight ? switchDirection.TrackToIdGoingStraight : switchDirection.TrackToIdTurning;
-            int currentNextTrack = switchStates.GetNextTrackId(switchId, switchDirection.TrackFromId);
+            int newTrackToId = straight ? switchDirection.TrackToIdGoingStraight : switchDirection.TrackToIdTurning;
+            int currentNextTrack = switchStates.GetNextTrackId(junctionId, switchDirection.TrackFromId);
             if (currentNextTrack != newTrackToId)
             {
-                switchStates.SetSwitchState(switchId, new SwitchFromTo(switchDirection.TrackFromId, newTrackToId));
+                switchStates.SetSwitchState(junctionId, new SwitchFromTo(switchDirection.TrackFromId, newTrackToId));
 
-                List<(string, MovementAuthority)> impactedMovementAuthorities = movementAuthorityTracker.GetMovementAuthoritiesImpactedBySwitch(switchId);
+                List<(string, MovementAuthority)> impactedMovementAuthorities = movementAuthorityTracker.GetMovementAuthoritiesImpactedBySwitch(junctionId);
 
                 foreach ((string trainId, MovementAuthority movementAuthority) in impactedMovementAuthorities) {
                     MovementAuthorityValidationOutcome validationOutcome = movementAuthorityValidator.IsTrainValidForMovementAuthority(trainId);
@@ -104,20 +106,22 @@ namespace EtcsServer.Controllers
 
         [HttpPost("semaphoreState")]
         public async Task<ActionResult> ChangeRailwaySignalState(
-            int signalId,
-            bool isGoMessage,
+            SignalStateChange signalStateChange,
             [FromServices] IMovementAuthorityValidator movementAuthorityValidator,
             [FromServices] IMovementAuthorityProvider movementAuthorityProvider,
             [FromServices] IDriverAppSender driverAppSender
             )
         {
-            RailwaySignalMessage currentMessage = railwaySignalStates.GetSignalMessage(signalId);
+            int semaphoreId = signalStateChange.SemaphoreId;
+            bool go = signalStateChange.Go;
+            bool isGoMessage = go;
+            RailwaySignalMessage currentMessage = railwaySignalStates.GetSignalMessage(semaphoreId);
             RailwaySignalMessage newMessage = isGoMessage ? RailwaySignalMessage.GO : RailwaySignalMessage.STOP;
             if (currentMessage != newMessage)
             {
-                railwaySignalStates.SetRailwaySignalState(signalId, newMessage);
+                railwaySignalStates.SetRailwaySignalState(semaphoreId, newMessage);
 
-                List<(string, MovementAuthority)> impactedMovementAuthorities = movementAuthorityTracker.GetMovementAuthoritiesImpactedByRailwaySignal(signalId);
+                List<(string, MovementAuthority)> impactedMovementAuthorities = movementAuthorityTracker.GetMovementAuthoritiesImpactedByRailwaySignal(semaphoreId);
 
                 foreach ((string trainId, MovementAuthority _) in impactedMovementAuthorities)
                 {
