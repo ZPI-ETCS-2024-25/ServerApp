@@ -17,7 +17,9 @@ using EtcsServer.InMemoryHolders;
 using EtcsServer.MapLoading;
 using EtcsServer.Security;
 using EtcsServer.Senders.Contracts;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace EtcsServer
 {
@@ -40,6 +42,11 @@ namespace EtcsServer
 
             builder.Services.AddProjectServices(builder.Configuration);
             builder.Services.AddControllers();
+            builder.Services.AddHttpLogging(options =>
+            {
+                options.LoggingFields = Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.All;
+                options.ResponseHeaders.Add("Server");
+            });
 
             //register map
             builder.Services.AddSingleton<ITrackageMap, UnityTrackageMap>();
@@ -49,7 +56,23 @@ namespace EtcsServer
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.Console()
+                .WriteTo.File("Logs/etcs-server.log", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+            if (!Directory.Exists("Logs"))
+            {
+                Directory.CreateDirectory("Logs");
+            }
+
+            builder.Host.UseSerilog();
+
             var app = builder.Build();
+
+            app.UseWhen(
+                context => !context.Request.Path.StartsWithSegments("/swagger"),
+                builder => builder.UseHttpLogging()
+            );
 
             //map loading
             using (var scope = app.Services.CreateScope())
