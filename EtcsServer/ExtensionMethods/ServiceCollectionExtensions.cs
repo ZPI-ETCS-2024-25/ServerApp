@@ -32,7 +32,6 @@ namespace EtcsServer.ExtensionMethods
             services.AddSingleton<IHolder<SwitchRoute>, SwitchRoutesHolder>();
             services.AddSingleton<IHolder<Track>, TracksHolder>();
             services.AddSingleton<IHolder<TrackageElement>, TrackageElementHolder>();
-            services.AddSingleton<IHolder<Train>, TrainsHolder>();
             services.AddSingleton<IHolder<SwitchDirection>, SwitchDirectionHolder>();
 
             services.AddSingleton<ITrainPositionTracker, LastKnownPositionsTracker>();

@@ -7,6 +7,7 @@ using EtcsServer.InMemoryData.Contract;
 using EtcsServer.Security;
 using EtcsServer.Senders;
 using EtcsServer.Senders.Contracts;
+using EtcsServer.UnityDto;
 using FakeItEasy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
