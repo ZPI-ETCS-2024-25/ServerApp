@@ -17,6 +17,8 @@ namespace EtcsServerTests.Helpers
                 new("ServerProperties:DriverAppUrl", "test"),
                 new("EtcsProperties:MaxSpeedDamagedCrossing", "20"),
                 new("EtcsProperties:DamagedCrossingImpactLength", "0.01"),
+                new("EtcsProperties:DistanceForMessageBeforeCrossing", "800"),
+                new("EtcsProperties:CrossingMessage", "Podaj sygnał baczność"),
                 new("Security:Base64EncodedAesKey", "DZR+F7EiPSj8qspCCk9DMtMoGq54fEbXLozOiQypZOo="),
                 new("Security:Base64EncodedInitialisationVector", "Gis8TV5vcIGSo7TF1uf4CQ==")
             ];

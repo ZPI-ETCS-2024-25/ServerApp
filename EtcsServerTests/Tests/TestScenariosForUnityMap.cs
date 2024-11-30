@@ -33,6 +33,7 @@ namespace EtcsServerTests.Tests
         private ServiceProvider serviceProvider;
         private TestRequestSender testRequestSender;
         private TrainDto Train { get; set; }
+        private string crossingMessage;
 
         public TestScenariosForUnityMap()
         {
@@ -51,6 +52,7 @@ namespace EtcsServerTests.Tests
                 BrakeWeight = 1000
             };
             testMap.RegisteredTrainsTracker.Register(Train);
+            crossingMessage = new TestConfiguration().Configuration["EtcsProperties:CrossingMessage"];
         }
 
         [Fact]
@@ -88,8 +90,8 @@ namespace EtcsServerTests.Tests
                 GradientsDistances = [0, 6846],
                 Lines = [1],
                 LinesDistances = [0, 6846],
-                Messages = [],
-                MessagesDistances = [],
+                Messages = [ crossingMessage ],
+                MessagesDistances = [ 3448 ],
                 ServerPosition = 2.1
             };
             Assert.Equal(expected, movementAuthority);
@@ -115,8 +117,8 @@ namespace EtcsServerTests.Tests
                 GradientsDistances = [0, 6366],
                 Lines = [1],
                 LinesDistances = [0, 6366],
-                Messages = [],
-                MessagesDistances = [],
+                Messages = [ crossingMessage ],
+                MessagesDistances = [ 2968 ],
                 ServerPosition = 2.6
             };
             Assert.True(messageToDriver.Timestamp > originalDateTime);
@@ -227,8 +229,8 @@ namespace EtcsServerTests.Tests
                 GradientsDistances = [0, 3846 ],
                 Lines = [1],
                 LinesDistances = [0, 3846],
-                Messages = [],
-                MessagesDistances = [],
+                Messages = [ crossingMessage ],
+                MessagesDistances = [448],
                 ServerPosition = 5.1
             };
             Assert.Equal(expected, movementAuthority);
@@ -254,8 +256,8 @@ namespace EtcsServerTests.Tests
                 GradientsDistances = [0, 3746],
                 Lines = [1],
                 LinesDistances = [0, 3746],
-                Messages = [],
-                MessagesDistances = [],
+                Messages = [crossingMessage],
+                MessagesDistances = [348],
                 ServerPosition = 5.2
             };
             Assert.True(messageToDriver.Timestamp > originalDateTime);
@@ -317,7 +319,7 @@ namespace EtcsServerTests.Tests
             TrainPosition trainPosition = new TrainPosition()
             {
                 TrainId = trainId,
-                Kilometer = 7.0,
+                Kilometer = 7.2,
                 LineNumber = 1,
                 Track = "1",
                 Direction = "P"
@@ -337,14 +339,14 @@ namespace EtcsServerTests.Tests
             MovementAuthority expected = new()
             {
                 Speeds = [160, 0],
-                SpeedDistances = [0, 3250],
+                SpeedDistances = [0, 3450],
                 Gradients = [0],
-                GradientsDistances = [0, 3250],
+                GradientsDistances = [0, 3450],
                 Lines = [1],
-                LinesDistances = [0, 3250],
-                Messages = [],
-                MessagesDistances = [],
-                ServerPosition = 7.0
+                LinesDistances = [0, 3450],
+                Messages = [ crossingMessage ],
+                MessagesDistances = [ 52 ],
+                ServerPosition = 7.2
             };
             Assert.Equal(expected, movementAuthority);
 
@@ -479,8 +481,8 @@ namespace EtcsServerTests.Tests
                 GradientsDistances = [0, 7446],
                 Lines = [1],
                 LinesDistances = [0, 7446],
-                Messages = [],
-                MessagesDistances = [],
+                Messages = [ crossingMessage ],
+                MessagesDistances = [ 4048 ],
                 ServerPosition = 1.5
             };
             Assert.True(messageToDriver.Timestamp > originalDateTime);
@@ -523,8 +525,8 @@ namespace EtcsServerTests.Tests
                 GradientsDistances = [0, 7446],
                 Lines = [1],
                 LinesDistances = [0, 7446],
-                Messages = [],
-                MessagesDistances = [],
+                Messages = [ crossingMessage ],
+                MessagesDistances = [ 4048 ],
                 ServerPosition = 1.5
             };
             Assert.Equal(expected, movementAuthority);
