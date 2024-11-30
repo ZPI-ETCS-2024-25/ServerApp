@@ -35,6 +35,14 @@ namespace EtcsServer.InMemoryData
                 .ToList();
         }
 
+        public List<CrossingTrack> GetCrossingTracks(int trackId)
+        {
+            return crossingTracks.GetValues()
+                .Where(kvp => kvp.Value.TrackId == trackId)
+                .Select(kvp => kvp.Value)
+                .ToList();
+        }
+
         public void SetCrossingState(int crossingId, bool isFunctional)
         {
             states[crossingId] = isFunctional;

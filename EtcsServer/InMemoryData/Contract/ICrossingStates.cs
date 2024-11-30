@@ -7,5 +7,6 @@ namespace EtcsServer.InMemoryData.Contract
         void SetCrossingState(int crossingId, bool isFunctional);
         bool GetCrossingState(int crossingId);
         List<CrossingTrack> GetDamagedCrossingTracks(int trackId);
+        List<CrossingTrack> GetCrossingTracks(int trackId);
     }
 }

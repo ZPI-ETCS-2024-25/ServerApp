@@ -72,6 +72,7 @@ namespace EtcsServer.DecisionExecutors
 
                 RegisterGradient(authorityContainer, destinationTrackEnd);
                 authorityContainer.RegisterLine();
+                RegisterMessagesForCurrentTrack(authorityContainer, destinationTrackEnd);
 
                 UpdateTravelledDistance(authorityContainer, destinationTrackEnd, trainPosition);
 
@@ -103,6 +104,7 @@ namespace EtcsServer.DecisionExecutors
 
                 RegisterGradient(authorityContainer, destinationTrackEnd);
                 authorityContainer.RegisterLine();
+                RegisterMessagesForCurrentTrack(authorityContainer, destinationTrackEnd);
 
                 UpdateTravelledDistance(authorityContainer, destinationTrackEnd, trainPosition);
 
@@ -142,6 +144,7 @@ namespace EtcsServer.DecisionExecutors
 
             List<CrossingTrack> damagedCrossingsAheadOnCurrentTrack = crossingStates.GetDamagedCrossingTracks(currentTrack.TrackageElementId)
                 .Where(c => isMovingUp ? c.GetDistanceFromStartMeters() > (currentMeter - currentTrack.GetMeter()) : c.GetDistanceFromStartMeters() < currentMeter - currentTrack.GetMeter())
+                .Where(c => isMovingUp ? c.DistanceFromTrackStart < stopKilometerOnTrack : c.DistanceFromTrackStart > stopKilometerOnTrack)
                 .ToList();
             int maxSpeedOnDamagedCrossing = etcsProperties.MaxSpeedDamagedCrossing;
             double kilometersBeforeAndAfterCrossing = etcsProperties.DamagedCrossingImpactLength;
@@ -177,6 +180,31 @@ namespace EtcsServer.DecisionExecutors
                 s.MaxSpeed,
                 isMovingUp ? metersSoFar + (s.GetDistanceFromStartMeters() + currentTrack.GetMeter() - currentMeter) : metersSoFar + (currentMeter - s.GetDistanceFromStartMeters() - currentTrack.GetMeter())
             ));
+        }
+
+        private void RegisterMessagesForCurrentTrack(MovementAuthorityContainer authorityContainer, TrackEnd destinationTrackEnd) => RegisterMessagesForCurrentTrack(authorityContainer, destinationTrackEnd, -1);
+        private void RegisterMessagesForCurrentTrack(MovementAuthorityContainer authorityContainer, TrackEnd destinationTrackEnd, RailwaySignal stopSignal) => RegisterMessagesForCurrentTrack(authorityContainer, destinationTrackEnd, stopSignal.DistanceFromTrackStart);
+
+        private void RegisterMessagesForCurrentTrack(MovementAuthorityContainer authorityContainer, TrackEnd destinationTrackEnd, double stopKilometerOnTrack)
+        {
+            Track currentTrack = authorityContainer.CurrentTrack!;
+            int currentMeter = authorityContainer.CurrentMeter;
+            int metersSoFar = authorityContainer.MetersSoFar;
+            bool isMovingUp = destinationTrackEnd == TrackEnd.RIGHT;
+            if (stopKilometerOnTrack == -1)
+                stopKilometerOnTrack = isMovingUp ? currentTrack.Length : 0;
+
+            List<CrossingTrack> crossingsAheadOnCurrentTrack = crossingStates.GetCrossingTracks(currentTrack.TrackageElementId)
+                .Where(c => isMovingUp ? c.GetDistanceFromStartMeters() > (currentMeter - currentTrack.GetMeter()) : c.GetDistanceFromStartMeters() < currentMeter - currentTrack.GetMeter())
+                .Where(c => isMovingUp ? c.DistanceFromTrackStart < stopKilometerOnTrack : c.DistanceFromTrackStart > stopKilometerOnTrack)
+                .ToList();
+            crossingsAheadOnCurrentTrack.ForEach(crossing =>
+            {
+                int distanceFromStartToCrossing = isMovingUp ? metersSoFar + (crossing.GetDistanceFromStartMeters() + currentTrack.GetMeter() - currentMeter) : metersSoFar + (currentMeter - crossing.GetDistanceFromStartMeters() - currentTrack.GetMeter());
+                int distanceToMessage = distanceFromStartToCrossing - etcsProperties.DistanceForMessageBeforeCrossing;
+                if (distanceToMessage >= 0)
+                    authorityContainer.RegisterMessage(etcsProperties.CrossingMessage, distanceToMessage);
+            });
         }
 
         private void RegisterGradient(MovementAuthorityContainer authorityContainer, TrackEnd destinationTrackEnd)
@@ -269,6 +297,7 @@ namespace EtcsServer.DecisionExecutors
             RegisterSpeedsForCurrentTrack(authorityContainer, destinationTrackEnd, stopSignal);
             RegisterGradient(authorityContainer, destinationTrackEnd);
             authorityContainer.RegisterLine();
+            RegisterMessagesForCurrentTrack(authorityContainer, destinationTrackEnd);
             UpdateTravelledDistance(authorityContainer, destinationTrackEnd, trainPosition, stopSignal);
         }
 
@@ -288,6 +317,8 @@ namespace EtcsServer.DecisionExecutors
             public List<double> SpeedsDistances { get; set; } = [];
             public List<double> Gradients { get; set; } = [];
             public List<double> GradientsDistances { get; set; } = [];
+            public List<string> Messages { get; set; } = [];
+            public List<double> MessagesDistances { get; set; } = [];
             public List<int> Lines { get; set; } = [];
             public List<double> LinesDistances { get; set; } = [];
 
@@ -330,6 +361,12 @@ namespace EtcsServer.DecisionExecutors
                 }
             }
 
+            public void RegisterMessage(string message, int meter)
+            {
+                Messages.Add(message);
+                MessagesDistances.Add(meter);
+            }
+
             public void RegisterGradient(double gradient, int meter)
             {
                 if (Gradients.Count == 0 || gradient != Gradients.Last())
@@ -365,8 +402,8 @@ namespace EtcsServer.DecisionExecutors
                     SpeedDistances = SpeedsDistances.ToArray(),
                     Gradients = Gradients.ToArray(),
                     GradientsDistances = GradientsDistances.ToArray(),
-                    Messages = [],
-                    MessagesDistances = [],
+                    Messages = Messages.ToArray(),
+                    MessagesDistances = MessagesDistances.ToArray(),
                     Lines = Lines.ToArray(),
                     LinesDistances = LinesDistances.ToArray(),
                     ServerPosition = TrainPosition.Kilometer
