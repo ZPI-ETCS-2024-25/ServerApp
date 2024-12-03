@@ -1,31 +1,14 @@
 ﻿using EtcsServer.Database.Entity;
-using EtcsServer.DecisionExecutors.Contract;
-using EtcsServer.DecisionExecutors;
-using EtcsServer.DecisionMakers.Contract;
-using EtcsServer.DecisionMakers;
 using EtcsServer.DriverDataCollectors.Contract;
-using EtcsServer.DriverDataCollectors;
 using EtcsServer.ExtensionMethods;
-using EtcsServer.Helpers.Contract;
-using EtcsServer.Helpers;
-using EtcsServer.InMemoryData;
 using EtcsServer.InMemoryData.Contract;
 using EtcsServer.InMemoryHolders;
 using FakeItEasy;
-using FluentAssertions.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.CompilerServices;
-using EtcsServer.DriverAppDto;
 using EtcsServer.Controllers;
-using System.Configuration;
-using Microsoft.Extensions.Configuration;
 using EtcsServerTests.Helpers;
+using EtcsServer.Senders.Contracts;
 
 namespace EtcsServerTests.TestMaps
 {
@@ -46,6 +29,7 @@ namespace EtcsServerTests.TestMaps
         public IRailwaySignalStates RailwaySignalStates { get; set; }
         public ISwitchStates SwitchStates { get; set; }
         public ICrossingStates CrossingStates { get; set; }
+        public IDriverAppSender DriverAppSender { get; set; }
 
         protected abstract void InitializeHolders();
 
@@ -59,6 +43,7 @@ namespace EtcsServerTests.TestMaps
             RailwaySignalHolder = A.Fake<IHolder<RailwaySignal>>();
             SwitchRouteHolder = A.Fake<IHolder<SwitchRoute>>();
             SwitchDirectionHolder = A.Fake<IHolder<SwitchDirection>>();
+            DriverAppSender = A.Fake<IDriverAppSender>();
             InitializeHolders();
 
             InitializeServiceProvider();
@@ -91,6 +76,7 @@ namespace EtcsServerTests.TestMaps
             serviceCollection.AddSingleton<IHolder<SwitchDirection>>(SwitchDirectionHolder);
             serviceCollection.AddSingleton<IHolder<Track>>(TrackHolder);
             serviceCollection.AddSingleton<IHolder<TrackageElement>>(TrackageElementHolder);
+            serviceCollection.AddSingleton<IDriverAppSender>(DriverAppSender);
 
             serviceCollection.AddScoped<DriverAppController>();
             serviceCollection.AddScoped<UnityAppController>();

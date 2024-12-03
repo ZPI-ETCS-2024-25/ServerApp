@@ -30,8 +30,7 @@ namespace EtcsServerTests.Helpers
         private IMovementAuthorityValidator movementAuthorityValidator;
         private IMovementAuthorityProvider movementAuthorityProvider;
         private IMovementAuthorityTracker movementAuthorityTracker;
-
-        public IDriverAppSender DriverAppSender { get; set; }
+        private readonly IServiceProvider serviceProvider;
 
         public TestRequestSender(IServiceProvider serviceProvider)
         {
@@ -41,8 +40,7 @@ namespace EtcsServerTests.Helpers
             this.movementAuthorityValidator = serviceProvider.GetRequiredService<IMovementAuthorityValidator>();
             this.movementAuthorityProvider = serviceProvider.GetRequiredService<IMovementAuthorityProvider>();
             this.movementAuthorityTracker = serviceProvider.GetRequiredService<IMovementAuthorityTracker>();
-
-            DriverAppSender = A.Fake<IDriverAppSender>();
+            this.serviceProvider = serviceProvider;
         }
         
         public MovementAuthority? PostValidMovementAuthorityRequest(MovementAuthorityRequest request)
@@ -71,9 +69,8 @@ namespace EtcsServerTests.Helpers
         {
             ActionResult response = unityAppController.ChangeSwitchState(
                 new JunctionStateChange() { JunctionId = switchId, Straight = isGoingStraight },
-                movementAuthorityValidator,
-                movementAuthorityProvider,
-                DriverAppSender
+                serviceProvider.GetRequiredService<ISwitchStates>(),
+                serviceProvider.GetRequiredService<ISwitchDirectionStates>()
             ).Result;
 
             Assert.True(response is OkResult);
@@ -83,9 +80,7 @@ namespace EtcsServerTests.Helpers
         {
             ActionResult response = unityAppController.ChangeCrossingState(
                 crossingId, isFunctional,
-                movementAuthorityValidator,
-                movementAuthorityProvider,
-                DriverAppSender
+                serviceProvider.GetRequiredService<ICrossingStates>()
             ).Result;
 
             Assert.True(response is OkResult);
@@ -95,9 +90,7 @@ namespace EtcsServerTests.Helpers
         {
             ActionResult response = unityAppController.ChangeRailwaySignalState(
                 new SignalStateChange() { SemaphoreId = railwaySignalId, Go = isGoMessage },
-                movementAuthorityValidator,
-                movementAuthorityProvider,
-                DriverAppSender
+                serviceProvider.GetRequiredService<IRailwaySignalStates>()
             ).Result;
 
             Assert.True(response is OkResult);

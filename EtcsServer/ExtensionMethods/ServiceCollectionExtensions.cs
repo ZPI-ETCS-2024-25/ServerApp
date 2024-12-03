@@ -43,6 +43,7 @@ namespace EtcsServer.ExtensionMethods
 
             services.AddSingleton<IRailwaySignalHelper, RailwaySignalHelper>();
             services.AddSingleton<ITrackHelper, TrackHelper>();
+            services.AddSingleton<IDriverAppSenderHelper, DriverAppSenderHelper>();
 
             services.AddSingleton<IMovementAuthorityValidator, MovementAuthorityValidator>();
             services.AddSingleton<IMovementAuthorityProvider, MovementAuthorityProvider>();

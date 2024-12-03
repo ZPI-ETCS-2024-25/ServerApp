@@ -7,9 +7,8 @@ namespace EtcsServer.InMemoryData.Contract
     {
         void SetActiveMovementAuthority(string trainId, MovementAuthority movementAuthority, List<TrackageElement> trackageElements);
         MovementAuthority? GetActiveMovementAuthority(string trainId);
-        List<(string, MovementAuthority)> GetActiveMovementAuthorities();
-        List<(string, MovementAuthority)> GetMovementAuthoritiesImpactedBySwitch(int switchId);
-        List<(string, MovementAuthority)> GetMovementAuthoritiesImpactedByCrossing(int crossingId);
-        List<(string, MovementAuthority)> GetMovementAuthoritiesImpactedByRailwaySignal(int signalId);
+        List<string> GetTrainsImpactedBySwitch(int switchId);
+        List<string> GetTrainsImpactedByCrossing(int crossingId);
+        List<string> GetTrainsImpactedByRailwaySignal(int signalId);
     }
 }

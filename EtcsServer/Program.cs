@@ -101,6 +101,7 @@ namespace EtcsServer
 
                 scope.ServiceProvider.GetRequiredService<IRailwaySignalHelper>();
                 scope.ServiceProvider.GetRequiredService<ITrackHelper>();
+                scope.ServiceProvider.GetRequiredService<IDriverAppSenderHelper>();
 
                 scope.ServiceProvider.GetRequiredService<IMovementAuthorityValidator>();
                 scope.ServiceProvider.GetRequiredService<IMovementAuthorityProvider>();

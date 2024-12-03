@@ -42,12 +42,7 @@ namespace EtcsServer.InMemoryData
             return trainToMovementAuthority[trainId];
         }
 
-        public List<(string, MovementAuthority)> GetActiveMovementAuthorities()
-        {
-            return trainToMovementAuthority.Select(kvp => (kvp.Key, kvp.Value)).ToList();
-        }
-
-        public List<(string, MovementAuthority)> GetMovementAuthoritiesImpactedBySwitch(int switchId)
+        public List<string> GetTrainsImpactedBySwitch(int switchId)
         {
             List<string> impactedTrains = trainToMovementAuthority.Where(kvp => trainToTrackageElements[kvp.Key].Any(t => t.TrackageElementId == switchId))
                 .Select(kvp => kvp.Key)
@@ -58,11 +53,10 @@ namespace EtcsServer.InMemoryData
             return impactedTrains
                 .Where(trainId => currentPositions[trainId] != null)
                 .Where(trainId => trainToTrackageElements[trainId].FindIndex(t => t.TrackageElementId == currentPositions[trainId]!.TrackageElementId) < trainToTrackageElements[trainId].FindIndex(t => t.TrackageElementId == switchId))
-                .Select(trainId => (trainId, trainToMovementAuthority[trainId]))
                 .ToList();
         }
 
-        public List<(string, MovementAuthority)> GetMovementAuthoritiesImpactedByCrossing(int crossingId)
+        public List<string> GetTrainsImpactedByCrossing(int crossingId)
         {
             Dictionary<int, double> affectedTracksToDistances = crossingTracksHolder.GetValues().Values
                 .Where(crossingTrack => crossingTrack.CrossingId == crossingId)
@@ -93,10 +87,10 @@ namespace EtcsServer.InMemoryData
                                     .Any(e => affectedTracks.Contains(e.TrackageElementId)))
                 .ToList();
             
-            return trainsImpactedOnCurrentTrack.Concat(trainImpactedOnFutureTracks).Select(trainId => (trainId, trainToMovementAuthority[trainId])).ToList();
+            return trainsImpactedOnCurrentTrack.Concat(trainImpactedOnFutureTracks).ToList();
         }
 
-        public List<(string, MovementAuthority)> GetMovementAuthoritiesImpactedByRailwaySignal(int signalId)
+        public List<string> GetTrainsImpactedByRailwaySignal(int signalId)
         {
             RailwaySignal railwaySignal = railwaySignalHolder.GetValues()[signalId];
 
@@ -124,7 +118,7 @@ namespace EtcsServer.InMemoryData
                                     .Any(e => e.TrackageElementId == railwaySignal.TrackId))
                 .ToList();
 
-            return trainsImpactedOnCurrentTrack.Concat(trainImpactedOnFutureTracks).Select(trainId => (trainId, trainToMovementAuthority[trainId])).ToList();
+            return trainsImpactedOnCurrentTrack.Concat(trainImpactedOnFutureTracks).ToList();
         }
     }
 }

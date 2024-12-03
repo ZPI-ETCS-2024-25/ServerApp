@@ -1,29 +1,9 @@
-﻿using Azure.Core;
-using EtcsServer.Controllers;
-using EtcsServer.Database.Entity;
-using EtcsServer.DecisionExecutors;
-using EtcsServer.DecisionExecutors.Contract;
-using EtcsServer.DecisionMakers.Contract;
-using EtcsServer.DriverAppDto;
-using EtcsServer.DriverDataCollectors.Contract;
-using EtcsServer.InMemoryData;
+﻿using EtcsServer.DriverAppDto;
 using EtcsServer.InMemoryData.Contract;
-using EtcsServer.InMemoryHolders;
-using EtcsServer.MapLoading;
-using EtcsServer.Security;
-using EtcsServer.Senders;
-using EtcsServer.Senders.Contracts;
 using EtcsServerTests.Helpers;
 using EtcsServerTests.TestMaps;
 using FakeItEasy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static EtcsServer.Controllers.UnityAppController;
 
 namespace EtcsServerTests.Tests
 {
@@ -695,7 +675,7 @@ namespace EtcsServerTests.Tests
 
         private void PrepareFakeMessageSender(FakeMessageToDriver messageToDriver)
         {
-            A.CallTo(() => testRequestSender.DriverAppSender.SendNewMovementAuthority(Train.TrainId, A<MovementAuthority>.Ignored))
+            A.CallTo(() => testMap.DriverAppSender.SendNewMovementAuthority(Train.TrainId, A<MovementAuthority>.Ignored))
                 .ReturnsLazily((string trainId, MovementAuthority movementAuthority) =>
                 {
                     messageToDriver.Timestamp = DateTime.Now;
