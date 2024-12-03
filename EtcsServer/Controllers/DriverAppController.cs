@@ -28,7 +28,7 @@ namespace EtcsServer.Controllers
         public async Task<ActionResult> RegisterTrain(EncryptedMessage encryptedMessage, [FromServices] IRegisteredTrainsTracker registeredTrainsTracker)
         {
             TrainDto train = securityManager.Decrypt<TrainDto>(encryptedMessage.Content);
-            _logger.LogInformation("Received register request for train {}", train.TrainId);
+            _logger.LogInformation("Received register request for train {TrainId}", train.TrainId);
             bool result = registeredTrainsTracker.Register(train);
             if (result)
                 return Ok(GetEncryptedResponse(new RegisterTrainResponse()));
@@ -40,7 +40,7 @@ namespace EtcsServer.Controllers
         public async Task<ActionResult> UpdateTrainData(EncryptedMessage encryptedMessage, [FromServices] IRegisteredTrainsTracker registeredTrainsTracker)
         {
             UpdateTrain updateTrain = securityManager.Decrypt<UpdateTrain>(encryptedMessage.Content);
-            _logger.LogInformation("Received train data update request for train {}", updateTrain.TrainId);
+            _logger.LogInformation("Received train data update request for train {TrainId}", updateTrain.TrainId);
             bool result = registeredTrainsTracker.Update(updateTrain);
             return result ? Ok() : BadRequest();
         }
@@ -49,7 +49,7 @@ namespace EtcsServer.Controllers
         public async Task<ActionResult> UnregisterTrain(EncryptedMessage encryptedMessage, [FromServices] IRegisteredTrainsTracker registeredTrainsTracker)
         {
             UnregisterRequest unregisterRequest = securityManager.Decrypt<UnregisterRequest>(encryptedMessage.Content);
-            _logger.LogInformation("Received train unregister request for train {}", unregisterRequest.TrainId);
+            _logger.LogInformation("Received train unregister request for train {TrainId}", unregisterRequest.TrainId);
             bool result = registeredTrainsTracker.Unregister(unregisterRequest.TrainId);
             return result ? Ok(GetEncryptedResponse(new UnregisterTrainResponse())) : BadRequest(GetEncryptedResponse(new UnregisterTrainResponse()));
         }
@@ -58,7 +58,7 @@ namespace EtcsServer.Controllers
         public async Task<ActionResult> UpdateTrainPosition(EncryptedMessage encryptedMessage, [FromServices] ITrainPositionTracker positionsTracker)
         {
             TrainPosition trainPosition = securityManager.Decrypt<TrainPosition>(encryptedMessage.Content);
-            _logger.LogInformation("Received train position for train {}: {}", trainPosition.TrainId, trainPosition.Kilometer);
+            _logger.LogInformation("Received train position for train {TrainId}: {Kilometer}", trainPosition.TrainId, trainPosition.Kilometer);
             positionsTracker.RegisterTrainPosition(trainPosition);
             return Ok(GetEncryptedResponse(new JsonResponse() { message = "Server received the location of train with id " + trainPosition.TrainId}));
         }
@@ -72,11 +72,16 @@ namespace EtcsServer.Controllers
             )
         {
             MovementAuthorityRequest movementAuthorityRequest = securityManager.Decrypt<MovementAuthorityRequest>(encryptedMessage.Content);
-            _logger.LogInformation("Received movement authority request for train {}", movementAuthorityRequest.TrainId);
+            _logger.LogInformation("Received movement authority request for train {TrainId}", movementAuthorityRequest.TrainId);
 
             MovementAuthorityValidationOutcome validationOutcome = movementAuthorityValidator.IsTrainValidForMovementAuthority(movementAuthorityRequest.TrainId);
             if (validationOutcome.Result != MovementAuthorityValidationResult.OK)
-                return BadRequest(GetEncryptedResponse(new JsonResponse() { message = $"Train with id {movementAuthorityRequest.TrainId} is not valid to receive movement authority: {validationOutcome.Result}" }));
+            {
+                var responseObj = new JsonResponse() { message = $"Train with id {movementAuthorityRequest.TrainId} is not valid to receive movement authority: {validationOutcome.Result}" };
+                _logger.LogInformation("Sending movement authority bad response: {MaResponse}", JsonSerializer.Serialize(responseObj));
+                return BadRequest(GetEncryptedResponse(responseObj));
+
+            }
 
             MovementAuthority movementAuthority = validationOutcome.NextStopSignal == null ?
                 movementAuthorityProvider.ProvideMovementAuthorityToEtcsBorder(movementAuthorityRequest.TrainId) :
@@ -84,6 +89,7 @@ namespace EtcsServer.Controllers
 
             MovementAuthorityWithTimestamp response = new MovementAuthorityWithTimestamp(movementAuthority);
 
+            _logger.LogInformation("Sending movement authority valid response: {MaResponse}", JsonSerializer.Serialize(response));
             return Ok(GetEncryptedResponse(response));                
         }
 
@@ -91,7 +97,7 @@ namespace EtcsServer.Controllers
         public async Task<ActionResult> PostTrainSpeed(EncryptedMessage encryptedMessage)
         {
             TrainSpeed trainSpeed = securityManager.Decrypt<TrainSpeed>(encryptedMessage.Content);
-            _logger.LogInformation("Received train speed ({}) for train {}", trainSpeed.Speed, trainSpeed.TrainId);
+            _logger.LogInformation("Received train speed ({TrainSpeed}) for train {TrainId}", trainSpeed.Speed, trainSpeed.TrainId);
             return Ok();
         }
 

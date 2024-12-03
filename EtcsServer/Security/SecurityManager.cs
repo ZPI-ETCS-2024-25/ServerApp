@@ -2,18 +2,21 @@
 using Microsoft.Extensions.Options;
 using System.Buffers.Text;
 using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 
 namespace EtcsServer.Security
 {
     public class SecurityManager : ISecurityManager
     {
+        private readonly ILogger<SecurityManager> logger;
         private readonly IOptions<SecurityConfiguration> securityConfiguration;
         private byte[] key;
         private byte[] iv;
 
-        public SecurityManager(IOptions<SecurityConfiguration> securityConfiguration)
+        public SecurityManager(ILogger<SecurityManager> logger, IOptions<SecurityConfiguration> securityConfiguration)
         {
+            this.logger = logger;
             this.securityConfiguration = securityConfiguration;
             this.key = Convert.FromBase64String(securityConfiguration.Value.Base64EncodedAesKey);
             this.iv = Convert.FromBase64String(securityConfiguration.Value.Base64EncodedInitialisationVector);
@@ -27,6 +30,8 @@ namespace EtcsServer.Security
 
         public string Encrypt(string plainText)
         {
+            logger.LogInformation("Trying to encrypt text {Plaintext}", plainText);
+
             if (plainText == null || plainText.Length <= 0)
                 return string.Empty;
 
@@ -52,7 +57,9 @@ namespace EtcsServer.Security
                 }
             }
 
-            return Convert.ToBase64String(encrypted);
+            var encoded = Convert.ToBase64String(encrypted);
+            logger.LogInformation("Encrypted result is {EncryptedText}", encoded);
+            return encoded;
         }
 
         public T Decrypt<T>(string ciphertext)
@@ -63,6 +70,8 @@ namespace EtcsServer.Security
 
         public string Decrypt(string encodedCiphertext)
         {
+            logger.LogInformation("Trying to decrypt ciphertext {Ciphertext}", encodedCiphertext);
+
             byte[] cipherText = Convert.FromBase64String(encodedCiphertext);
             if (cipherText == null || cipherText.Length <= 0)
                 return string.Empty;
@@ -89,6 +98,7 @@ namespace EtcsServer.Security
                 }
             }
 
+            logger.LogInformation("Decrypted plaintext is {Plaintext}", plaintext);
             return plaintext;
         }
     }
