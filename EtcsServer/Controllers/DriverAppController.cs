@@ -6,7 +6,6 @@ using EtcsServer.InMemoryData.Contract;
 using EtcsServer.Security;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
-using static EtcsServer.Controllers.TestController;
 using static EtcsServer.DecisionMakers.Contract.MovementAuthorityValidationOutcome;
 
 namespace EtcsServer.Controllers
@@ -15,10 +14,10 @@ namespace EtcsServer.Controllers
     [Route("/")]
     public class DriverAppController : ControllerBase
     {
-         private readonly ILogger<TestController> _logger;
+         private readonly ILogger<DriverAppController> _logger;
          private readonly ISecurityManager securityManager;
 
-        public DriverAppController(ILogger<TestController> logger, ISecurityManager securityManager)
+        public DriverAppController(ILogger<DriverAppController> logger, ISecurityManager securityManager)
         {
             _logger = logger;
             this.securityManager = securityManager;
