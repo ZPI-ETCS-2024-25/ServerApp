@@ -79,7 +79,7 @@ namespace EtcsServerTests.Helpers
         public void ImitateReceivingCrossingStateFromUnity(int crossingId, bool isFunctional)
         {
             ActionResult response = unityAppController.ChangeCrossingState(
-                crossingId, isFunctional,
+                new CrossingStateChange() { CrossingId = crossingId, IsFunctional = isFunctional },
                 serviceProvider.GetRequiredService<ICrossingStates>()
             ).Result;
 

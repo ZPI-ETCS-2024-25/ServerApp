@@ -40,8 +40,9 @@ namespace EtcsServer.Controllers
         }
 
         [HttpPost("crossingState")]
-        public async Task<ActionResult> ChangeCrossingState(int crossingId, bool isFunctional, [FromServices] ICrossingStates crossingStates)
+        public async Task<ActionResult> ChangeCrossingState(CrossingStateChange crossingStateChange, [FromServices] ICrossingStates crossingStates)
         {
+            (int crossingId, bool isFunctional) = (crossingStateChange.CrossingId, crossingStateChange.IsFunctional);
             bool isCurrentlyFunctional = crossingStates.GetCrossingState(crossingId);
             if (isCurrentlyFunctional != isFunctional)
             {
