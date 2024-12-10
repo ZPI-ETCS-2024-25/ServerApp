@@ -90,6 +90,7 @@ namespace EtcsServer
                 scope.ServiceProvider.GetRequiredService<IHolder<RailroadSign>>();
                 scope.ServiceProvider.GetRequiredService<IHolder<RailwaySignal>>();
                 scope.ServiceProvider.GetRequiredService<IHolder<SwitchRoute>>();
+                scope.ServiceProvider.GetRequiredService<IHolder<SwitchDirection>>();
                 scope.ServiceProvider.GetRequiredService<IHolder<Track>>();
                 scope.ServiceProvider.GetRequiredService<IHolder<TrackageElement>>();
 
