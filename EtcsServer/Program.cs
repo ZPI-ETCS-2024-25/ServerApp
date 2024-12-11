@@ -30,11 +30,6 @@ namespace EtcsServer
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            //var connectionString = builder.Configuration.GetConnectionString("EtcsDbConnectionString");
-            //builder.Services.AddDbContext<EtcsDbContext>(options =>
-            //{
-            //    options.UseSqlServer(connectionString);
-            //});
             builder.Services.AddDbContext<EtcsDbContext>(options =>
             {
                 options.UseInMemoryDatabase("EtcsInMemoryDatabase");
